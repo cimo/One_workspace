@@ -1,0 +1,33 @@
+ARG NODEJS_VERSION
+
+FROM node:${NODEJS_VERSION}
+
+ARG PATH_ROOT
+ARG TIMEZONE
+ARG NODEJS_PORT_HTTP
+ARG NODEJS_PORT_HTTPS
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV DEBCONF_NOWARNINGS=yes
+ENV NODE_ENV=production
+
+COPY ${PATH_ROOT}/certificate/. /etc/certificate/
+
+# System
+RUN cd ~ \
+&& apt-get update && apt-get install -y --no-install-recommends \
+sudo \
+nano \
+tzdata \
+# Time
+&& ln -sf /usr/share/zoneinfo/${TIMEZONE} /etc/localtime \
+&& dpkg-reconfigure -f noninteractive tzdata \
+# Npm
+&& npm install -g pm2 \
+# Clean
+&& rm -rf /var/lib/apt/lists/* \
+&& apt-get clean -y \
+&& apt-get autoclean -y \
+&& apt-get autoremove -y
+
+EXPOSE ${NODEJS_PORT_HTTP} ${NODEJS_PORT_HTTPS}

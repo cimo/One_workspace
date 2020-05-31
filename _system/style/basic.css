@@ -1,0 +1,46 @@
+body {
+	background: #000000;
+}
+
+a, p, li {
+	color: #c6c6c6;
+	text-decoration: none;
+}
+
+a:hover {
+	color: #ff0000;
+}
+
+li {
+    margin: 10px 0 10px 0;
+}
+
+td {
+    vertical-align: top;
+}
+
+iframe {
+
+    width: 100%;
+    height: calc(50vh - 20px);
+}
+
+.title {
+    list-style-type: none; 
+}
+
+.column_left {
+    width: 20%;
+}
+.column_right {
+    width: 80%;
+}
+
+.logo_background {
+    z-index: -1;
+    position: fixed;
+    right: 10px;
+    bottom: 10px;
+    opacity: 0.3;
+    width: 200px;
+}

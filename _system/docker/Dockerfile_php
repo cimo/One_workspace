@@ -1,0 +1,145 @@
+ARG PHP_VERSION
+
+FROM php:${PHP_VERSION}-fpm
+
+ARG USER_NAME
+ARG USER_PASSWORD
+ARG WWW_USER_NAME
+ARG WWW_USER_PASSWORD
+ARG WEB_USER_GROUP
+ARG PATH_ROOT
+ARG TIMEZONE
+ARG SSH_GROUP
+ARG SSH_PORT
+ARG PHP_PORT_FPM
+ARG PHP_PORT_XDEBUG
+ARG PHP_PATH_ROOT
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV DEBCONF_NOWARNINGS=yes
+
+COPY ${PATH_ROOT}/zz-docker.conf ${PHP_PATH_ROOT}/php-fpm.d/zz-docker.conf
+COPY ${PATH_ROOT}/override.ini ${PHP_PATH_ROOT}/php/conf.d/override.ini
+COPY ${PATH_ROOT}/sshd_config /etc/ssh/sshd_config
+COPY ${PATH_ROOT}/entrypoint_php.sh /usr/local/bin/entrypoint.sh
+COPY ${PATH_ROOT}/key/id_rsa /tmp/key/id_rsa
+COPY ${PATH_ROOT}/key/authorized_keys /tmp/key/authorized_keys
+
+# System
+RUN cd ~ \
+&& mkdir /var/run/sshd \
+&& chmod +x /usr/local/bin/entrypoint.sh \
+&& cp ${PHP_PATH_ROOT}/php/php.ini-production ${PHP_PATH_ROOT}/php/php.ini \
+&& apt-get update && apt-get install -y --no-install-recommends \
+sudo \
+nano \
+tzdata \
+make \
+openssh-server \
+git \
+zip \
+unzip \
+cron \
+wget \
+libfreetype6-dev \
+libjpeg-dev \
+libpng-dev \
+libssl-dev \
+libssh2-1-dev \
+libicu-dev \
+libzip-dev \
+zlib1g-dev \
+libxml2-dev \
+libpq-dev \
+# Group
+&& addgroup sftp \
+# User sudo
+&& useradd --home /home/${USER_NAME} --gid sudo --shell /bin/bash -m ${USER_NAME} \
+&& echo "${USER_NAME}:${USER_PASSWORD}" | chpasswd \
+&& echo "${USER_NAME} ALL=(ALL:ALL) NOPASSWD: ALL" >> /etc/sudoers \
+&& mkdir /home/${USER_NAME}/.ssh \
+&& cp /tmp/key/id_rsa /home/${USER_NAME}/.ssh/id_rsa \
+&& cp /tmp/key/authorized_keys /home/${USER_NAME}/.ssh/authorized_keys \
+&& chmod 700 /home/${USER_NAME}/.ssh \
+&& chmod 600 /home/${USER_NAME}/.ssh/id_rsa \
+&& chmod 600 /home/${USER_NAME}/.ssh/authorized_keys \
+&& chown -R ${USER_NAME}:sudo /home/${USER_NAME}/.ssh \
+# User www
+&& useradd --home /home/${WWW_USER_NAME} --gid ${WEB_USER_GROUP} --groups ${SSH_GROUP} --shell /bin/false -m ${WWW_USER_NAME} \
+&& echo "${WWW_USER_NAME}:${WWW_USER_PASSWORD}" | chpasswd \
+&& chown root:root /home/${WWW_USER_NAME} \
+&& mkdir /home/${WWW_USER_NAME}/.ssh \
+&& cp /tmp/key/id_rsa /home/${WWW_USER_NAME}/.ssh/id_rsa \
+&& cp /tmp/key/authorized_keys /home/${WWW_USER_NAME}/.ssh/authorized_keys \
+&& chmod 700 /home/${WWW_USER_NAME}/.ssh \
+&& chmod 600 /home/${WWW_USER_NAME}/.ssh/id_rsa \
+&& chmod 600 /home/${WWW_USER_NAME}/.ssh/authorized_keys \
+&& chown -R ${WWW_USER_NAME}:${WEB_USER_GROUP} /home/${WWW_USER_NAME}/.ssh \
+&& mkdir /home/${WWW_USER_NAME}/www \
+# Time
+&& ln -sf /usr/share/zoneinfo/${TIMEZONE} /etc/localtime \
+&& dpkg-reconfigure -f noninteractive tzdata \
+# Extension
+&& cd /tmp \
+&& git clone https://git.php.net/repository/pecl/networking/ssh2.git \
+&& cd /tmp/ssh2 \
+&& phpize \
+&& ./configure \
+&& make \
+&& make install \
+&& echo "extension=ssh2.so" >> ${PHP_PATH_ROOT}/php/conf.d/ext-ssh2.ini \
+&& rm -rf /tmp/ssh2 \
+&& cd ~ \
+&& pecl install apcu \
+&& pecl install xdebug \
+&& docker-php-ext-configure gd --with-freetype --with-jpeg \
+&& docker-php-ext-install gd \
+&& docker-php-ext-install intl \
+&& docker-php-ext-install opcache \
+&& docker-php-ext-install zip \
+&& docker-php-ext-install pdo_mysql \
+&& docker-php-ext-install pdo_pgsql \
+&& docker-php-ext-enable apcu \
+&& docker-php-ext-enable xdebug \
+# Ini file setting
+&& echo "opcache.enable=1 \n \
+opcache.memory_consumption=256 \n \
+opcache.max_accelerated_files=20000 \n \
+opcache.revalidate_freq=0 \n \
+opcache.validate_timestamps=0 \n \
+opcache.interned_strings_buffer=16 \n \
+opcache.fast_shutdown=1" >> ${PHP_PATH_ROOT}/php/conf.d/docker-php-ext-opcache.ini \
+&& echo "xdebug.remote_enable=on \n \
+xdebug.remote_handler=dbgp \n \
+xdebug.remote_mode=req \n \
+xdebug.remote_host=php_container \n \
+xdebug.remote_port=9999 \n \
+xdebug.remote_log=/tmp/xdebug.log \n \
+xdebug.max_nesting_level=1000" >> ${PHP_PATH_ROOT}/php/conf.d/docker-php-ext-xdebug.ini \
+# Composer
+&& curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
+# NodeJs
+&& curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash - \
+&& apt-get install -y --no-install-recommends nodejs \
+&& npm update -g npm \
+## Npm
+&& npm install -g terser \
+&& npm install -g sass \
+#&& wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add \
+#&& echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list \
+#&& apt-get update \
+#&& apt-get install -y --no-install-recommends google-chrome-stable \
+#&& npm install -g selenium-side-runner --unsafe-perm=true --allow-root \
+#&& npm install -g chromedriver --unsafe-perm=true --allow-root \
+#&& npm install -g geckodriver --unsafe-perm=true --allow-root \
+# Clean
+&& pecl clear-cache \
+&& rm -rf /var/lib/apt/lists/* \
+&& apt-get clean -y \
+&& apt-get autoclean -y \
+&& apt-get autoremove -y \
+&& rm -rf /tmp/key
+
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+
+EXPOSE ${SSH_PORT} ${PHP_PORT_FPM} ${PHP_PORT_XDEBUG}

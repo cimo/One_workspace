@@ -1,0 +1,22 @@
+{
+    "name": "NodeJs_example",
+    "version": "1.0.0",
+    "author": "cimo",
+    "description": "NodeJs example",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/cimo/one_workspace"
+    },
+    "dependencies": {
+        "express": "4.17.1",
+        "pug": "3.0.0",
+        "body-parser": "1.19.0",
+        "cookie-parser": "1.4.5",
+        "csurf": "1.11.0",
+        "http-auth": "4.1.2",
+        "canvas": "2.6.1",
+        "jszip": "3.4.0"
+    },
+    "peerDependencies": {}
+}
