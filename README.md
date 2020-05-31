@@ -1,37 +1,26 @@
-Material design sk
+One workspace
 ==============
 
-Starter kit with material design components.
+One workspace for all your delevelop.
 
-All folders are organize for easy and fast develop.
+Is a docker service container for have in one space a large and complete develop tolls that look and work in same way on all machine.
 
 | Info: |
 |:---|
-| Cross browser and responsive (Chrome, Firefox, Edge, Opera, Safari) |
-| Cross platform (Windows, Linux, Mac, Android, Ios) |
+| Ui tolls for increase your productivity (Work in progress...) |
+| Cross platform (Windows docker, Linux docker, Mac docker) |
 
 | Elements: |
 |:---|
-| Button |
-| Card |
-| Chip |
-| Dialog |
-| Checkbox |
-| Radio button |
-| Select |
-| Slider |
-| Switch |
-| Text field |
-| Linear progress |
-| List |
-| Menu |
-| Snackbar |
-| Tab |
-| Datepicker |
+| Php 7.4 |
+| Apache 2.4 |
+| NodeJs 12 |
+| MySql 5.7 |
+| PostgreSql 10 |
 
 | Library: |
 |:---|
-| Material design web - https://material.io/develop/web |
+| Docker - https://www.docker.com/ |
 
 <b>By CIMO - https://reinventsoftware.org</b>
 
