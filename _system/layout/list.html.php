@@ -1,7 +1,7 @@
 <?php
 ob_start();
-include_once("_system/layout/list_custom.html.php");
-$layoutCustomListContent = ob_get_contents();
+include_once("_system/layout/custom/list.html.php");
+$layoutCustomContent = ob_get_contents();
 ob_end_clean();
 
 $html = <<<XYZ
@@ -36,7 +36,7 @@ $html = <<<XYZ
             </div>
         </li>
     </ul>
-    {$layoutCustomListContent}
+    {$layoutCustomContent}
 </nav>
 XYZ;
 echo $html;
