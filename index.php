@@ -4,8 +4,7 @@ $headerCsp = "Content-Security-Policy: script-src 'strict-dynamic' 'nonce-{$nonc
 header($headerCsp);
 
 $layoutInfoContent = "";
-$layoutListLs1Content = "";
-$layoutListLs2Content = "";
+$layoutListContent = "";
 $layoutQunitContent = "";
 
 ob_start();
@@ -27,7 +26,7 @@ $html = <<<XYZ
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <title>Workspace</title>
+        <title>One workspace</title>
 
         <!-- Meta -->
         <meta charset="utf-8"/>

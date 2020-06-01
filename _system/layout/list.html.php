@@ -1,4 +1,9 @@
 <?php
+ob_start();
+include_once("_system/layout/list_custom.html.php");
+$layoutCustomListContent = ob_get_contents();
+ob_end_clean();
+
 $html = <<<XYZ
 <div>
     <button class="command" data-event="opcache">OPcache</button>
@@ -7,15 +12,6 @@ $html = <<<XYZ
     <ul>
     	<li><a href="https://www.google.com" target="_blank">Google</a></li>
     	<br>
-		<li class="title"><b>GitLab:</b></li>
-		<li>
-			<a href="https://localhost/project/reinvent_software/root/symfony_fw/public/index.php" target="_blank">Reinvent software</a>
-            <div>
-                <button class="command" data-event="sass" data-path="project/reinvent_software/root/symfony_fw/public">Sass</button>
-                <button class="command" data-event="terser" data-path="project/reinvent_software/root/symfony_fw/public">Terser</button>
-            </div>
-		</li>
-		<br>
         <li class="title"><b>GitHub:</b></li>
         <li><a href="https://localhost:1443" target="_blank">TensorFlowJs example</a></li>
         <li>
@@ -40,6 +36,7 @@ $html = <<<XYZ
             </div>
         </li>
     </ul>
+    {$layoutCustomListContent}
 </nav>
 XYZ;
 echo $html;
