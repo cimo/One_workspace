@@ -46,9 +46,7 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
-# cimo
-error.log
-project
+# cimo +
 _system/bash/custom/*
 !_system/bash/custom/.gitkeep
 _system/images/custom/*
@@ -61,3 +59,5 @@ _system/style/custom/*
 !_system/style/custom/.gitkeep
 _system/virtual_host/custom/*
 !_system/virtual_host/custom/.gitkeep
+error.log
+project

@@ -1,20 +1,22 @@
 ChallengeResponseAuthentication no
 UsePAM no
 PrintMotd no
+
 X11Forwarding no
 AllowTcpForwarding no
 AllowAgentForwarding no
 PermitTunnel no
 PermitRootLogin no
 PasswordAuthentication no
-Subsystem sftp internal-sftp
 
-Match Group sftp
+Subsystem sftp internal-sftp
+	Match Group sftp
 	ChrootDirectory %h
+	ForceCommand internal-sftp
+	
 	X11Forwarding no
 	AllowTcpForwarding no
 	AllowAgentForwarding no
 	PermitTunnel no
-	#ForceCommand internal-sftp
 	PermitRootLogin no
 	PasswordAuthentication no

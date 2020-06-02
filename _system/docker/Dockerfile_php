@@ -21,9 +21,9 @@ ENV DEBCONF_NOWARNINGS=yes
 COPY ${PATH_ROOT}/zz-docker.conf ${PHP_PATH_ROOT}/php-fpm.d/zz-docker.conf
 COPY ${PATH_ROOT}/override.ini ${PHP_PATH_ROOT}/php/conf.d/override.ini
 COPY ${PATH_ROOT}/sshd_config /etc/ssh/sshd_config
-COPY ${PATH_ROOT}/entrypoint_php.sh /usr/local/bin/entrypoint.sh
 COPY ${PATH_ROOT}/key/id_rsa /tmp/key/id_rsa
 COPY ${PATH_ROOT}/key/authorized_keys /tmp/key/authorized_keys
+COPY ${PATH_ROOT}/entrypoint_php.sh /usr/local/bin/entrypoint.sh
 
 # System
 RUN cd ~ \
