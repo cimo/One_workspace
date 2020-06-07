@@ -18,8 +18,8 @@ $layoutListContent = ob_get_contents();
 ob_end_clean();
 
 ob_start();
-include_once("_system/layout/qunit.html.php");
-$layoutQunitContent = ob_get_contents();
+include_once("_system/layout/custom.html.php");
+$layoutCustomContent = ob_get_contents();
 ob_end_clean();
 
 $html = <<<XYZ
@@ -50,7 +50,7 @@ $html = <<<XYZ
                 </td>
                 <td class="column_right">
                     {$layoutInfoContent}
-                    {$layoutQunitContent}
+                    {$layoutCustomContent}
                 </td>
             </tr>
         </table>

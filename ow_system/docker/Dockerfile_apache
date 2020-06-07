@@ -1,16 +1,22 @@
-ARG NODEJS_VERSION
+ARG APACHE_VERSION
 
-FROM node:${NODEJS_VERSION}
+FROM httpd:${APACHE_VERSION}
 
+ARG WWW_USER_NAME
+ARG WWW_USER_PASSWORD
+ARG WEB_USER_GROUP
 ARG PATH_ROOT
 ARG TIMEZONE
-ARG NODEJS_PORT_HTTP
-ARG NODEJS_PORT_HTTPS
+ARG APACHE_PORT_HTTP
+ARG APACHE_PORT_HTTPS
+ARG APACHE_PATH_ROOT
+ARG PHP5_PORT_FPM
+ARG PHP7_PORT_FPM
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV DEBCONF_NOWARNINGS=yes
-ENV NODE_ENV=production
 
+COPY ${PATH_ROOT}/httpd.conf ${APACHE_PATH_ROOT}/conf/httpd.conf
 COPY ${PATH_ROOT}/certificate/. /etc/certificate/
 
 # System
@@ -22,12 +28,10 @@ tzdata \
 # Time
 && ln -sf /usr/share/zoneinfo/${TIMEZONE} /etc/localtime \
 && dpkg-reconfigure -f noninteractive tzdata \
-# Npm
-&& npm install -g pm2 \
 # Clean
 && rm -rf /var/lib/apt/lists/* \
 && apt-get clean -y \
 && apt-get autoclean -y \
 && apt-get autoremove -y
 
-EXPOSE ${NODEJS_PORT_HTTP} ${NODEJS_PORT_HTTPS}
+EXPOSE ${APACHE_PORT_HTTP} ${APACHE_PORT_HTTPS}

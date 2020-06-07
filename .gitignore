@@ -61,3 +61,5 @@ _system/virtual_host/custom/*
 !_system/virtual_host/custom/.gitkeep
 error.log
 project
+ow_system/node_modules
+ow_system/dist
