@@ -1,8 +1,13 @@
 module.exports = {
     publicPath: "",
+    configureWebpack: {
+        mode: "development"
+    },
     devServer: {
         watchOptions: {
-            poll: true
+            ignored: /node_modules/,
+            aggregateTimeout: 300,
+            poll: 1000
         }
     }
 };
