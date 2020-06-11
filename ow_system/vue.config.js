@@ -4,6 +4,11 @@ module.exports = {
         mode: "development"
     },
     devServer: {
+        host: "0.0.0.0",
+        port: 8080,
+        https: true,
+        open: false,
+        hot: true,
         watchOptions: {
             ignored: /node_modules/,
             aggregateTimeout: 300,
