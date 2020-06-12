@@ -1,5 +1,5 @@
 <template>
-    <div id="timeDate_component" class="mainbar_element">
+    <div id="timeDate_component" class="mainbar_element root">
         <p>{{time}}</p>
         <p>{{date}}</p>
     </div>
@@ -49,9 +49,9 @@
 <style>
     #timeDate_component {
         width: 90px !important;
-        line-height: 15px !important;
+        padding-top: 6px !important;
     }
     #timeDate_component p {
-        font-size: 14px;
+        font-size: 12px;
     }
 </style>

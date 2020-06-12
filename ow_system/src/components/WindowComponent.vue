@@ -2,6 +2,7 @@
     <div id="window_component" class="window">
         <div class="header">
             <div class="left_column">
+                <img src="@/assets/images/empty.png"/>
                 <p>{{title}}</p>
             </div>
             <div class="right_column">
@@ -36,32 +37,49 @@
     }
 </script>
 
-<style scoped>
+<style>
     #window_component {
         display: none;
         position: fixed;
         width: 60%;
         height: 80%;
-        border: 1px solid #004172;
+        border: 1px solid #0078d7;
+        /*z-index: 5;*/
+    }
+    #window_component.focused {
+        /*z-index: 6;*/
     }
     
     #window_component .header {
         display: flex;
         justify-content: space-between;
-        background-color: #00aced;
-        height: 40px;
+        background-color: #0078d7;
+        height: 28px;
+    }
+    #window_component .header .left_column img {
+        width: 18px;
+        height: 18px;
+        margin: 5px;
     }
     #window_component .header .left_column p {
         color: #ffffff;
-        margin: 12px;
+        margin: 5px;
+        display: inline-block;
+        vertical-align: top;
     }
     #window_component .header .right_column .button {
-        width: 25px;
-        height: 25px;
+        width: 18px;
+        height: 18px;
         cursor: pointer;
-        margin: 7px;
+        padding: 5px 13px;
     }
-    
+    #window_component .header .right_column .button:hover {
+        background-color: #1a86db;
+    }
+    #window_component .header .right_column .button_close:hover {
+        background-color: #ff0000 !important;
+    }
+
     #window_component .body {
         background: #000000;
         height: calc(100% - 40px);

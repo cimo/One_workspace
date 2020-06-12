@@ -117,4 +117,9 @@
         font-family: Roboto,sans-serif;
         -webkit-font-smoothing: antialiased;
     }
+
+    p {
+        margin: 0;
+        padding: 0;
+    }
 </style>

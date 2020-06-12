@@ -1,5 +1,5 @@
 <template>
-    <div id="menuRoot_component" class="mainbar_element">
+    <div id="menuRoot_component" class="mainbar_element root">
         <img class="menuRoot_image" src="@/assets/images/menu_root.svg" alt="menu_root.svg"/>
         <div class="menuRoot_container">
             <div class="menuRoot_side">
@@ -14,19 +14,7 @@
                 <div class="program_container window_opener" data-name="Create project">
                     <div class="program">
                         <img src="@/assets/images/create_project.svg" alt="create_project.svg"/>
-                        <p>Generic</p>
-                    </div>
-                </div>
-                <div class="program_container window_opener" data-name="Symfony">
-                    <div class="program">
-                        <img src="@/assets/images/symfony.svg" alt="symfony.svg"/>
-                        <p>Symfony</p>
-                    </div>
-                </div>
-                <div class="program_container window_opener" data-name="Vuejs">
-                    <div class="program">
-                        <img src="@/assets/images/vuejs.svg" alt="vuejs.svg"/>
-                        <p>VueJs</p>
+                        <p>Create</p>
                     </div>
                 </div>
                 <p class="label">Tool</p>
@@ -118,27 +106,11 @@
         computed: {},
         methods: {
             findParent: Helper.findParent,
-            mainbarElementLogic: function(event) {
-                const findParentA = this.findParent(event.target, "mainbar_element");
-                const findParentB = this.findParent(event.target, "menuRoot_container");
-                const findParentC = this.findParent(event.target, "window_opener");
-                
-                this.mainbarElements.forEach((value) => {
-                    if (findParentA !== value)
-                        value.classList.remove("active");
-                });
-                
-                if (findParentA !== null && findParentB === null)
-                    findParentA.classList.toggle("active");
-                
-                if (findParentC !== null)
-                    findParentA.classList.remove("active");
-            },
             menuRootLogic: function(event) {
                 const findParentA = this.findParent(event.target, "menuRoot_container");
                 const findParentB = this.findParent(event.target, "window_opener");
                 
-                if (event.target.classList.contains("mainbar_element") === true || event.target.classList.contains("menuRoot_image") === true) {
+                if (event.target.classList.contains("root") === true || event.target.classList.contains("menuRoot_image") === true) {
                     if (this.menuRootContainer.style.display === "" || this.menuRootContainer.style.display === "none")
                         this.menuRootContainer.style.display = "block";
                     else
@@ -151,18 +123,15 @@
         data() {
             return {
                 body: null,
-                mainbarElements: [],
                 menuRootContainer: null
             };
         },
         created() {
             window.addEventListener("load", () => {
                 this.body = document.querySelector("body");
-                this.mainbarElements = document.querySelectorAll(".mainbar_element");
                 this.menuRootContainer = document.querySelector(".menuRoot_container");
                 
                 this.body.addEventListener("click", (event) => {
-                    this.mainbarElementLogic(event);
                     this.menuRootLogic(event);
                 }, {passive: true});
             });
@@ -189,7 +158,7 @@
     #menuRoot_component .menuRoot_container .menuRoot_side {
         position: fixed;
         width: 40px;
-        background: rgba(11, 31, 35, 0.80);
+        background: #1b5c8d;
         bottom: 40px;
         top: 100px;
         left: 0;
@@ -204,19 +173,18 @@
         width: 40px;
         height: 40px;
         cursor: pointer;
-        line-height: 40px;
     }
     #menuRoot_component .menuRoot_container .menuRoot_side .item_container .item:hover {
         background-color: #00aced;
     }
     #menuRoot_component .menuRoot_container .menuRoot_side .item_container .item img {
-        margin: 11px;
+        margin-top: 8px;
     }
 
     #menuRoot_component .menuRoot_container .menuRoot_panel {
         position: fixed;
         width: 340px;
-        background: rgba(11, 31, 35, 0.80);
+        background: #1b5c8d;
         bottom: 40px;
         top: 100px;
         left: 40px;
@@ -247,7 +215,7 @@
         background-color: #00aced;
     }
     #menuRoot_component .menuRoot_container .menuRoot_panel .program_container .program {
-        background-color: rgba(57, 63, 64, 0.70);
+        background-color: #0078d7;
         width: 100%;
         height: 100%;
         position: relative;

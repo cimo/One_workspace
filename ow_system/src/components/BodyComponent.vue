@@ -17,46 +17,72 @@
         methods: {
             findParent: Helper.findParent,
             windowLogic: function(event) {
-                const findParentA = this.findParent(event.target, "window_opener");
+                const findParent = this.findParent(event.target, "window_opener");
                 
-                if (findParentA !== null) {
-                    let name = findParentA.getAttribute("data-name");
+                if (findParent !== null) {
+                    let name = findParent.getAttribute("data-name");
                     
                     let windows = document.querySelectorAll(".window");
                     
                     let isOpen = false;
                     
-                    windows.forEach((value) => {
-                        if (name === value.getAttribute("data-origin"))
+                    windows.forEach((value, index) => {
+                        value.classList.remove("focused");
+                        value.style.zIndex = index + 1;
+
+                        if (name === value.getAttribute("data-origin")) {
                             isOpen = true;
+
+                            value.style.zIndex = windows.length + 1;
+                        }
                     });
                     
                     if (isOpen === false) {
                         let newWindowComponent = this.windowComponent.cloneNode(true);
                         document.querySelector("#body_component").appendChild(newWindowComponent);
-                        
-                        let title = newWindowComponent.querySelector(".left_column p");
-                        title.innerHTML = name;
-                        
+
                         newWindowComponent.setAttribute("data-origin", name);
                         newWindowComponent.style.display = "block";
-                        
-                        let leftColumn = document.querySelector("#footer_component .left_column");
-                        
-                        let alt = findParentA.querySelector("img").getAttribute("alt");
-                        
+                        newWindowComponent.classList.add("focused");
+                        newWindowComponent.style.zIndex = windows.length + 1;
+
+                        let alt = findParent.querySelector("img").getAttribute("alt");
+
+                        let icon = newWindowComponent.querySelector(".left_column img");
+                        icon.setAttribute("src", require(`@/assets/images/${alt}`));
+
+                        let title = newWindowComponent.querySelector(".left_column p");
+                        title.innerHTML = name;
+
                         let newMainbarElement = document.querySelector("#footer_component .left_column .mainbar_element.empty").cloneNode(true);
                         newMainbarElement.classList.remove("empty");
+                        newMainbarElement.classList.add("opened");
+                        newMainbarElement.setAttribute("data-origin", name);
                         newMainbarElement.querySelector("img").setAttribute("src", require(`@/assets/images/${alt}`));
                         newMainbarElement.querySelector("img").setAttribute("alt", alt);
+
+                        let leftColumn = document.querySelector("#footer_component .left_column");
                         leftColumn.appendChild(newMainbarElement);
                     }
                 }
                 
                 if (event.target.classList.contains("button_minimize") === true) {
-                    //const findParent = this.findParent(event.target, "window");
-                    
-                    
+                    const findParent = this.findParent(event.target, "window");
+
+                    let mainbarOpenedElements = document.querySelectorAll(".mainbar_element.opened");
+
+                    mainbarOpenedElements.forEach((value) => {
+                        if (value.getAttribute("data-origin") === findParent.getAttribute("data-origin")) {
+                            value.classList.remove("active");
+
+                            value.classList.add("minimized");
+
+                            findParent.classList.remove("focused");
+                            findParent.style.zIndex = 0;
+                        }
+                    });
+
+                    findParent.style.display = "none";
                 }
                 else if (event.target.classList.contains("button_maximize") === true) {
                     const findParent = this.findParent(event.target, "window");
@@ -74,7 +100,14 @@
                 }
                 else if (event.target.classList.contains("button_close") === true) {
                     const findParent = this.findParent(event.target, "window");
-                    
+
+                    let mainbarOpenedElements = document.querySelectorAll(".mainbar_element.opened");
+
+                    mainbarOpenedElements.forEach((value) => {
+                        if (value.getAttribute("data-origin") === findParent.getAttribute("data-origin"))
+                            value.parentNode.removeChild(value);
+                    });
+
                     findParent.parentNode.removeChild(findParent);
                 }
             }
@@ -91,7 +124,7 @@
             window.addEventListener("load", () => {
                 this.body = document.querySelector("body");
                 this.windowComponent = document.querySelector("#window_component");
-                
+
                 this.body.addEventListener("click", (event) => {
                     this.windowLogic(event);
                 }, {passive: true});
