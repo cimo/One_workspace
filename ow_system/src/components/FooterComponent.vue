@@ -26,6 +26,7 @@
         computed: {},
         methods: {
             findParent: Helper.findParent,
+            focusNextWindow: Helper.focusNextWindow,
             mainbarElementLogic: function(event) {
                 const findParentA = this.findParent(event.target, "root");
                 const findParentB = this.findParent(event.target, "menuRoot_container");
@@ -33,7 +34,9 @@
                 const findParentD = this.findParent(event.target, "minimized");
                 const findParentE = this.findParent(event.target, "opened");
 
-                this.mainbarElements.forEach((value) => {
+                let mainbarElements = document.querySelectorAll(".mainbar_element");
+
+                mainbarElements.forEach((value) => {
                     if (findParentA !== value)
                         value.classList.remove("active");
                 });
@@ -55,21 +58,21 @@
                         mainbarElement.classList.add("minimized");
 
                         window.classList.remove("focused");
-                        window.style.zIndex = 0;
                         window.style.display = "none";
+
+                        this.focusNextWindow(window);
                     }
                     else {
-                        let windows = document.querySelectorAll(".window");
-
-                        windows.forEach((value, index) => {
-                            value.classList.remove("focused");
-                            value.style.zIndex = index + 1;
-                        });
-
                         mainbarElement.classList.remove("minimized");
 
+                        let windows = document.querySelectorAll(".window");
+
+                        windows.forEach((value) => {
+                            value.classList.remove("focused");
+                        });
+
+                        window.parentNode.appendChild(window);
                         window.classList.add("focused");
-                        window.style.zIndex = windows.length + 1;
                         window.style.display = "block";
                     }
                 }
@@ -77,14 +80,12 @@
         },
         data() {
             return {
-                body: null,
-                mainbarElements: []
+                body: null
             };
         },
         created() {
             window.addEventListener("load", () => {
                 this.body = document.querySelector("body");
-                this.mainbarElements = document.querySelectorAll(".mainbar_element");
 
                 this.body.addEventListener("click", (event) => {
                     this.mainbarElementLogic(event);

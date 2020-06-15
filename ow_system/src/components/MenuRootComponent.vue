@@ -109,28 +109,28 @@
             menuRootLogic: function(event) {
                 const findParentA = this.findParent(event.target, "menuRoot_container");
                 const findParentB = this.findParent(event.target, "window_opener");
+
+                let menuRootContainer = document.querySelector(".menuRoot_container");
                 
                 if (event.target.classList.contains("root") === true || event.target.classList.contains("menuRoot_image") === true) {
-                    if (this.menuRootContainer.style.display === "" || this.menuRootContainer.style.display === "none")
-                        this.menuRootContainer.style.display = "block";
+                    if (menuRootContainer.style.display === "" || menuRootContainer.style.display === "none")
+                        menuRootContainer.style.display = "block";
                     else
-                        this.menuRootContainer.style.display = "none";
+                        menuRootContainer.style.display = "none";
                 }
                 else if (findParentA === null || findParentB !== null)
-                    this.menuRootContainer.style.display = "none";
+                    menuRootContainer.style.display = "none";
             }
         },
         data() {
             return {
-                body: null,
-                menuRootContainer: null
+                body: null
             };
         },
         created() {
             window.addEventListener("load", () => {
                 this.body = document.querySelector("body");
-                this.menuRootContainer = document.querySelector(".menuRoot_container");
-                
+
                 this.body.addEventListener("click", (event) => {
                     this.menuRootLogic(event);
                 }, {passive: true});

@@ -1,9 +1,9 @@
 <template>
-    <div id="window_component" class="window">
+    <div id="window_component" class="window empty">
         <div class="header">
             <div class="left_column">
                 <img src="@/assets/images/empty.png"/>
-                <p>{{title}}</p>
+                <p></p>
             </div>
             <div class="right_column">
                 <img src="@/assets/images/window_minimize.svg" class="button_minimize button" alt="window_minimize.svg"/>
@@ -24,9 +24,7 @@
         methods: {
         },
         data: function() {
-            return {
-                title: ""
-            };
+            return {};
         },
         created: function() {
             window.addEventListener("load", () => {
@@ -44,10 +42,9 @@
         width: 60%;
         height: 80%;
         border: 1px solid #0078d7;
-        /*z-index: 5;*/
     }
     #window_component.focused {
-        /*z-index: 6;*/
+
     }
     
     #window_component .header {

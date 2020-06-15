@@ -16,35 +16,41 @@
         computed: {},
         methods: {
             findParent: Helper.findParent,
+            focusNextWindow: Helper.focusNextWindow,
             windowLogic: function(event) {
                 const findParent = this.findParent(event.target, "window_opener");
-                
+
                 if (findParent !== null) {
-                    let name = findParent.getAttribute("data-name");
-                    
                     let windows = document.querySelectorAll(".window");
+
+                    let name = findParent.getAttribute("data-name");
                     
                     let isOpen = false;
                     
-                    windows.forEach((value, index) => {
+                    windows.forEach((value) => {
                         value.classList.remove("focused");
-                        value.style.zIndex = index + 1;
 
                         if (name === value.getAttribute("data-origin")) {
                             isOpen = true;
 
-                            value.style.zIndex = windows.length + 1;
+                            value.parentNode.appendChild(value);
+                            value.classList.add("focused");
+                            value.style.display = "block";
+
+                            let minimized = document.querySelector(`.minimized[data-origin='${name}']`);
+                            minimized.classList.remove("minimized");
                         }
                     });
                     
                     if (isOpen === false) {
-                        let newWindowComponent = this.windowComponent.cloneNode(true);
-                        document.querySelector("#body_component").appendChild(newWindowComponent);
+                        let windowComponent = document.querySelector("#window_component");
 
+                        let newWindowComponent = windowComponent.cloneNode(true);
+                        newWindowComponent.classList.remove("empty");
                         newWindowComponent.setAttribute("data-origin", name);
                         newWindowComponent.style.display = "block";
                         newWindowComponent.classList.add("focused");
-                        newWindowComponent.style.zIndex = windows.length + 1;
+                        document.querySelector("#body_component").appendChild(newWindowComponent);
 
                         let alt = findParent.querySelector("img").getAttribute("alt");
 
@@ -60,9 +66,7 @@
                         newMainbarElement.setAttribute("data-origin", name);
                         newMainbarElement.querySelector("img").setAttribute("src", require(`@/assets/images/${alt}`));
                         newMainbarElement.querySelector("img").setAttribute("alt", alt);
-
-                        let leftColumn = document.querySelector("#footer_component .left_column");
-                        leftColumn.appendChild(newMainbarElement);
+                        document.querySelector("#footer_component .left_column").appendChild(newMainbarElement);
                     }
                 }
                 
@@ -74,11 +78,12 @@
                     mainbarOpenedElements.forEach((value) => {
                         if (value.getAttribute("data-origin") === findParent.getAttribute("data-origin")) {
                             value.classList.remove("active");
-
                             value.classList.add("minimized");
 
                             findParent.classList.remove("focused");
-                            findParent.style.zIndex = 0;
+                            findParent.style.display = "none";
+
+                            this.focusNextWindow(findParent);
                         }
                     });
 
@@ -103,6 +108,8 @@
 
                     let mainbarOpenedElements = document.querySelectorAll(".mainbar_element.opened");
 
+                    this.focusNextWindow(findParent);
+
                     mainbarOpenedElements.forEach((value) => {
                         if (value.getAttribute("data-origin") === findParent.getAttribute("data-origin"))
                             value.parentNode.removeChild(value);
@@ -115,7 +122,6 @@
         data() {
             return {
                 body: null,
-                windowComponent: null,
                 windowWidth: "60%",
                 windowHeight: "80%"
             };
@@ -123,7 +129,6 @@
         created() {
             window.addEventListener("load", () => {
                 this.body = document.querySelector("body");
-                this.windowComponent = document.querySelector("#window_component");
 
                 this.body.addEventListener("click", (event) => {
                     this.windowLogic(event);
