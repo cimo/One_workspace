@@ -1,6 +1,6 @@
 <template>
     <div id="window_component" class="window empty">
-        <div class="header">
+        <div class="header drag">
             <div class="left_column">
                 <img src="@/assets/images/empty.png"/>
                 <p></p>
@@ -17,20 +17,129 @@
 </template>
 
 <script>
+    import Helper from "@/assets/js/Helper.js";
+    
     export default {
         name: "WindowComponent",
         //components: {},
         computed: {},
         methods: {
+            findParent: Helper.findParent,
+            focusNextWindow: Helper.focusNextWindow,
+            focusCurrentWindow: Helper.focusCurrentWindow,
+            dragInit: Helper.dragInit,
+            windowLogic: function(event) {
+                const windowOpener = this.findParent(event.target, "window_opener");
+                
+                if (windowOpener !== null) {
+                    let name = windowOpener.getAttribute("data-name");
+                    
+                    let opened = document.querySelector(`.window[data-origin='${name}']`);
+                    
+                    if (opened === null) {
+                        let windowComponent = document.querySelector("#window_component");
+
+                        let newWindowComponent = windowComponent.cloneNode(true);
+                        newWindowComponent.classList.remove("empty");
+                        newWindowComponent.setAttribute("data-origin", name);
+                        newWindowComponent.style.display = "block";
+                        newWindowComponent.classList.add("focused");
+                        document.querySelector("#body_component").appendChild(newWindowComponent);
+
+                        let alt = windowOpener.querySelector("img").getAttribute("alt");
+
+                        let icon = newWindowComponent.querySelector(".left_column img");
+                        icon.setAttribute("src", require(`@/assets/images/${alt}`));
+
+                        let title = newWindowComponent.querySelector(".left_column p");
+                        title.innerHTML = name;
+
+                        let newMainbarElement = document.querySelector("#footer_component .left_column .mainbar_element.empty").cloneNode(true);
+                        newMainbarElement.classList.remove("empty");
+                        newMainbarElement.classList.add("opened");
+                        newMainbarElement.setAttribute("data-origin", name);
+                        newMainbarElement.querySelector("img").setAttribute("src", require(`@/assets/images/${alt}`));
+                        newMainbarElement.querySelector("img").setAttribute("alt", alt);
+                        document.querySelector("#footer_component .left_column").appendChild(newMainbarElement);
+                    }
+                }
+
+                if (event.target.classList.contains("button_minimize") === true) {
+                    const window = this.findParent(event.target, "window");
+
+                    let mainbarOpenedElements = document.querySelectorAll(".mainbar_element.opened");
+
+                    mainbarOpenedElements.forEach((value) => {
+                        if (value.getAttribute("data-origin") === window.getAttribute("data-origin")) {
+                            value.classList.remove("active");
+                            value.classList.add("minimized");
+
+                            window.classList.remove("focused");
+                            window.style.display = "none";
+
+                            this.focusNextWindow(window);
+                        }
+                    });
+
+                    window.style.display = "none";
+                }
+                else if (event.target.classList.contains("button_maximize") === true) {
+                    const window = this.findParent(event.target, "window");
+
+                    if (window.classList.contains("maximized") === false) {
+                        window.style.width = "calc(100% - 2px)";
+                        window.style.height = "calc(100% - 42px)";
+                    }
+                    else {
+                        window.style.width = this.windowWidth;
+                        window.style.height = this.windowHeight;
+                    }
+
+                    window.classList.toggle("maximized");
+                    
+                    window.style.top = 0;
+                    window.style.left = 0;
+                    window.style.transform = "none";
+                }
+                else if (event.target.classList.contains("button_close") === true) {
+                    const window = this.findParent(event.target, "window");
+
+                    let mainbarOpenedElements = document.querySelectorAll(".mainbar_element.opened");
+
+                    this.focusNextWindow(window);
+
+                    mainbarOpenedElements.forEach((value) => {
+                        if (value.getAttribute("data-origin") === window.getAttribute("data-origin"))
+                            value.parentNode.removeChild(value);
+                    });
+
+                    window.parentNode.removeChild(window);
+                }
+            }
         },
         data: function() {
-            return {};
+            return {
+                body: null,
+                windowWidth: "60%",
+                windowHeight: "80%"
+            };
         },
         created: function() {
             window.addEventListener("load", () => {
+                this.body = document.querySelector("body");
+
+                this.body.addEventListener("click", (event) => {
+                    this.windowLogic(event);
+                }, {passive: true});
+                
+                this.dragInit("window", true);
             });
         },
         beforeDestroy: function() {
+            if (this.body !== null)
+                this.body.removeEventListener("click", () => {}, false);
+
+            this.dragInit("window", false);
         }
     }
 </script>
@@ -43,8 +152,8 @@
         height: 80%;
         border: 1px solid #0078d7;
     }
-    #window_component.focused {
-
+    #window_component.focused .header .left_column {
+        opacity: 1.0;
     }
     
     #window_component .header {
@@ -52,6 +161,9 @@
         justify-content: space-between;
         background-color: #0078d7;
         height: 28px;
+    }
+    #window_component .header .left_column {
+        opacity: 0.5;
     }
     #window_component .header .left_column img {
         width: 18px;

@@ -11,10 +11,16 @@
             </div>
             <div class="menuRoot_panel">
                 <p class="label">Project</p>
-                <div class="program_container window_opener" data-name="Create project">
+                <div class="program_container window_opener" data-name="Create">
                     <div class="program">
-                        <img src="@/assets/images/create_project.svg" alt="create_project.svg"/>
+                        <img src="@/assets/images/create.svg" alt="create.svg"/>
                         <p>Create</p>
+                    </div>
+                </div>
+                <div class="program_container window_opener" data-name="Explore">
+                    <div class="program">
+                        <img src="@/assets/images/explore.svg" alt="explore.svg"/>
+                        <p>Explore</p>
                     </div>
                 </div>
                 <p class="label">Tool</p>
@@ -98,7 +104,7 @@
 </template>
 
 <script>
-    import {Helper} from "@/assets/js/Helper.js";
+    import Helper from "@/assets/js/Helper.js";
     
     export default {
         name: "MenuRootComponent",
@@ -107,11 +113,11 @@
         methods: {
             findParent: Helper.findParent,
             menuRootLogic: function(event) {
+                let menuRootContainer = document.querySelector(".menuRoot_container");
+                
                 const findParentA = this.findParent(event.target, "menuRoot_container");
                 const findParentB = this.findParent(event.target, "window_opener");
 
-                let menuRootContainer = document.querySelector(".menuRoot_container");
-                
                 if (event.target.classList.contains("root") === true || event.target.classList.contains("menuRoot_image") === true) {
                     if (menuRootContainer.style.display === "" || menuRootContainer.style.display === "none")
                         menuRootContainer.style.display = "block";

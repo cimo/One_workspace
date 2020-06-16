@@ -11,7 +11,7 @@
         //components: {},
         computed: {},
         methods: {
-            currentTimeDate: function() {
+            timeDateLogic: function() {
                 let currentDate = new Date();
 
                 let minute = currentDate.getMinutes();
@@ -37,7 +37,7 @@
         },
         created: function() {
             window.addEventListener("load", () => {
-                this.timeDateInterval = setInterval(this.currentTimeDate, 1000);
+                this.timeDateInterval = setInterval(this.timeDateLogic, 1000);
             });
         },
         beforeDestroy: function() {

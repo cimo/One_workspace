@@ -13,7 +13,7 @@
 </template>
 
 <script>
-    import {Helper} from "@/assets/js/Helper.js";
+    import Helper from "@/assets/js/Helper.js";
     import MenuRootComponent from "@/components/MenuRootComponent.vue";
     import TimeDateComponent from "@/components/TimeDateComponent.vue";
 
@@ -27,28 +27,29 @@
         methods: {
             findParent: Helper.findParent,
             focusNextWindow: Helper.focusNextWindow,
+            focusCurrentWindow: Helper.focusCurrentWindow,
             mainbarElementLogic: function(event) {
-                const findParentA = this.findParent(event.target, "root");
-                const findParentB = this.findParent(event.target, "menuRoot_container");
-                const findParentC = this.findParent(event.target, "window_opener");
-                const findParentD = this.findParent(event.target, "minimized");
-                const findParentE = this.findParent(event.target, "opened");
+                const root = this.findParent(event.target, "root");
+                const menuRootContainer = this.findParent(event.target, "menuRoot_container");
+                const windowOpener = this.findParent(event.target, "window_opener");
+                const minimized = this.findParent(event.target, "minimized");
+                const opened = this.findParent(event.target, "opened");
 
                 let mainbarElements = document.querySelectorAll(".mainbar_element");
 
                 mainbarElements.forEach((value) => {
-                    if (findParentA !== value)
+                    if (root !== value)
                         value.classList.remove("active");
                 });
 
-                if (findParentA !== null && findParentB === null)
-                    findParentA.classList.toggle("active");
+                if (root !== null && menuRootContainer === null)
+                    root.classList.toggle("active");
 
-                if (findParentC !== null)
-                    findParentA.classList.remove("active");
+                if (windowOpener !== null)
+                    root.classList.remove("active");
 
-                if (findParentD !== null || findParentE !== null) {
-                    let mainbarElement = findParentD !== null ? findParentD : findParentE;
+                if (minimized !== null || opened !== null) {
+                    let mainbarElement = minimized !== null ? minimized : opened;
 
                     let origin = mainbarElement.getAttribute("data-origin");
 
@@ -65,15 +66,7 @@
                     else {
                         mainbarElement.classList.remove("minimized");
 
-                        let windows = document.querySelectorAll(".window");
-
-                        windows.forEach((value) => {
-                            value.classList.remove("focused");
-                        });
-
-                        window.parentNode.appendChild(window);
-                        window.classList.add("focused");
-                        window.style.display = "block";
+                        this.focusCurrentWindow(window);
                     }
                 }
             }
