@@ -29,27 +29,27 @@
             focusNextWindow: Helper.focusNextWindow,
             focusCurrentWindow: Helper.focusCurrentWindow,
             mainbarElementLogic: function(event) {
-                const root = this.findParent(event.target, "root");
-                const menuRootContainer = this.findParent(event.target, "menuRoot_container");
-                const windowOpener = this.findParent(event.target, "window_opener");
-                const minimized = this.findParent(event.target, "minimized");
-                const opened = this.findParent(event.target, "opened");
+                const rootParent = this.findParent(event.target, "root");
+                const menuRootContainerParent = this.findParent(event.target, "menuRoot_container");
+                const windowOpenerParent = this.findParent(event.target, "window_opener");
+                const minimizedParent = this.findParent(event.target, "minimized");
+                const openedParent = this.findParent(event.target, "opened");
 
                 let mainbarElements = document.querySelectorAll(".mainbar_element");
 
                 mainbarElements.forEach((value) => {
-                    if (root !== value)
+                    if (rootParent !== value)
                         value.classList.remove("active");
                 });
 
-                if (root !== null && menuRootContainer === null)
-                    root.classList.toggle("active");
+                if (rootParent !== null && menuRootContainerParent === null)
+                    rootParent.classList.toggle("active");
 
-                if (windowOpener !== null)
-                    root.classList.remove("active");
+                if (windowOpenerParent !== null)
+                    rootParent.classList.remove("active");
 
-                if (minimized !== null || opened !== null) {
-                    let mainbarElement = minimized !== null ? minimized : opened;
+                if (minimizedParent !== null || openedParent !== null) {
+                    let mainbarElement = minimizedParent !== null ? minimizedParent : openedParent;
 
                     let origin = mainbarElement.getAttribute("data-origin");
 

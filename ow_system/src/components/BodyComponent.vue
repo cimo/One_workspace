@@ -13,15 +13,19 @@
             WindowComponent
         },
         computed: {},
-        methods: {            
+        methods: {
+            terminal: function() {
+                
+            }
         },
         data() {
-            return {
-            };
+            return {};
         },
         created() {
             window.addEventListener("load", () => {
             });
+
+            this.terminal();
         },
         beforeDestroy() {
         }

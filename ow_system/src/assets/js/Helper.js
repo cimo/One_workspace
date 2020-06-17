@@ -1,6 +1,6 @@
 let tag = "";
 
-let dragElement = null;
+let dragElementParent = null;
 
 let active = false;
 
@@ -84,22 +84,22 @@ const dragInit = (tagValue, create) => {
 };
 
 const dragStart = (event) => {
-    dragElement = findParent(event.target, tag);
+    dragElementParent = findParent(event.target, tag);
     
-    const rightColumn = findParent(event.target, "right_column");
+    const rightColumnParent = findParent(event.target, "right_column");
     
-    if (rightColumn === null)
-        focusCurrentWindow(dragElement);
+    if (rightColumnParent === null)
+        focusCurrentWindow(dragElementParent);
 
     if (event.target.classList.contains("drag") === true) {
-        let dragElementBounding = dragElement.getBoundingClientRect();
+        let dragElementParentBounding = dragElementParent.getBoundingClientRect();
 
         if (event.target.type === "touchstart") {
-            xInitial = event.touches[0].clientX - dragElementBounding.left;
-            yInitial = event.touches[0].clientY - dragElementBounding.top;
+            xInitial = event.touches[0].clientX - dragElementParentBounding.left;
+            yInitial = event.touches[0].clientY - dragElementParentBounding.top;
         } else {
-            xInitial = event.clientX - dragElementBounding.left;
-            yInitial = event.clientY - dragElementBounding.top;
+            xInitial = event.clientX - dragElementParentBounding.left;
+            yInitial = event.clientY - dragElementParentBounding.top;
         }
         
         active = true;
@@ -117,12 +117,12 @@ const dragMove = (event) => {
             yCurrent = event.clientY - yInitial;
         }
 
-        dragElement.style.transform = `translate3d(${xCurrent}px, ${yCurrent}px, 0)`;
+        dragElementParent.style.transform = `translate3d(${xCurrent}px, ${yCurrent}px, 0)`;
     }
 };
 
 const dragEnd = () => {
-    dragElement = null;
+    dragElementParent = null;
 
     active = false;
 

@@ -15,6 +15,7 @@ ENV DEBCONF_NOWARNINGS=yes
 ENV NODE_ENV=development
 
 COPY ${PATH_ROOT}/certificate/. /etc/certificate/
+COPY ${PATH_ROOT}/nodejs_server/. /home/node/server/
 COPY ${PATH_ROOT}/entrypoint_nodejs.sh /usr/local/bin/entrypoint.sh
 
 # System

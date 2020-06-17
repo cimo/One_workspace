@@ -59,7 +59,8 @@ _system/style/custom/*
 !_system/style/custom/.gitkeep
 _system/virtual_host/custom/*
 !_system/virtual_host/custom/.gitkeep
-error.log
-project
 ow_system/node_modules
 ow_system/dist
+error.log
+debug.log
+project

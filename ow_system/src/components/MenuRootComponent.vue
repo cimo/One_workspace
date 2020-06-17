@@ -1,101 +1,44 @@
 <template>
     <div id="menuRoot_component" class="mainbar_element root">
         <img class="menuRoot_image" src="@/assets/images/menu_root.svg" alt="menu_root.svg"/>
+        
         <div class="menuRoot_container">
             <div class="menuRoot_side">
-                <div class="item_container window_opener" data-name="Setting">
-                    <div class="item">
-                        <img src="@/assets/images/setting.svg" alt="setting.svg"/>
+                <div class="menuRoot_side_container">
+                    <div v-for="(value, key) in sideItems" v-bind:key="`${key}-${value.name}`" class="item_container window_opener" v-bind:data-name="value.name">
+                        <div class="item">
+                            <img v-bind:src="value.imagePath" v-bind:alt="value.imageName"/>
+                        </div>
                     </div>
                 </div>
             </div>
             <div class="menuRoot_panel">
                 <p class="label">Project</p>
-                <div class="program_container window_opener" data-name="Create">
+                <div v-for="(value, key) in projectItems" v-bind:key="`${key}-${value.name}`" class="program_container window_opener" v-bind:data-name="value.name">
                     <div class="program">
-                        <img src="@/assets/images/create.svg" alt="create.svg"/>
-                        <p>Create</p>
-                    </div>
-                </div>
-                <div class="program_container window_opener" data-name="Explore">
-                    <div class="program">
-                        <img src="@/assets/images/explore.svg" alt="explore.svg"/>
-                        <p>Explore</p>
+                        <img v-bind:src="value.imagePath" v-bind:alt="value.imageName"/>
+                        <p>{{value.name}}</p>
                     </div>
                 </div>
                 <p class="label">Tool</p>
-                <div class="program_container window_opener" data-name="Docker">
+                <div v-for="(value, key) in toolItems" v-bind:key="`${key}-${value.name}`" class="program_container window_opener" v-bind:data-name="value.name">
                     <div class="program">
-                        <img src="@/assets/images/docker.svg" alt="docker.svg"/>
-                        <p>Docker</p>
-                    </div>
-                </div>
-                <div class="program_container window_opener" data-name="Git">
-                    <div class="program">
-                        <img src="@/assets/images/git.svg" alt="git.svg"/>
-                        <p>Git</p>
-                    </div>
-                </div>
-                <div class="program_container window_opener" data-name="Ssh">
-                    <div class="program">
-                        <img src="@/assets/images/ssh.svg" alt="ssh.svg"/>
-                        <p>Ssh</p>
-                    </div>
-                </div>
-                <div class="program_container window_opener" data-name="Sass">
-                    <div class="program">
-                        <img src="@/assets/images/sass.svg" alt="sass.svg"/>
-                        <p>Sass</p>
-                    </div>
-                </div>
-                <div class="program_container window_opener" data-name="Javascript">
-                    <div class="program">
-                        <img src="@/assets/images/javascript.svg" alt="javascript.svg"/>
-                        <p>Terser</p>
+                        <img v-bind:src="value.imagePath" v-bind:alt="value.imageName"/>
+                        <p>{{value.name}}</p>
                     </div>
                 </div>
                 <p class="label">Package</p>
-                <div class="program_container window_opener" data-name="Composer">
+                <div v-for="(value, key) in packageItems" v-bind:key="`${key}-${value.name}`" class="program_container window_opener" v-bind:data-name="value.name">
                     <div class="program">
-                        <img src="@/assets/images/composer.svg" alt="composer.svg"/>
-                        <p>Composer</p>
+                        <img v-bind:src="value.imagePath" v-bind:alt="value.imageName"/>
+                        <p>{{value.name}}</p>
                     </div>
                 </div>
                 <p class="label">Container</p>
-                <div class="program_container window_opener" data-name="Php 5">
+                <div v-for="(value, key) in containerItems" v-bind:key="`${key}-${value.name}`" class="program_container window_opener" v-bind:data-name="value.name">
                     <div class="program">
-                        <img src="@/assets/images/php.svg" alt="php.svg"/>
-                        <p>Php 5</p>
-                    </div>
-                </div>
-                <div class="program_container window_opener" data-name="Php 7">
-                    <div class="program">
-                        <img src="@/assets/images/php.svg" alt="php.svg"/>
-                        <p>Php 7</p>
-                    </div>
-                </div>
-                <div class="program_container window_opener" data-name="Apache">
-                    <div class="program">
-                        <img src="@/assets/images/apache.svg" alt="apache.svg"/>
-                        <p>Apache</p>
-                    </div>
-                </div>
-                <div class="program_container window_opener" data-name="MySql">
-                    <div class="program">
-                        <img src="@/assets/images/mysql.svg" alt="mysql.svg"/>
-                        <p>MySql</p>
-                    </div>
-                </div>
-                <div class="program_container window_opener" data-name="PostgreSql">
-                    <div class="program">
-                        <img src="@/assets/images/postgresql.svg" alt="postgresql.svg"/>
-                        <p>PostgreSql</p>
-                    </div>
-                </div>
-                <div class="program_container window_opener" data-name="NodeJs">
-                    <div class="program">
-                        <img src="@/assets/images/nodejs.svg" alt="nodejs.svg"/>
-                        <p>NodeJs</p>
+                        <img v-bind:src="value.imagePath" v-bind:alt="value.imageName"/>
+                        <p>{{value.name}}</p>
                     </div>
                 </div>
             </div>
@@ -112,25 +55,118 @@
         computed: {},
         methods: {
             findParent: Helper.findParent,
+            focusCurrentWindow: Helper.focusCurrentWindow,
             menuRootLogic: function(event) {
                 let menuRootContainer = document.querySelector(".menuRoot_container");
                 
-                const findParentA = this.findParent(event.target, "menuRoot_container");
-                const findParentB = this.findParent(event.target, "window_opener");
-
+                const menuRootContainerParent = this.findParent(event.target, "menuRoot_container");
+                const windowOpenerParent = this.findParent(event.target, "window_opener");
+                
                 if (event.target.classList.contains("root") === true || event.target.classList.contains("menuRoot_image") === true) {
                     if (menuRootContainer.style.display === "" || menuRootContainer.style.display === "none")
                         menuRootContainer.style.display = "block";
                     else
                         menuRootContainer.style.display = "none";
                 }
-                else if (findParentA === null || findParentB !== null)
+                else if (menuRootContainerParent === null || windowOpenerParent !== null)
                     menuRootContainer.style.display = "none";
+                
+                if (windowOpenerParent !== null) {
+                    let name = windowOpenerParent.getAttribute("data-name");
+                    let window = document.querySelector(`.window[data-origin='${name}']`);
+                    
+                    this.focusCurrentWindow(window);
+                }
             }
         },
         data() {
             return {
-                body: null
+                body: null,
+                sideItems: [
+                    {
+                        name: "Setting",
+                        imagePath: require("@/assets/images/setting.svg"),
+                        imageName: "setting.svg"
+                    }
+                ],
+                projectItems: [
+                    {
+                        name: "Create",
+                        imagePath: require("@/assets/images/create.svg"),
+                        imageName: "create.svg"
+                    },
+                    {
+                        name: "Explore",
+                        imagePath: require("@/assets/images/explore.svg"),
+                        imageName: "explore.svg"
+                    }
+                ],
+                toolItems: [
+                    {
+                        name: "Docker",
+                        imagePath: require("@/assets/images/docker.svg"),
+                        imageName: "docker.svg"
+                    },
+                    {
+                        name: "Git",
+                        imagePath: require("@/assets/images/git.svg"),
+                        imageName: "git.svg"
+                    },
+                    {
+                        name: "Ssh",
+                        imagePath: require("@/assets/images/ssh.svg"),
+                        imageName: "ssh.svg"
+                    },
+                    {
+                        name: "Terser",
+                        imagePath: require("@/assets/images/terser.svg"),
+                        imageName: "terser.svg"
+                    },
+                    {
+                        name: "Sass",
+                        imagePath: require("@/assets/images/sass.svg"),
+                        imageName: "sass.svg"
+                    }
+                ],
+                packageItems: [
+                    {
+                        name: "Composer",
+                        imagePath: require("@/assets/images/composer.svg"),
+                        imageName: "composer.svg"
+                    }
+                ],
+                containerItems: [
+                    {
+                        name: "Php 5",
+                        imagePath: require("@/assets/images/php.svg"),
+                        imageName: "php.svg"
+                    },
+                    {
+                        name: "Php 7",
+                        imagePath: require("@/assets/images/php.svg"),
+                        imageName: "php.svg"
+                    },
+                    {
+                        name: "Apache",
+                        imagePath: require("@/assets/images/apache.svg"),
+                        imageName: "apache.svg"
+                    },
+                    {
+                        name: "MySql",
+                        imagePath: require("@/assets/images/mysql.svg"),
+                        imageName: "mysql.svg"
+                    },
+                    {
+                        name: "PostgreSql",
+                        imagePath: require("@/assets/images/postgresql.svg"),
+                        imageName: "postgresql.svg"
+                    },
+                    {
+                        name: "NodeJs",
+                        imagePath: require("@/assets/images/nodejs.svg"),
+                        imageName: "nodejs.svg"
+                    }
+                ]
             };
         },
         created() {
@@ -171,19 +207,23 @@
         cursor: default;
     }
     
-    #menuRoot_component .menuRoot_container .menuRoot_side .item_container {
+    #menuRoot_component .menuRoot_container .menuRoot_side .menuRoot_side_container {
         position: absolute;
         bottom: 0;
     }
-    #menuRoot_component .menuRoot_container .menuRoot_side .item_container .item {
+    #menuRoot_component .menuRoot_container .menuRoot_side .menuRoot_side_container .item_container {
+        position: relative;
+        bottom: 0;
+    }
+    #menuRoot_component .menuRoot_container .menuRoot_side .menuRoot_side_container .item_container .item {
         width: 40px;
         height: 40px;
         cursor: pointer;
     }
-    #menuRoot_component .menuRoot_container .menuRoot_side .item_container .item:hover {
+    #menuRoot_component .menuRoot_container .menuRoot_side .menuRoot_side_container .item_container .item:hover {
         background-color: #00aced;
     }
-    #menuRoot_component .menuRoot_container .menuRoot_side .item_container .item img {
+    #menuRoot_component .menuRoot_container .menuRoot_side .menuRoot_side_container .item_container .item img {
         margin-top: 8px;
     }
 

@@ -8,4 +8,10 @@ rm -r node_modules
 npm cache clear --force
 npm install
 
+cd /home/node/server
+rm -r node_modules
+npm cache clear --force
+npm install
+node Server.js
+
 exec "$@"

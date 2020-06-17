@@ -7,16 +7,21 @@ Is a docker service container for have, in one space, a large and complete devel
 
 | Info: |
 |:---|
-| Ui tools for increase your productivity (Work in progress...) |
+| Ui tools for increase your productivity |
 | Cross platform (Windows docker, Linux docker, Mac docker) |
+
+| Project: |
+|:---|
+| Create |
+| Explore |
 
 | Tool: |
 |:---|
 | Docker |
 | Git |
 | Ssh |
-| Sass |
 | Terser |
+| Sass |
 
 | Package: |
 |:---|
@@ -30,7 +35,7 @@ Is a docker service container for have, in one space, a large and complete devel
 | MySql 5.7 |
 | PostgreSql 10.13 |
 | NodeJs 12.17.10 |
-| NodeJs 3.8.3 (Coming soon...) |
+| Python 3.8.3 (Coming soon...) |
 
 | Library: |
 |:---|
