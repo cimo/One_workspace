@@ -6,7 +6,11 @@
 
 <script>
     import WindowComponent from "@/components/WindowComponent.vue";
-    
+
+    import io from "socket.io-client";
+
+    const socketIo = io("https://localhost:1443");
+
     export default {
         name: "BodyComponent",
         components: {
@@ -14,18 +18,18 @@
         },
         computed: {},
         methods: {
-            terminal: function() {
-                
-            }
         },
         data() {
             return {};
         },
         created() {
-            window.addEventListener("load", () => {
+            socketIo.on("t_command", (data) => {
+                console.log(data);
             });
 
-            this.terminal();
+            window.addEventListener("load", () => {
+                //socketIo.emit("t_command", {'cmd': "ls -la"});
+            });
         },
         beforeDestroy() {
         }

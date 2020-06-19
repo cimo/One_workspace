@@ -130,6 +130,11 @@
                 ],
                 packageItems: [
                     {
+                        name: "Npm",
+                        imagePath: require("@/assets/images/npm.svg"),
+                        imageName: "npm.svg"
+                    },
+                    {
                         name: "Composer",
                         imagePath: require("@/assets/images/composer.svg"),
                         imageName: "composer.svg"

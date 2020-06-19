@@ -1,0 +1,22 @@
+{
+  "apps" : [{
+    "name": "nodejs_server_dev",
+    "script" : "/home/node/server/Server.js",
+    "watch": "/home/node/server",
+    "ignore_watch": ["node_modules"],
+    "watch_options": {
+      "followSymlinks": false,
+      "usePolling": true
+    },
+    "env" : {
+      "NODE_ENV" : "development"
+    }
+  },
+  {
+    "name": "nodejs_server_prod",
+    "script" : "/home/node/server/Server.js",
+    "env" : {
+      "NODE_ENV" : "production"
+    }
+  }]
+}
