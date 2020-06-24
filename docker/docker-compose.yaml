@@ -3,7 +3,7 @@ services:
   php5_container:
     container_name: Php_${PHP5_VERSION}-fpm
     build:
-      context: ${PATH_ROOT}/docker
+      context: ${PATH_ROOT}
       dockerfile: Dockerfile_php5
       args:
         USER_NAME: ${USER_NAME}
@@ -43,7 +43,7 @@ services:
   php7_container:
     container_name: Php_${PHP7_VERSION}-fpm
     build:
-      context: ${PATH_ROOT}/docker
+      context: ${PATH_ROOT}
       dockerfile: Dockerfile_php7
       args:
         USER_NAME: ${USER_NAME}
@@ -82,7 +82,7 @@ services:
   apache_container:
     container_name: Apache_${APACHE_VERSION}
     build:
-      context: ${PATH_ROOT}/docker
+      context: ${PATH_ROOT}
       dockerfile: Dockerfile_apache
       args:
         WWW_USER_NAME: ${WWW_USER_NAME}
@@ -120,7 +120,7 @@ services:
   mysql_container:
     container_name: MySql_${MYSQL_VERSION}
     build:
-      context: ${PATH_ROOT}/docker
+      context: ${PATH_ROOT}
       dockerfile: Dockerfile_mysql
       args:
         WWW_USER_NAME: ${WWW_USER_NAME}
@@ -153,7 +153,7 @@ services:
   postgresql_container:
     container_name: PostgreSql_${POSTGRES_VERSION}
     build:
-      context: ${PATH_ROOT}/docker
+      context: ${PATH_ROOT}
       dockerfile: Dockerfile_postgresql
       args:
         WWW_USER_NAME: ${WWW_USER_NAME}
@@ -184,7 +184,7 @@ services:
   nodejs_container:
     container_name: NodeJs_${NODEJS_VERSION}
     build:
-      context: ${PATH_ROOT}/docker
+      context: ${PATH_ROOT}
       dockerfile: Dockerfile_nodejs
       args:
         PATH_ROOT: ${PATH_ROOT}

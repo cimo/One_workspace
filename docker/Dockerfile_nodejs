@@ -16,7 +16,7 @@ ENV DEBCONF_NOWARNINGS=yes
 ENV NODE_ENV=development
 
 COPY ${PATH_ROOT}/certificate/. /etc/certificate/
-COPY ${PATH_ROOT}/nodejs_server/. /home/node/server/
+COPY ${PATH_ROOT}/nodejs_server/. ${NODEJS_PATH_SERVER}/
 COPY ${PATH_ROOT}/entrypoint_nodejs.sh /usr/local/bin/entrypoint.sh
 
 # System
@@ -34,6 +34,14 @@ tzdata \
 && npm install -g terser \
 && npm install -g sass \
 && npm install -g pm2 \
+## Selenium
+#&& wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add \
+#&& echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list \
+#&& apt-get update \
+#&& apt-get install -y --no-install-recommends google-chrome-stable firefox \
+#&& npm install -g selenium-side-runner --unsafe-perm=true --allow-root \
+#&& npm install -g chromedriver --unsafe-perm=true --allow-root \
+#&& npm install -g geckodriver --unsafe-perm=true --allow-root \
 # Server
 && cd ${NODEJS_PATH_SERVER} \
 && npm cache clear --force \

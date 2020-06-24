@@ -51,6 +51,7 @@ libzip-dev \
 zlib1g-dev \
 libxml2-dev \
 libpq-dev \
+libmagickwand-dev \
 # Group
 && addgroup sftp \
 # User sudo
@@ -85,6 +86,7 @@ libpq-dev \
 && echo "\n" | pecl install ssh2-1.2 \
 && echo "\n" | pecl install apcu-5.1.18 \
 && echo "\n" | pecl install xdebug-2.9.6 \
+&& echo "\n" | pecl install imagick-3.4.4 \
 && docker-php-ext-configure gd --with-freetype=/usr/include --with-jpeg=/usr/include \
 && docker-php-ext-install gd \
 && docker-php-ext-install intl \
@@ -111,18 +113,6 @@ xdebug.remote_log=/tmp/xdebug.log \n \
 xdebug.max_nesting_level=1000" >> ${PHP7_PATH_ROOT}/php/conf.d/override.ini \
 # Composer
 && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
-# NodeJs
-&& curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash - \
-&& apt-get install -y --no-install-recommends nodejs \
-&& npm update -g npm \
-## Npm (Selenium)
-#&& wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add \
-#&& echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list \
-#&& apt-get update \
-#&& apt-get install -y --no-install-recommends google-chrome-stable \
-#&& npm install -g selenium-side-runner --unsafe-perm=true --allow-root \
-#&& npm install -g chromedriver --unsafe-perm=true --allow-root \
-#&& npm install -g geckodriver --unsafe-perm=true --allow-root \
 # Clean
 && pecl clear-cache \
 && rm -rf /var/lib/apt/lists/* \
