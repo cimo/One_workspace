@@ -17,8 +17,7 @@ services:
         PHP5_PORT_FPM: ${PHP5_PORT_FPM}
         PHP5_PORT_XDEBUG: ${PHP5_PORT_XDEBUG}
         PHP5_PATH_ROOT: ${PHP5_PATH_ROOT}
-        PHP5_SSH_GROUP: ${PHP5_SSH_GROUP}
-        PHP5_SSH_PORT: ${PHP5_SSH_PORT}
+        PHP5_VH_NAME: ${PHP5_VH_NAME}
     environment:
       USER_NAME: ${USER_NAME}
       USER_PASSWORD: ${USER_PASSWORD}
@@ -31,15 +30,12 @@ services:
       PHP5_PORT_FPM: ${PHP5_PORT_FPM}
       PHP5_PORT_XDEBUG: ${PHP5_PORT_XDEBUG}
       PHP5_PATH_ROOT: ${PHP5_PATH_ROOT}
-      PHP5_SSH_GROUP: ${PHP5_SSH_GROUP}
-      PHP5_SSH_PORT: ${PHP5_SSH_PORT}
+      PHP5_VH_NAME: ${PHP5_VH_NAME}
     ports:
-      - ${PHP5_SSH_PORT}:22
-      - ${PHP5_PORT_FPM}:9000
-      - ${PHP5_PORT_XDEBUG}:9999
+      - ${PHP5_PORT_FPM}:${PHP5_PORT_FPM}
+      - ${PHP5_PORT_XDEBUG}:${PHP5_PORT_XDEBUG}
     volumes:
       - ${PATH_ROOT}:/home/${WWW_USER_NAME}/www
-    
   php7_container:
     container_name: Php_${PHP7_VERSION}-fpm
     build:
@@ -57,8 +53,7 @@ services:
         PHP7_PORT_FPM: ${PHP7_PORT_FPM}
         PHP7_PORT_XDEBUG: ${PHP7_PORT_XDEBUG}
         PHP7_PATH_ROOT: ${PHP7_PATH_ROOT}
-        PHP7_SSH_GROUP: ${PHP7_SSH_GROUP}
-        PHP7_SSH_PORT: ${PHP7_SSH_PORT}
+        PHP7_VH_NAME: ${PHP7_VH_NAME}
     environment:
       USER_NAME: ${USER_NAME}
       USER_PASSWORD: ${USER_PASSWORD}
@@ -71,12 +66,10 @@ services:
       PHP7_PORT_FPM: ${PHP7_PORT_FPM}
       PHP7_PORT_XDEBUG: ${PHP7_PORT_XDEBUG}
       PHP7_PATH_ROOT: ${PHP7_PATH_ROOT}
-      PHP7_SSH_GROUP: ${PHP7_SSH_GROUP}
-      PHP7_SSH_PORT: ${PHP7_SSH_PORT}
+      PHP7_VH_NAME: ${PHP7_VH_NAME}
     ports:
-      - ${PHP7_SSH_PORT}:22
-      - ${PHP7_PORT_FPM}:9000
-      - ${PHP7_PORT_XDEBUG}:9999
+      - ${PHP7_PORT_FPM}:${PHP7_PORT_FPM}
+      - ${PHP7_PORT_XDEBUG}:${PHP7_PORT_XDEBUG}
     volumes:
       - ${PATH_ROOT}:/home/${WWW_USER_NAME}/www
   apache_container:
@@ -95,7 +88,9 @@ services:
         APACHE_PORT_HTTPS: ${APACHE_PORT_HTTPS}
         APACHE_PATH_ROOT: ${APACHE_PATH_ROOT}
         PHP5_PORT_FPM: ${PHP5_PORT_FPM}
+        PHP5_VH_NAME: ${PHP5_VH_NAME}
         PHP7_PORT_FPM: ${PHP7_PORT_FPM}
+        PHP7_VH_NAME: ${PHP7_VH_NAME}
     environment:
       WWW_USER_NAME: ${WWW_USER_NAME}
       WWW_USER_PASSWORD: ${WWW_USER_PASSWORD}
@@ -107,7 +102,9 @@ services:
       APACHE_PORT_HTTPS: ${APACHE_PORT_HTTPS}
       APACHE_PATH_ROOT: ${APACHE_PATH_ROOT}
       PHP5_PORT_FPM: ${PHP5_PORT_FPM}
+      PHP5_VH_NAME: ${PHP5_VH_NAME}
       PHP7_PORT_FPM: ${PHP7_PORT_FPM}
+      PHP7_VH_NAME: ${PHP7_VH_NAME}
     ports:
       - ${APACHE_PORT_HTTP}:80
       - ${APACHE_PORT_HTTPS}:443
@@ -207,9 +204,9 @@ services:
         NODEJS_PATH_ROOT: ${NODEJS_PATH_ROOT}
         NODEJS_PATH_SERVER: ${NODEJS_PATH_SERVER}
     ports:
-      - ${NODEJS_PORT_HTTP}:1080
-      - ${NODEJS_PORT_HTTPS}:1443
-      - ${NODEJS_PORT_VUE}:8000
-      - ${NODEJS_PORT_VUE_APP}:8080
+      - ${NODEJS_PORT_HTTP}:${NODEJS_PORT_HTTP}
+      - ${NODEJS_PORT_HTTPS}:${NODEJS_PORT_HTTPS}
+      - ${NODEJS_PORT_VUE}:${NODEJS_PORT_VUE}
+      - ${NODEJS_PORT_VUE_APP}:${NODEJS_PORT_VUE_APP}
     volumes:
       - ${PATH_ROOT}:${NODEJS_PATH_ROOT}

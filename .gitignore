@@ -58,10 +58,10 @@ _system/module/custom/*
 _system/style/custom/*
 !_system/style/custom/.gitkeep
 ow_system/node_modules
-virtual_host/custom/*
-!virtual_host/custom/.gitkeep
-!virtual_host/custom/empty.conf
 project/*
 !project/.gitkeep
+virtual_host/custom/*
+!virtual_host/custom/.gitkeep
+!virtual_host/custom/localhost.conf
 error.log
 debug.log
