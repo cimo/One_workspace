@@ -1,14 +1,14 @@
-ARG NODEJS_VERSION
+ARG NODEJS_OS_VERSION
 
-FROM node:${NODEJS_VERSION}
+FROM ubuntu:${NODEJS_OS_VERSION}
 
 ARG PATH_ROOT
 ARG TIMEZONE
+ARG NODEJS_VERSION
 ARG NODEJS_PORT_HTTP
 ARG NODEJS_PORT_HTTPS
 ARG NODEJS_PORT_VUE
 ARG NODEJS_PORT_VUE_APP
-ARG NODEJS_PATH_ROOT
 ARG NODEJS_PATH_SERVER
 
 ENV DEBIAN_FRONTEND=noninteractive
@@ -29,21 +29,24 @@ tzdata \
 # Time
 && ln -sf /usr/share/zoneinfo/${TIMEZONE} /etc/localtime \
 && dpkg-reconfigure -f noninteractive tzdata \
+# NodeJs
+&& curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash - \
+&& apt-get update \
+&& apt-get install nodejs \
+&& npm update -g npm \
 # Npm
 && npm install -g @vue/cli \
 && npm install -g terser \
 && npm install -g sass \
 && npm install -g pm2 \
 ## Selenium
-#&& wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add \
-#&& echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list \
-#&& apt-key adv --keyserver keyserver.ubuntu.com --recv-keys A6DCF7707EBC211F \
-#&& echo "deb http://ppa.launchpad.net/ubuntu-mozilla-security/ppa/ubuntu bionic main" >> /etc/apt/sources.list.d/firefox.list \
-#&& apt-get update \
-#&& apt-get install -y --no-install-recommends google-chrome-stable firefox \
-#&& npm install -g selenium-side-runner --unsafe-perm=true --allow-root \
-#&& npm install -g chromedriver --unsafe-perm=true --allow-root \
-#&& npm install -g geckodriver --unsafe-perm=true --allow-root \
+&& wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add \
+&& echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list \
+&& apt-get update \
+&& apt-get install -y --no-install-recommends google-chrome-stable firefox \
+&& npm install -g selenium-side-runner --unsafe-perm=true --allow-root \
+&& npm install -g chromedriver --unsafe-perm=true --allow-root \
+&& npm install -g geckodriver --unsafe-perm=true --allow-root \
 # Server
 && cd ${NODEJS_PATH_SERVER} \
 && npm cache clear --force \

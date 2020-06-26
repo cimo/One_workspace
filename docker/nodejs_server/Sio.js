@@ -15,36 +15,36 @@ const helper = require("./Helper");
 
 let connectionCount = 0;
 
-exports.startup = async(socketIoServer, socket) => {
-    run(socketIoServer, socket);
+exports.startup = async(socketIoServer, socket, type) => {
+    run(socketIoServer, socket, type);
 };
 
-const run = (socketIoServer, socket) => {
+const run = (socketIoServer, socket, type) => {
     let address = JSON.stringify(socket.handshake.address);
     
-    helper.writeLog(`Connection from client: ${address}`);
+    helper.writeLog(`${address} connected on ${type} server.`);
     
     connectionCount ++;
     
-    socketIoServer.emit("broadcast", `${connectionCount} clients connected.`);
+    socketIoServer.emit("broadcast", `${connectionCount} clients connected on ${type} server.`);
     
     let intervalEvent = setInterval(() => {
         serverTime(socket);
     }, 1000);
     
-    socket.emit("message", "Connected to server.");
+    socket.emit("message", `Connected to ${type} server.`);
     
     socket.on("disconnect", () => {
-        helper.writeLog(`Disconnection from client: ${address}`);
+        helper.writeLog(`${address} disconnected from ${type} client.`);
         
         connectionCount --;
         
-        socketIoServer.emit("broadcast", `${connectionCount} clients connected.`);
+        socketIoServer.emit("broadcast", `${connectionCount} clients connected on ${type} server.`);
         
         if (connectionCount === 0)
             clearInterval(intervalEvent);
         
-        socket.emit("message", "Disconnected from server.");
+        socket.emit("message", `Disconnected from ${type} server.`);
     });
 };
 

@@ -15,12 +15,12 @@ const socketIo = require("socket.io");
 
 const config = require("./Config");
 const helper = require("./Helper");
-const sio_Websocket = require("./Sio_Websocket");
+const sio = require("./Sio");
 const vue = require("./Vue");
 const terminal = require("./Terminal");
 
-const portHttp = 1080;
-const portHttps = 1443;
+const portHttp = ${process.env.NODEJS_PORT_HTTP};
+const portHttps = ${process.env.NODEJS_PORT_HTTPS};
 
 const urlRoot = `${path.dirname(__dirname)}/public`;
 
@@ -30,7 +30,7 @@ const certificates = {
 };
 
 const digest = httpAuth.digest({
-    realm: "Auth - Digest",
+    realm: config.settings.digest.realm,
     file: `${config.settings.digest.path}/.digest_htpasswd`
 });
 
@@ -62,10 +62,12 @@ httpsServer.listen(portHttps, () => {
 });
 
 socketIoServer.on("connection", (socket) => {
-    //sio_Websocket.startup(socketIoServer, socket);
+    sio.startup(socketIoServer, socket, "http");
+
+    terminal.socketEvent(socketIosServer, socket);
 });
 socketIosServer.on("connection", (socket) => {
-    sio_Websocket.startup(socketIosServer, socket);
+    sio.startup(socketIosServer, socket, "https");
 
     terminal.socketEvent(socketIosServer, socket);
 });

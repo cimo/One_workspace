@@ -23,7 +23,6 @@ COPY ${PATH_ROOT}/entrypoint_php.sh /usr/local/bin/entrypoint.sh
 
 # System
 RUN cd ~ \
-&& mkdir /var/run/sshd \
 && chmod +x /usr/local/bin/entrypoint.sh \
 && cp ${PHP7_PATH_ROOT}/php/php.ini-production ${PHP7_PATH_ROOT}/php/php.ini \
 && apt-get update && apt-get install -y --no-install-recommends \
@@ -47,6 +46,9 @@ zlib1g-dev \
 libxml2-dev \
 libpq-dev \
 libmagickwand-dev \
+# Time
+&& ln -sf /usr/share/zoneinfo/${TIMEZONE} /etc/localtime \
+&& dpkg-reconfigure -f noninteractive tzdata \
 # User sudo
 && useradd --home /home/${USER_NAME} --gid sudo --shell /bin/bash -m ${USER_NAME} \
 && echo "${USER_NAME}:${USER_PASSWORD}" | chpasswd \
@@ -55,9 +57,6 @@ libmagickwand-dev \
 && echo "${WWW_USER_NAME}:${WWW_USER_PASSWORD}" | chpasswd \
 && chown root:root /home/${WWW_USER_NAME} \
 && mkdir /home/${WWW_USER_NAME}/www \
-# Time
-&& ln -sf /usr/share/zoneinfo/${TIMEZONE} /etc/localtime \
-&& dpkg-reconfigure -f noninteractive tzdata \
 # Extension
 && pear config-set php_ini ${PHP7_PATH_ROOT}/php/php.ini \
 && pear config-set php_bin /usr/local/bin \
