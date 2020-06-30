@@ -19,8 +19,8 @@ const sio = require("./Sio");
 const vue = require("./Vue");
 const terminal = require("./Terminal");
 
-const portHttp = ${process.env.NODEJS_PORT_HTTP};
-const portHttps = ${process.env.NODEJS_PORT_HTTPS};
+const portHttp = process.env.NODEJS_PORT_HTTP;
+const portHttps = process.env.NODEJS_PORT_HTTPS;
 
 const urlRoot = `${path.dirname(__dirname)}/public`;
 

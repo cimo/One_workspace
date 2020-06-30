@@ -2,24 +2,22 @@
 
 /* global */
 
-const digestEnable = false;
-
 exports.settings = {
     'certificates': {
-        'key': `${process.env.CERTIFICATE_KEY}`,
-        'cert': `${process.env.CERTIFICATE_FILE}`
+        'key': `/home/${process.env.WWW_USER_NAME}/root/certificate/${process.env.CERTIFICATE_KEY}`,
+        'cert': `/home/${process.env.WWW_USER_NAME}/root/certificate/${process.env.CERTIFICATE_FILE}`
     },
     'digest': {
         'realm': "Auth - Digest",
-        'path': `/home/${process.env.WWW_USER_NAME}/www`,
-        'enable': digestEnable
+        'path': `/home/${process.env.WWW_USER_NAME}/root/web_space`,
+        'enable': process.env.NODEJS_DIGEST_ENABLE
     }
 };
 
 exports.digestCheck = (digest, callback) => {
     let self = this;
 
-    if (digestEnable === true) {
+    if (process.env.NODEJS_DIGEST_ENABLE === true) {
         return digest.check((req, res) => {
             callback.apply(self, [req, res]);
         });

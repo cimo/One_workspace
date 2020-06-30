@@ -23,12 +23,14 @@
             return {};
         },
         created() {
-            socketIo.on("t_command", (data) => {
-                console.log(data);
-            });
+            let socketTag = "t_";
 
             window.addEventListener("load", () => {
-                //socketIo.emit("t_command", {'cmd': "ls -la"});
+                //socketIo.emit(`${socketTag}_command`, {'cmd': "ls -la"});
+            });
+
+            socketIo.on(`${socketTag}_command`, (data) => {
+                console.log(data);
             });
         },
         beforeDestroy() {

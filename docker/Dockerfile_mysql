@@ -17,10 +17,17 @@ ENV DEBCONF_NOWARNINGS=yes
 
 # System
 RUN cd ~ \
-&& apt-get update && apt-get install -y --no-install-recommends \
+&& apt-get update && apt-get install -y \
 sudo \
 nano \
 tzdata \
+curl \
+make \
+git \
+zip \
+unzip \
+cron \
+wget \
 # Time
 && ln -sf /usr/share/zoneinfo/${TIMEZONE} /etc/localtime \
 && dpkg-reconfigure -f noninteractive tzdata \

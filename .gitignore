@@ -60,8 +60,9 @@ _system/style/custom/*
 ow_system/node_modules
 project/*
 !project/.gitkeep
+nodejs/node_modules
 virtual_host/custom/*
 !virtual_host/custom/.gitkeep
-!virtual_host/custom/localhost.conf
+!virtual_host/custom/example.conf
 error.log
 debug.log

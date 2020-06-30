@@ -1,7 +1,11 @@
 #!/bin/bash
 set -e
 
-pm2 start ${NODEJS_PATH_SERVER}/processes.json --only nodejs_server_dev
+# Server
+cd /home/${WWW_USER_NAME}/root/nodejs
+npm cache clear --force
+npm install
+node Server.js
 
 tail -f /dev/null
 

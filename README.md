@@ -35,7 +35,7 @@ Is a docker service container for have, in one space, a large and complete devel
 | Apache 2.4 |
 | MySql 5.7 |
 | PostgreSql 10.13 |
-| NodeJs 12.17.10 |
+| NodeJs 12.18.1 |
 | Python 3.8.3 (Coming soon...) |
 
 | Library: |

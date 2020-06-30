@@ -1,56 +1,56 @@
-ARG NODEJS_OS_VERSION
+ARG NODEJS_VERSION
 
-FROM ubuntu:${NODEJS_OS_VERSION}
+FROM node:${NODEJS_VERSION}
 
+ARG WWW_USER_NAME
 ARG PATH_ROOT
 ARG TIMEZONE
-ARG NODEJS_VERSION
+ARG CERTIFICATE_FILE
+ARG CERTIFICATE_KEY
+ARG CERTIFICATE_CHAIN
+ARG NODEJS_ENV
+ARG NODEJS_SERVER_NAME
 ARG NODEJS_PORT_HTTP
 ARG NODEJS_PORT_HTTPS
+ARG NODEJS_DIGEST_ENABLE
 ARG NODEJS_PORT_VUE
 ARG NODEJS_PORT_VUE_APP
-ARG NODEJS_PATH_SERVER
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV DEBCONF_NOWARNINGS=yes
-ENV NODE_ENV=development
 
-COPY ${PATH_ROOT}/certificate/. /etc/certificate/
-COPY ${PATH_ROOT}/nodejs_server/. ${NODEJS_PATH_SERVER}/
 COPY ${PATH_ROOT}/entrypoint_nodejs.sh /usr/local/bin/entrypoint.sh
 
 # System
 RUN cd ~ \
 && chmod +x /usr/local/bin/entrypoint.sh \
-&& apt-get update && apt-get install -y --no-install-recommends \
+&& apt-get update && apt-get install -y \
 sudo \
 nano \
 tzdata \
+curl \
+make \
+git \
+zip \
+unzip \
+cron \
+wget \
 # Time
 && ln -sf /usr/share/zoneinfo/${TIMEZONE} /etc/localtime \
 && dpkg-reconfigure -f noninteractive tzdata \
-# NodeJs
-&& curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash - \
-&& apt-get update \
-&& apt-get install nodejs \
-&& npm update -g npm \
 # Npm
+&& npm install -g pm2 \
 && npm install -g @vue/cli \
 && npm install -g terser \
 && npm install -g sass \
-&& npm install -g pm2 \
-## Selenium
-&& wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add \
+# Selenium
+&& wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add \
 && echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list \
 && apt-get update \
-&& apt-get install -y --no-install-recommends google-chrome-stable firefox \
-&& npm install -g selenium-side-runner --unsafe-perm=true --allow-root \
-&& npm install -g chromedriver --unsafe-perm=true --allow-root \
-&& npm install -g geckodriver --unsafe-perm=true --allow-root \
-# Server
-&& cd ${NODEJS_PATH_SERVER} \
-&& npm cache clear --force \
-&& npm install \
+&& apt-get install -y google-chrome-stable=83.0.4103.116-1 firefox-esr=68.9.0esr-1~deb9u1 \
+&& npm install -g selenium-side-runner@3.17.0 --unsafe-perm=true --allow-root \
+&& npm install -g chromedriver@83.0.0 --unsafe-perm=true --allow-root \
+&& npm install -g geckodriver@1.19.1 --unsafe-perm=true --allow-root \
 # Clean
 && rm -rf /var/lib/apt/lists/* \
 && apt-get clean -y \

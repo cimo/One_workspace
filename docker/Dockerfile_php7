@@ -25,10 +25,11 @@ COPY ${PATH_ROOT}/entrypoint_php.sh /usr/local/bin/entrypoint.sh
 RUN cd ~ \
 && chmod +x /usr/local/bin/entrypoint.sh \
 && cp ${PHP7_PATH_ROOT}/php/php.ini-production ${PHP7_PATH_ROOT}/php/php.ini \
-&& apt-get update && apt-get install -y --no-install-recommends \
+&& apt-get update && apt-get install -y \
 sudo \
 nano \
 tzdata \
+curl \
 make \
 git \
 zip \
@@ -50,13 +51,13 @@ libmagickwand-dev \
 && ln -sf /usr/share/zoneinfo/${TIMEZONE} /etc/localtime \
 && dpkg-reconfigure -f noninteractive tzdata \
 # User sudo
-&& useradd --home /home/${USER_NAME} --gid sudo --shell /bin/bash -m ${USER_NAME} \
+&& useradd --home /home/${USER_NAME} -g sudo --shell /bin/bash -m ${USER_NAME} \
 && echo "${USER_NAME}:${USER_PASSWORD}" | chpasswd \
 # User www
-&& useradd --home /home/${WWW_USER_NAME} --gid ${WEB_USER_GROUP} --shell /bin/false -m ${WWW_USER_NAME} \
+&& useradd --home /home/${WWW_USER_NAME} -g ${WEB_USER_GROUP} --shell /bin/false -m ${WWW_USER_NAME} \
 && echo "${WWW_USER_NAME}:${WWW_USER_PASSWORD}" | chpasswd \
 && chown root:root /home/${WWW_USER_NAME} \
-&& mkdir /home/${WWW_USER_NAME}/www \
+&& mkdir /home/${WWW_USER_NAME}/root \
 # Extension
 && pear config-set php_ini ${PHP7_PATH_ROOT}/php/php.ini \
 && pear config-set php_bin /usr/local/bin \
