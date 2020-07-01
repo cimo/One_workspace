@@ -37,7 +37,7 @@ services:
     volumes:
       - ${PATH_ROOT}:/home/${WWW_USER_NAME}/root
     networks:
-      one_workspace:
+      default:
         ipv4_address: ${PHP5_NETWORK_IP}
   php7_container:
     container_name: Php_${PHP7_VERSION}-fpm
@@ -76,7 +76,7 @@ services:
     volumes:
       - ${PATH_ROOT}:/home/${WWW_USER_NAME}/root
     networks:
-      one_workspace:
+      default:
         ipv4_address: ${PHP7_NETWORK_IP}
   apache_container:
     container_name: Apache_${APACHE_VERSION}
@@ -129,7 +129,7 @@ services:
       - php5_container
       - php7_container
     networks:
-      one_workspace:
+      default:
         ipv4_address: ${APACHE_NETWORK_IP}
   mysql_container:
     container_name: MySql_${MYSQL_VERSION}
@@ -166,7 +166,7 @@ services:
     depends_on:
       - apache_container
     networks:
-      one_workspace:
+      default:
         ipv4_address: ${MYSQL_NETWORK_IP}
   postgresql_container:
     container_name: PostgreSql_${POSTGRES_VERSION}
@@ -201,7 +201,7 @@ services:
     depends_on:
       - apache_container
     networks:
-      one_workspace:
+      default:
         ipv4_address: ${POSTGRES_NETWORK_IP}
   nodejs_container:
     container_name: NodeJs_${NODEJS_VERSION}
@@ -247,10 +247,10 @@ services:
       - ${PATH_ROOT}:/home/${WWW_USER_NAME}/root
       - ${NODEJS_VUE_DATA_PATH}:/home/${WWW_USER_NAME}/root/ow_system/node_modules
     networks:
-      one_workspace:
+      default:
         ipv4_address: ${NODEJS_NETWORK_IP}
 networks:
-  one_workspace:
+  default:
     driver: ${NETWORK_DRIVER}
     ipam:
       driver: default

@@ -38,11 +38,36 @@ Is a docker service container for have, in one space, a large and complete devel
 | NodeJs 12.18.1 |
 | Python 3.8.3 (Coming soon...) |
 
+## Instructions:
+1) Copy file in your folder (for example /home/cimo/One_workspace).
+
+2) Write on terminal:
+
+    cd /home/cimo/One_workspace
+    
+    sudo cp .env.dist .env
+    
+    sudo nano .env
+
+3) Modify file with your configuration, save and close the file.
+
+4) Add shared folder in your docker and write on terminal:
+    
+    docker-compose up -d --build
+
+5) Add in your hosts file:
+
+    127.0.0.1 localhost
+    127.0.0.1 php5
+    127.0.0.1 php7
+
+6) Write on your browser "https://localhost".
+
+<b>By CIMO - https://reinventsoftware.org</b>
+
 | Library: |
 |:---|
 | Docker - https://www.docker.com/ |
-
-<b>By CIMO - https://reinventsoftware.org</b>
 
 Supported By:
 
