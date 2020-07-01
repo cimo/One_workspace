@@ -8,8 +8,10 @@
     import WindowComponent from "@/components/WindowComponent.vue";
 
     import io from "socket.io-client";
-
-    const socketIo = io("https://localhost:1443");
+    
+    let port = window.location.protocol === "https:" ? 1443 : 1080;
+    
+    const socketIo = io(`${window.location.protocol}//localhost:${port}`);
 
     export default {
         name: "BodyComponent",
