@@ -3,7 +3,7 @@ One workspace
 
 One workspace for all your delevelop.
 
-Is a docker service container for have, in one space, a large and complete develop tolls that look and work in same way on all machine.
+Is a docker service container for have, in one space, a large and complete develop tools that look and work in same way on all machine.
 
 | Info: |
 |:---|
