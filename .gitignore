@@ -66,3 +66,4 @@ virtual_host/custom/*
 !virtual_host/custom/example.conf
 error.log
 debug.log
+.env
