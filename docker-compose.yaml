@@ -171,8 +171,6 @@ services:
     volumes:
       - ${PATH_ROOT}:/home/${WWW_USER_NAME}/root
       - ${MYSQL_DATA_PATH}:/var/lib/mysql
-    depends_on:
-      - apache_container
     networks:
       default:
         ipv4_address: ${MYSQL_NETWORK_IP}
@@ -208,8 +206,6 @@ services:
     volumes:
       - ${PATH_ROOT}:/home/${WWW_USER_NAME}/root
       - ${POSTGRES_DATA_PATH}:/var/lib/postgresql/data
-    depends_on:
-      - apache_container
     networks:
       default:
         ipv4_address: ${POSTGRES_NETWORK_IP}
