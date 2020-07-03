@@ -37,6 +37,8 @@ zip \
 unzip \
 cron \
 wget \
+re2c \
+file \
 libfreetype6-dev \
 libjpeg-dev \
 libpng-dev \
@@ -48,6 +50,11 @@ zlib1g-dev \
 libxml2-dev \
 libpq-dev \
 libmagickwand-dev \
+libgmp-dev \
+libmhash-dev \
+libmcrypt-dev \
+libmemcached-dev \
+zlib1g-dev \
 # Time
 && ln -sf /usr/share/zoneinfo/${TIMEZONE} /etc/localtime \
 && dpkg-reconfigure -f noninteractive tzdata \
@@ -60,19 +67,24 @@ libmagickwand-dev \
 && chown root:root /home/${WWW_USER_NAME} \
 && mkdir /home/${WWW_USER_NAME}/root \
 # Extension
+&& ln -s /usr/include/x86_64-linux-gnu/gmp.h /usr/local/include/ \
 && pear config-set php_ini ${PHP5_PATH_ROOT}/php/php.ini \
 && pear config-set php_bin /usr/local/bin \
 && echo "\n" | pecl install ssh2-0.13 \
 && echo "\n" | pecl install apcu-4.0.11 \
 && echo "\n" | pecl install xdebug-2.5.5 \
 && echo "\n" | pecl install imagick-3.4.4 \
+&& echo "\n" | pecl install memcached-3.1.5 \
 && docker-php-ext-configure gd --with-freetype-dir=/usr/include --with-jpeg-dir=/usr/include \
+&& docker-php-ext-configure gmp \
 && docker-php-ext-install gd \
 && docker-php-ext-install intl \
 && docker-php-ext-install opcache \
 && docker-php-ext-install zip \
 && docker-php-ext-install pdo_mysql \
 && docker-php-ext-install pdo_pgsql \
+&& docker-php-ext-install bcmath \
+&& docker-php-ext-install gmp \
 # Ini file setting
 && echo "\n\n \
 opcache.enable=1 \n \
