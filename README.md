@@ -43,23 +43,21 @@ Is a docker service container for have, in one space, a large and complete devel
 
 2) Write on terminal:
 
-    cd /home/cimo/One_workspace
-    
-    sudo cp .env.dist .env
-    
-    sudo nano .env
+        cd /home/cimo/One_workspace
+        sudo cp .env.dist .env
+        sudo nano .env
 
 3) Modify file with your configuration, save and close the file.
 
 4) Add your path in the shared folder docker dashboard and write on terminal:
 
-    sudo docker-compose up -d --build
+        sudo docker-compose up -d --build
 
 5) Add in your hosts file:
 
-    127.0.0.1 localhost
-    127.0.0.1 localhost-php5
-    127.0.0.1 localhost-php7
+        127.0.0.1 localhost
+        127.0.0.1 localhost-php5
+        127.0.0.1 localhost-php7
 
 6) Write on your browser "https://localhost".
 
