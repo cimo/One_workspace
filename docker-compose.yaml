@@ -137,9 +137,6 @@ services:
     volumes:
       - ${PATH_ROOT}:/home/${WWW_USER_NAME}/root
       - ${PATH_ROOT}:${APACHE_PATH_ROOT}/htdocs
-    depends_on:
-      - php5_container
-      - php7_container
     networks:
       default:
         ipv4_address: ${APACHE_NETWORK_IP}
