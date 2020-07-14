@@ -23,7 +23,7 @@ COPY ${PATH_ROOT}/sshd_config /etc/ssh/sshd_config
 COPY ${PATH_ROOT}/key/id_rsa /tmp/key/id_rsa
 COPY ${PATH_ROOT}/key/authorized_keys /tmp/key/authorized_keys
 COPY ${PATH_ROOT}/zz-docker_php5.conf ${PHP5_PATH_ROOT}/php-fpm.d/zz-docker.conf
-COPY ${PATH_ROOT}/override.ini ${PHP5_PATH_ROOT}/php/conf.d/override.ini
+COPY ${PATH_ROOT}/php_override.ini ${PHP5_PATH_ROOT}/php/conf.d/override.ini
 COPY ${PATH_ROOT}/entrypoint_php.sh /usr/local/bin/entrypoint.sh
 
 # System
@@ -108,7 +108,6 @@ zlib1g-dev \
 && docker-php-ext-install pdo_mysql \
 && docker-php-ext-install pdo_pgsql \
 && docker-php-ext-install mysql \
-&& docker-php-ext-install mysqli \
 && docker-php-ext-install bcmath \
 && docker-php-ext-install gmp \
 # Ini file setting

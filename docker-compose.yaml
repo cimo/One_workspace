@@ -140,12 +140,11 @@ services:
     networks:
       default:
         ipv4_address: ${APACHE_NETWORK_IP}
-  mysql_container:
-    container_name: MySql_${MYSQL_VERSION}
-    command: --sql_mode=""
+  mysql56_container:
+    container_name: MySql_5.6
     build:
       context: ${PATH_ROOT}/docker
-      dockerfile: Dockerfile_mysql
+      dockerfile: Dockerfile_mysql56
       args:
         WWW_USER_NAME: ${WWW_USER_NAME}
         WWW_USER_PASSWORD: ${WWW_USER_PASSWORD}
@@ -153,8 +152,7 @@ services:
         WEB_PATH: ${WEB_PATH}
         PATH_ROOT: ${PATH_ROOT}
         TIMEZONE: ${TIMEZONE}
-        MYSQL_VERSION: ${MYSQL_VERSION}
-        MYSQL_PORT: ${MYSQL_PORT}
+        MYSQL56_PORT: ${MYSQL56_PORT}
         MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
         MYSQL_USER: ${MYSQL_USER}
         MYSQL_PASSWORD: ${MYSQL_PASSWORD}
@@ -165,19 +163,53 @@ services:
       WEB_PATH: ${WEB_PATH}
       PATH_ROOT: ${PATH_ROOT}
       TIMEZONE: ${TIMEZONE}
-      MYSQL_VERSION: ${MYSQL_VERSION}
-      MYSQL_PORT: ${MYSQL_PORT}
+      MYSQL56_PORT: ${MYSQL56_PORT}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     ports:
-      - 127.0.0.1:${MYSQL_PORT}:3306
+      - 127.0.0.1:${MYSQL56_PORT}:3306
     volumes:
       - ${PATH_ROOT}:/home/${WWW_USER_NAME}/root
-      - ${MYSQL_DATA_PATH}:/var/lib/mysql
+      - ${MYSQL56_DATA_PATH}:/var/lib/mysql
     networks:
       default:
-        ipv4_address: ${MYSQL_NETWORK_IP}
+        ipv4_address: ${MYSQL56_NETWORK_IP}
+  mysql57_container:
+    container_name: MySql_5.7
+    build:
+      context: ${PATH_ROOT}/docker
+      dockerfile: Dockerfile_mysql57
+      args:
+        WWW_USER_NAME: ${WWW_USER_NAME}
+        WWW_USER_PASSWORD: ${WWW_USER_PASSWORD}
+        WEB_USER_GROUP: ${WEB_USER_GROUP}
+        WEB_PATH: ${WEB_PATH}
+        PATH_ROOT: ${PATH_ROOT}
+        TIMEZONE: ${TIMEZONE}
+        MYSQL57_PORT: ${MYSQL57_PORT}
+        MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+        MYSQL_USER: ${MYSQL_USER}
+        MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    environment:
+      WWW_USER_NAME: ${WWW_USER_NAME}
+      WWW_USER_PASSWORD: ${WWW_USER_PASSWORD}
+      WEB_USER_GROUP: ${WEB_USER_GROUP}
+      WEB_PATH: ${WEB_PATH}
+      PATH_ROOT: ${PATH_ROOT}
+      TIMEZONE: ${TIMEZONE}
+      MYSQL57_PORT: ${MYSQL57_PORT}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - 127.0.0.1:${MYSQL57_PORT}:3306
+    volumes:
+      - ${PATH_ROOT}:/home/${WWW_USER_NAME}/root
+      - ${MYSQL57_DATA_PATH}:/var/lib/mysql
+    networks:
+      default:
+        ipv4_address: ${MYSQL57_NETWORK_IP}
   postgresql_container:
     container_name: PostgreSql_${POSTGRES_VERSION}
     build:
