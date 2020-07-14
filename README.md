@@ -33,6 +33,7 @@ Is a docker service container for have, in one space, a large and complete devel
 | Php 5.6-fpm |
 | Php 7.4-fpm |
 | Apache 2.4 |
+| MySql 5.6 |
 | MySql 5.7 |
 | PostgreSql 10.13 |
 | NodeJs 12.18.1 |
