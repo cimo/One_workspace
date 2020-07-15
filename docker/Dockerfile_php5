@@ -32,7 +32,7 @@ RUN cd ~ \
 && chmod +x /usr/local/bin/entrypoint.sh \
 && cp ${PHP5_PATH_ROOT}/php/php.ini-production ${PHP5_PATH_ROOT}/php/php.ini \
 && apt-get update && apt-get install -y \
-openssh-server \
+software-properties-common \
 sudo \
 nano \
 tzdata \
@@ -43,6 +43,7 @@ zip \
 unzip \
 cron \
 wget \
+openssh-server \
 re2c \
 file \
 libfreetype6-dev \
@@ -107,7 +108,6 @@ zlib1g-dev \
 && docker-php-ext-install zip \
 && docker-php-ext-install pdo_mysql \
 && docker-php-ext-install pdo_pgsql \
-&& docker-php-ext-install mysql \
 && docker-php-ext-install bcmath \
 && docker-php-ext-install gmp \
 # Ini file setting
