@@ -10,11 +10,11 @@ ARG WEB_USER_GROUP
 ARG WEB_PATH
 ARG PATH_ROOT
 ARG TIMEZONE
-ARG PHP5_SSH_PORT
-ARG PHP5_PORT_FPM
-ARG PHP5_PORT_XDEBUG
 ARG PHP5_PATH_ROOT
 ARG PHP5_VH_NAME
+ARG PHP5_PORT_SSH
+ARG PHP5_PORT_FPM
+ARG PHP5_PORT_XDEBUG
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV DEBCONF_NOWARNINGS=yes
@@ -106,6 +106,7 @@ zlib1g-dev \
 && docker-php-ext-install intl \
 && docker-php-ext-install opcache \
 && docker-php-ext-install zip \
+&& docker-php-ext-install mysql \
 && docker-php-ext-install pdo_mysql \
 && docker-php-ext-install pdo_pgsql \
 && docker-php-ext-install bcmath \
@@ -139,4 +140,4 @@ xdebug.max_nesting_level=1000" >> ${PHP5_PATH_ROOT}/php/conf.d/override.ini \
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 
-EXPOSE ${PHP5_SSH_PORT} ${PHP5_PORT_FPM} ${PHP5_PORT_XDEBUG}
+EXPOSE ${PHP5_PORT_SSH} ${PHP5_PORT_FPM} ${PHP5_PORT_XDEBUG}
