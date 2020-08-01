@@ -35,7 +35,7 @@
                     </div>
                 </div>
                 <p class="label">Container</p>
-                <div v-for="(value, key) in containerItems" v-bind:key="`${key}-${value.name}`" class="program_container window_opener" v-bind:data-name="value.name">
+                <div v-for="(value, key) in containerItems" v-bind:key="`${key}-${value.name}`" class="program_container window_opener" v-bind:data-name="value.name" v-bind:data-container_name="value.containerName">
                     <div class="program">
                         <img v-bind:src="value.imagePath" v-bind:alt="value.imageName"/>
                         <p>{{value.name}}</p>
@@ -47,13 +47,16 @@
 </template>
 
 <script>
+    import Config from "@/assets/js/Config.js";
     import Helper from "@/assets/js/Helper.js";
-    
+
     export default {
         name: "MenuRootComponent",
-        //components: {},
+        /*components: {
+        },*/
         computed: {},
         methods: {
+            setting: Config.setting,
             findParent: Helper.findParent,
             focusCurrentWindow: Helper.focusCurrentWindow,
             menuRootLogic: function(event) {
@@ -61,7 +64,22 @@
                 
                 const menuRootContainerParent = this.findParent(event.target, "menuRoot_container");
                 const windowOpenerParent = this.findParent(event.target, "window_opener");
-                
+
+                if (windowOpenerParent !== null) {
+                    let name = windowOpenerParent.getAttribute("data-name");
+
+                    if (name === "VueJs") {
+                        let win = window.open(`http://localhost:${this.setting().vuejs.ui_port}`, "_blank");
+                        win.focus();
+                    }
+
+                    let windowElement = document.querySelector(`.window[data-origin='${name}']`);
+
+                    this.focusCurrentWindow(windowElement, (value) => {
+                        this.$root.$refs.windowComponent.connectWithContainer(value);
+                    });
+                }
+
                 if (event.target.classList.contains("root") === true || event.target.classList.contains("menuRoot_image") === true) {
                     if (menuRootContainer.style.display === "" || menuRootContainer.style.display === "none")
                         menuRootContainer.style.display = "block";
@@ -70,13 +88,6 @@
                 }
                 else if (menuRootContainerParent === null || windowOpenerParent !== null)
                     menuRootContainer.style.display = "none";
-                
-                if (windowOpenerParent !== null) {
-                    let name = windowOpenerParent.getAttribute("data-name");
-                    let window = document.querySelector(`.window[data-origin='${name}']`);
-                    
-                    this.focusCurrentWindow(window);
-                }
             }
         },
         data() {
@@ -91,22 +102,12 @@
                 ],
                 projectItems: [
                     {
-                        name: "Create",
-                        imagePath: require("@/assets/images/create.svg"),
-                        imageName: "create.svg"
-                    },
-                    {
                         name: "Explore",
                         imagePath: require("@/assets/images/explore.svg"),
                         imageName: "explore.svg"
                     }
                 ],
                 toolItems: [
-                    {
-                        name: "Docker",
-                        imagePath: require("@/assets/images/docker.svg"),
-                        imageName: "docker.svg"
-                    },
                     {
                         name: "Git",
                         imagePath: require("@/assets/images/git.svg"),
@@ -116,6 +117,11 @@
                         name: "Ssh",
                         imagePath: require("@/assets/images/ssh.svg"),
                         imageName: "ssh.svg"
+                    },
+                    {
+                        name: "VueJs",
+                        imagePath: require("@/assets/images/vuejs.svg"),
+                        imageName: "vuejs.svg"
                     },
                     {
                         name: "Terser",
@@ -142,34 +148,46 @@
                 ],
                 containerItems: [
                     {
+                        name: "NodeJs",
+                        containerName: "NodeJs_12.18.1",
+                        imagePath: require("@/assets/images/nodejs.svg"),
+                        imageName: "nodejs.svg"
+                    },
+                    {
+                        name: "Apache",
+                        containerName: "Apache_2.4",
+                        imagePath: require("@/assets/images/apache.svg"),
+                        imageName: "apache.svg"
+                    },
+                    {
                         name: "Php 5",
+                        containerName: "Php_5.6-fpm",
                         imagePath: require("@/assets/images/php.svg"),
                         imageName: "php.svg"
                     },
                     {
                         name: "Php 7",
+                        containerName: "Php_7.4-fpm",
                         imagePath: require("@/assets/images/php.svg"),
                         imageName: "php.svg"
                     },
                     {
-                        name: "Apache",
-                        imagePath: require("@/assets/images/apache.svg"),
-                        imageName: "apache.svg"
+                        name: "MySql 5.6",
+                        containerName: "MySql_5.6",
+                        imagePath: require("@/assets/images/mysql.svg"),
+                        imageName: "mysql.svg"
                     },
                     {
-                        name: "MySql",
+                        name: "MySql 5.7",
+                        containerName: "MySql_5.7",
                         imagePath: require("@/assets/images/mysql.svg"),
                         imageName: "mysql.svg"
                     },
                     {
                         name: "PostgreSql",
+                        containerName: "PostgreSql_10.13",
                         imagePath: require("@/assets/images/postgresql.svg"),
                         imageName: "postgresql.svg"
-                    },
-                    {
-                        name: "NodeJs",
-                        imagePath: require("@/assets/images/nodejs.svg"),
-                        imageName: "nodejs.svg"
                     }
                 ]
             };
@@ -178,14 +196,12 @@
             window.addEventListener("load", () => {
                 this.body = document.querySelector("body");
 
-                this.body.addEventListener("click", (event) => {
-                    this.menuRootLogic(event);
-                }, {passive: true});
+                this.body.addEventListener("click", this.menuRootLogic, {passive: true});
             });
         },
         beforeDestroy() {
             if (this.body !== null)
-                this.body.removeEventListener("click", () => {}, false);
+                this.body.removeEventListener("click", this.menuRootLogic, false);
         }
     }
 </script>

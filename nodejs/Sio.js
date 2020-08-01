@@ -2,48 +2,36 @@
 
 /* global */
 
-// Send to connected client
-//socket.emit("label", "message");
-
-// Send to all connected clients
-//socketIoServer.emit("label", "message");
-
 // Send to all clients except sender
 //socket.broadcast.emit("message");
 
-const helper = require("./Helper");
-
 let connectionCount = 0;
 
-exports.startup = async(socketIoServer, socket, type) => {
-    run(socketIoServer, socket, type);
-};
-
-const run = (socketIoServer, socket, type) => {
+const startup = async(helper, server, socket, type) => {
     let address = JSON.stringify(socket.handshake.address);
-    
+
     helper.writeLog(`${address} connected on ${type} server.`);
-    
+
     connectionCount ++;
-    
-    socketIoServer.emit("broadcast", `${connectionCount} clients connected on ${type} server.`);
-    
+
+    server.emit("broadcast", `${connectionCount} clients connected on ${type} server.`);
+
     let intervalEvent = setInterval(() => {
         serverTime(socket);
     }, 1000);
-    
+
     socket.emit("message", `Connected to ${type} server.`);
-    
+
     socket.on("disconnect", () => {
         helper.writeLog(`${address} disconnected from ${type} client.`);
-        
+
         connectionCount --;
-        
-        socketIoServer.emit("broadcast", `${connectionCount} clients connected on ${type} server.`);
-        
+
+        server.emit("broadcast", `${connectionCount} clients disconnected from ${type} server.`);
+
         if (connectionCount === 0)
             clearInterval(intervalEvent);
-        
+
         socket.emit("message", `Disconnected from ${type} server.`);
     });
 };
@@ -64,3 +52,5 @@ const serverTime = (socket) => {
     
     socket.emit("serverTime", date);
 };
+
+exports.startup = startup;

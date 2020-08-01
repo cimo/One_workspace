@@ -2,8 +2,13 @@
 
 /* global */
 
-exports.settings = {
-    'certificates': {
+const setting = {
+    'debug': false,
+    'port': {
+        'http': process.env.NODEJS_PORT_HTTP,
+        'https': process.env.NODEJS_PORT_HTTPS
+    },
+    'certificate': {
         'key': `/home/${process.env.WWW_USER_NAME}/root/certificate/${process.env.CERTIFICATE_KEY}`,
         'cert': `/home/${process.env.WWW_USER_NAME}/root/certificate/${process.env.CERTIFICATE_FILE}`
     },
@@ -14,7 +19,7 @@ exports.settings = {
     }
 };
 
-exports.digestCheck = (digest, callback) => {
+const digestCheck = (digest, callback) => {
     let self = this;
 
     if (process.env.NODEJS_DIGEST_ENABLE === true) {
@@ -28,3 +33,6 @@ exports.digestCheck = (digest, callback) => {
         };
     }
 };
+
+exports.setting = setting;
+exports.digestCheck = digestCheck;

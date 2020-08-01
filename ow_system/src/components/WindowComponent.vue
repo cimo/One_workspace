@@ -3,7 +3,7 @@
         <div class="header">
             <div class="overlay drag"></div>
             <div class="left_column">
-                <img src="@/assets/images/empty.png"/>
+                <img src="@/assets/images/empty.png" alt="empty.png"/>
                 <p></p>
             </div>
             <div class="right_column">
@@ -19,7 +19,8 @@
 
 <script>
     import Helper from "@/assets/js/Helper.js";
-    
+    import Sio from "@/assets/js/Sio.js";
+
     export default {
         name: "WindowComponent",
         //components: {},
@@ -31,37 +32,54 @@
             dragInit: Helper.dragInit,
             windowLogic: function(event) {
                 const windowOpenerParent = this.findParent(event.target, "window_opener");
-                
+
                 if (windowOpenerParent !== null) {
                     let name = windowOpenerParent.getAttribute("data-name");
-                    
-                    let opened = document.querySelector(`.window[data-origin='${name}']`);
-                    
-                    if (opened === null) {
-                        let windowComponent = document.querySelector("#window_component");
 
-                        let newWindowComponent = windowComponent.cloneNode(true);
-                        newWindowComponent.classList.remove("empty");
-                        newWindowComponent.setAttribute("data-origin", name);
-                        newWindowComponent.style.display = "block";
-                        newWindowComponent.classList.add("focused");
-                        document.querySelector("#body_component").appendChild(newWindowComponent);
+                    if (name !== "VueJs") {
+                        let windowElement = document.querySelector(`.window[data-origin='${name}']`);
 
-                        let alt = windowOpenerParent.querySelector("img").getAttribute("alt");
+                        if (windowElement === null) {
+                            let windowComponent = document.querySelector("#window_component");
 
-                        let icon = newWindowComponent.querySelector(".left_column img");
-                        icon.setAttribute("src", require(`@/assets/images/${alt}`));
+                            let newWindowComponent = windowComponent.cloneNode(true);
+                            newWindowComponent.classList.remove("empty");
+                            newWindowComponent.setAttribute("data-origin", name);
 
-                        let title = newWindowComponent.querySelector(".left_column p");
-                        title.innerHTML = name;
+                            newWindowComponent.style.display = "block";
+                            newWindowComponent.classList.add("focused");
+                            document.querySelector("#body_component").appendChild(newWindowComponent);
 
-                        let newMainbarElement = document.querySelector("#footer_component .left_column .mainbar_element.empty").cloneNode(true);
-                        newMainbarElement.classList.remove("empty");
-                        newMainbarElement.classList.add("opened");
-                        newMainbarElement.setAttribute("data-origin", name);
-                        newMainbarElement.querySelector("img").setAttribute("src", require(`@/assets/images/${alt}`));
-                        newMainbarElement.querySelector("img").setAttribute("alt", alt);
-                        document.querySelector("#footer_component .left_column").appendChild(newMainbarElement);
+                            let alt = windowOpenerParent.querySelector("img").getAttribute("alt");
+
+                            let icon = newWindowComponent.querySelector(".left_column img");
+                            icon.setAttribute("src", require(`@/assets/images/${alt}`));
+
+                            let title = newWindowComponent.querySelector(".left_column p");
+                            title.innerHTML = name;
+
+                            this.dragInit(newWindowComponent, "window");
+
+                            newWindowComponent.addEventListener("click", (event) => {
+                                if (this.oldOrigin !== "" && this.oldOrigin !== name) {
+                                    const rightColumnParent = this.findParent(event.target, "right_column");
+
+                                    if (rightColumnParent === null) {
+                                        this.focusCurrentWindow(newWindowComponent, (value) => {
+                                            this.connectWithContainer(value);
+                                        });
+                                    }
+                                }
+                            }, {passive: true});
+
+                            let newMainbarElement = document.querySelector("#footer_component .left_column .mainbar_element.empty").cloneNode(true);
+                            newMainbarElement.classList.remove("empty");
+                            newMainbarElement.classList.add("opened");
+                            newMainbarElement.setAttribute("data-origin", name);
+                            newMainbarElement.querySelector("img").setAttribute("src", require(`@/assets/images/${alt}`));
+                            newMainbarElement.querySelector("img").setAttribute("alt", alt);
+                            document.querySelector("#footer_component .left_column").appendChild(newMainbarElement);
+                        }
                     }
                 }
 
@@ -75,10 +93,9 @@
                             value.classList.remove("active");
                             value.classList.add("minimized");
 
-                            windowParent.classList.remove("focused");
-                            windowParent.style.display = "none";
-
-                            this.focusNextWindow(windowParent);
+                            this.focusNextWindow(windowParent, (value) => {
+                                this.connectWithContainer(value);
+                            });
                         }
                     });
 
@@ -99,7 +116,7 @@
                     }
 
                     windowParent.classList.toggle("maximized");
-                    
+
                     windowParent.style.top = 0;
                     windowParent.style.left = 0;
                     windowParent.style.transform = "none";
@@ -109,7 +126,9 @@
 
                     let mainbarOpenedElements = document.querySelectorAll(".mainbar_element.opened");
 
-                    this.focusNextWindow(windowParent);
+                    this.focusNextWindow(windowParent, (value) => {
+                        this.connectWithContainer(value);
+                    });
 
                     mainbarOpenedElements.forEach((value) => {
                         if (value.getAttribute("data-origin") === windowParent.getAttribute("data-origin"))
@@ -118,31 +137,67 @@
 
                     windowParent.parentNode.removeChild(windowParent);
                 }
+            },
+            connectWithContainer: function(windowParent) {
+                this.disconnectFromContainer();
+
+                if (windowParent !== undefined && windowParent !== null) {
+                    let origin = windowParent.getAttribute("data-origin");
+                    let windowOpener = document.querySelector(`.window_opener[data-name='${origin}']`);
+                    let containerName = windowOpener.getAttribute("data-container_name");
+
+                    if (containerName !== null) {
+                        this.oldOrigin = origin;
+
+                        this.currentWindowBody = windowParent.querySelector(".body");
+
+                        this.currentInterval = Sio.sendMessage("t_input", {'cmd': `docker stats ${containerName} --no-stream`}, 1000);
+
+                        let timeout = setTimeout(() => {
+                            Sio.readMessage("t_output", (data) => {
+                                if (this.currentWindowBody !== null)
+                                    this.currentWindowBody.innerHTML = data.stdout;
+                            });
+
+                            clearTimeout(timeout);
+                        }, 3000);
+                    }
+                }
+            },
+            disconnectFromContainer: function() {
+                clearInterval(this.currentInterval);
+
+                if (this.currentWindowBody !== null) {
+                    this.currentWindowBody.innerHTML = "";
+                    this.currentWindowBody = null;
+                }
+
+                Sio.stopRead("t_output");
             }
         },
         data: function() {
             return {
+              test: "",
                 body: null,
+                oldOrigin: "",
+                currentInterval: null,
+                currentWindowBody: null,
                 windowWidth: "60%",
                 windowHeight: "80%"
             };
         },
         created: function() {
+            this.$root.$refs.windowComponent = this;
+
             window.addEventListener("load", () => {
                 this.body = document.querySelector("body");
 
-                this.body.addEventListener("click", (event) => {
-                    this.windowLogic(event);
-                }, {passive: true});
-                
-                this.dragInit("window", true);
+                this.body.addEventListener("click", this.windowLogic, {passive: true});
             });
         },
         beforeDestroy: function() {
             if (this.body !== null)
-                this.body.removeEventListener("click", () => {}, false);
-
-            this.dragInit("window", false);
+                this.body.removeEventListener("click", this.windowLogic, false);
         }
     }
 </script>
@@ -154,7 +209,7 @@
         width: 60%;
         height: 80%;
         border: 1px solid #0078d7;
-        
+
         box-shadow:         0px 0px 5px #000000;
         -webkit-box-shadow: 0px 0px 5px #000000;
         -moz-box-shadow:    0px 0px 5px #000000;
@@ -210,8 +265,9 @@
     #window_component .body {
         background: #000000;
         height: calc(100% - 28px);
+        color: #ffffff;
     }
-    
+
     #window_component .footer {
     }
 </style>

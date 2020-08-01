@@ -112,6 +112,8 @@ services:
         PHP5_PORT_FPM: ${PHP5_PORT_FPM}
         PHP7_VH_NAME: ${PHP7_VH_NAME}
         PHP7_PORT_FPM: ${PHP7_PORT_FPM}
+        NODEJS_PORT_HTTP: ${NODEJS_PORT_HTTP}
+        NODEJS_PORT_HTTPS: ${NODEJS_PORT_HTTPS}
     environment:
       WWW_USER_NAME: ${WWW_USER_NAME}
       WWW_USER_PASSWORD: ${WWW_USER_PASSWORD}
@@ -131,6 +133,8 @@ services:
       PHP5_PORT_FPM: ${PHP5_PORT_FPM}
       PHP7_VH_NAME: ${PHP7_VH_NAME}
       PHP7_PORT_FPM: ${PHP7_PORT_FPM}
+      NODEJS_PORT_HTTP: ${NODEJS_PORT_HTTP}
+      NODEJS_PORT_HTTPS: ${NODEJS_PORT_HTTPS}
     ports:
       - 127.0.0.1:${APACHE_PORT_HTTP}:80
       - 127.0.0.1:${APACHE_PORT_HTTPS}:443
@@ -286,6 +290,7 @@ services:
       - 127.0.0.1:${NODEJS_PORT_VUE}:${NODEJS_PORT_VUE}
       - 127.0.0.1:${NODEJS_PORT_VUE_APP}:${NODEJS_PORT_VUE_APP}
     volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
       - ${PATH_ROOT}:/home/${WWW_USER_NAME}/root
     networks:
       default:

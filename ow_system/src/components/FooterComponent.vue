@@ -53,20 +53,21 @@
 
                     let origin = mainbarElement.getAttribute("data-origin");
 
-                    let window = document.querySelector(`.window[data-origin='${origin}']`);
+                    let windowElement = document.querySelector(`.window[data-origin='${origin}']`);
 
-                    if (window.classList.contains("focused") === true) {
+                    if (windowElement.classList.contains("focused") === true) {
                         mainbarElement.classList.add("minimized");
 
-                        window.classList.remove("focused");
-                        window.style.display = "none";
-
-                        this.focusNextWindow(window);
+                        this.focusNextWindow(windowElement, (value) => {
+                            this.$root.$refs.windowComponent.connectWithContainer(value);
+                        });
                     }
                     else {
                         mainbarElement.classList.remove("minimized");
 
-                        this.focusCurrentWindow(window);
+                        this.focusCurrentWindow(windowElement, (value) => {
+                            this.$root.$refs.windowComponent.connectWithContainer(value);
+                        });
                     }
                 }
             }
@@ -80,14 +81,12 @@
             window.addEventListener("load", () => {
                 this.body = document.querySelector("body");
 
-                this.body.addEventListener("click", (event) => {
-                    this.mainbarElementLogic(event);
-                }, {passive: true});
+                this.body.addEventListener("click", this.mainbarElementLogic, {passive: true});
             });
         },
         beforeDestroy() {
             if (this.body !== null)
-                this.body.removeEventListener("click", () => {}, false);
+                this.body.removeEventListener("click", this.mainbarElementLogic, false);
         }
     }
 </script>

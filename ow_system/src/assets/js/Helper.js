@@ -1,3 +1,9 @@
+"use strict";
+
+/* global */
+
+let target = null;
+
 let tag = "";
 
 let dragElementParent = null;
@@ -21,23 +27,7 @@ const findParent = (element, name) => {
     return null;
 };
 
-const focusNextWindow = (window) => {
-    if (window !== null && window.classList.contains("empty") === false && document.querySelectorAll(`.mainbar_element.opened:not(.minimized)`).length > 0) {
-        let origin =  window.previousSibling.getAttribute("data-origin");
-        let mainbarElement = document.querySelector(`.mainbar_element[data-origin='${origin}']`);
-
-        if (mainbarElement !== null) {
-            let newWindow = document.querySelector(`.window[data-origin='${origin}']`);
-
-            if (mainbarElement.classList.contains("opened") === true && mainbarElement.classList.contains("minimized") === false)
-                newWindow.classList.add("focused");
-            else
-                focusNextWindow(newWindow);
-        }
-    }
-};
-
-const focusCurrentWindow = (window) => {
+const focusCurrentWindow = (window, callback) => {
     if (window !== null) {
         let windows = document.querySelectorAll(".window");
 
@@ -52,46 +42,56 @@ const focusCurrentWindow = (window) => {
         let name = window.getAttribute("data-name");
 
         let minimized = document.querySelector(`.minimized[data-origin='${name}']`);
-        
+
         if (minimized !== null)
             minimized.classList.remove("minimized");
+
+        if (callback !== undefined)
+            callback(window);
     }
 };
 
-const dragInit = (tagValue, create) => {
-    tag = tagValue;
-    
-    let bodyComponent = document.querySelector("#body_component");
+const focusNextWindow = (window, callback) => {
+    if (window !== null && window.classList.contains("empty") === false && document.querySelectorAll(`.mainbar_element.opened:not(.minimized)`).length > 0) {
+        window.classList.remove("focused");
+        window.style.display = "none";
 
-    if (create === true) {
-        bodyComponent.addEventListener("mousedown", dragStart, {passive: true});
-        bodyComponent.addEventListener("mousemove", dragMove, {passive: true});
-        bodyComponent.addEventListener("mouseup", dragEnd, {passive: true});
-        
-        bodyComponent.addEventListener("touchstart", dragStart, {passive: true});
-        bodyComponent.addEventListener("touchmove", dragMove, {passive: true});
-        bodyComponent.addEventListener("touchend", dragEnd, {passive: true});
+        let origin =  window.previousSibling.getAttribute("data-origin");
+        let mainbarElement = document.querySelector(`.mainbar_element[data-origin='${origin}']`);
+
+        if (mainbarElement !== null) {
+            let newWindow = document.querySelector(`.window[data-origin='${origin}']`);
+
+            if (mainbarElement.classList.contains("opened") === true && mainbarElement.classList.contains("minimized") === false) {
+                newWindow.classList.add("focused");
+
+                if (callback !== undefined)
+                    callback(newWindow);
+            }
+            else
+                focusNextWindow(newWindow, callback);
+        }
     }
-    else {
-        bodyComponent.removeEventListener("mousedown", dragStart, false);
-        bodyComponent.removeEventListener("mousemove", dragMove, false);
-        bodyComponent.removeEventListener("mouseup", dragEnd, false);
-        
-        bodyComponent.removeEventListener("touchstart", dragStart, false);
-        bodyComponent.removeEventListener("touchmove", dragMove, false);
-        bodyComponent.removeEventListener("touchend", dragEnd, false);
-    }
+};
+
+const dragInit = (parent, tagValue) => {
+    target = parent.querySelector(".drag");
+
+    target.addEventListener("mousedown", dragStart, {passive: true});
+    target.addEventListener("mousemove", dragMove, {passive: true});
+    target.addEventListener("mouseup", dragEnd, {passive: true});
+
+    target.addEventListener("touchstart", dragStart, {passive: true});
+    target.addEventListener("touchmove", dragMove, {passive: true});
+    target.addEventListener("touchend", dragEnd, {passive: true});
+
+    tag = tagValue;
 };
 
 const dragStart = (event) => {
     dragElementParent = findParent(event.target, tag);
-    
-    const rightColumnParent = findParent(event.target, "right_column");
-    
-    if (rightColumnParent === null)
-        focusCurrentWindow(dragElementParent);
 
-    if (event.target.classList.contains("drag") === true) {
+    if (event.target.classList.contains("drag") === true && dragElementParent.classList.contains("focused") === true) {
         let dragElementParentBounding = dragElementParent.getBoundingClientRect();
 
         if (event.target.type === "touchstart") {
@@ -101,9 +101,11 @@ const dragStart = (event) => {
             xInitial = event.clientX - dragElementParentBounding.left;
             yInitial = event.clientY - dragElementParentBounding.top;
         }
-        
+
         active = true;
     }
+    else
+        dragEnd();
 };
 
 const dragMove = (event) => {
@@ -131,6 +133,6 @@ const dragEnd = () => {
 };
 
 exports.findParent = findParent;
-exports.focusNextWindow = focusNextWindow;
 exports.focusCurrentWindow = focusCurrentWindow;
+exports.focusNextWindow = focusNextWindow;
 exports.dragInit = dragInit;

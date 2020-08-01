@@ -4,19 +4,26 @@
 
 const {exec} = require("child_process");
 
-let socketTag = "t_";
+const socketEvent = async(helper, socket, type) => {
+    helper.writeLog(`Terminal listen on ${type}`);
 
-exports.socketEvent = async(socketIo, socket) => {
-    socket.on(`${socketTag}command`, async(data) => {
+    socket.on("t_input", async(data) => {
         if (data.cmd !== undefined) {
-            exec(data.cmd, (error, stdout, stderror) => {
-                if (error)
-                    socket.emit(`${socketTag}command`, error);
-                else
-                    socket.emit(`${socketTag}command`, {'stdout': stdout, 'stderror': stderror});
+            exec(data.cmd, (error, stdout, stderr) => {
+                if (error !== null) {
+                    socket.emit("t_output", error);
+
+                    helper.writeLog(`Terminal error => ${error}`);
+                } else {
+                    socket.emit("t_output", {'stdout': stdout, 'stderr': stderr});
+
+                    helper.writeLog(`Terminal output => ${stdout} - ${stderr}`);
+                }
             });
         }
         else
-            socket.emit(`${socketTag}command`, "cmd is undefined!");
+            socket.emit("t_output", "cmd is undefined!");
     });
 };
+
+exports.socketEvent = socketEvent;

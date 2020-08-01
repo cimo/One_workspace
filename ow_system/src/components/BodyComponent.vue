@@ -7,12 +7,6 @@
 <script>
     import WindowComponent from "@/components/WindowComponent.vue";
 
-    import io from "socket.io-client";
-    
-    let port = window.location.protocol === "https:" ? 1443 : 1080;
-    
-    const socketIo = io(`${window.location.protocol}//localhost:${port}`);
-
     export default {
         name: "BodyComponent",
         components: {
@@ -25,15 +19,6 @@
             return {};
         },
         created() {
-            let socketTag = "t_";
-
-            window.addEventListener("load", () => {
-                //socketIo.emit(`${socketTag}_command`, {'cmd': "ls -la"});
-            });
-
-            socketIo.on(`${socketTag}_command`, (data) => {
-                console.log(data);
-            });
         },
         beforeDestroy() {
         }
