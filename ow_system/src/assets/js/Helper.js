@@ -52,7 +52,7 @@ const focusCurrentWindow = (window, callback) => {
 };
 
 const focusNextWindow = (window, callback) => {
-    if (window !== null && window.classList.contains("empty") === false && document.querySelectorAll(`.mainbar_element.opened:not(.minimized)`).length > 0) {
+    if (window !== null && window.classList.contains("empty") === false) {
         window.classList.remove("focused");
         window.style.display = "none";
 

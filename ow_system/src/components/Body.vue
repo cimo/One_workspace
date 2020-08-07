@@ -1,11 +1,11 @@
 <template>
-    <div id="body_component">
+    <div class="body_component">
         <WindowComponent/>
     </div>
 </template>
 
 <script>
-    import WindowComponent from "@/components/WindowComponent.vue";
+    import WindowComponent from "@/components/Window.vue";
 
     export default {
         name: "BodyComponent",
@@ -25,8 +25,8 @@
     }
 </script>
 
-<style>
-    #body_component {
+<style scoped>
+    .body_component {
         background-color: #000000;
         position: fixed;
         top: 0;

@@ -14,6 +14,8 @@ ARG PHP7_PATH_ROOT
 ARG PHP7_VH_NAME
 ARG PHP7_PORT_SSH
 ARG PHP7_PORT_FPM
+ARG PHP7_KEY_XDEBUG
+ARG PHP7_HOST_XDEBUG
 ARG PHP7_PORT_XDEBUG
 
 ENV DEBIAN_FRONTEND=noninteractive
@@ -120,10 +122,10 @@ opcache.validate_timestamps=0 \n \
 opcache.interned_strings_buffer=16 \n \
 opcache.fast_shutdown=1" >> ${PHP7_PATH_ROOT}/php/conf.d/override.ini \
 && echo "\n \
-xdebug.remote_enable=on \n \
+xdebug.remote_enable=1 \n \
 xdebug.remote_handler=dbgp \n \
-xdebug.remote_mode=req \n \
-xdebug.remote_host=127.0.0.1 \n \
+xdebug.idekey=${PHP7_KEY_XDEBUG} \n \
+xdebug.remote_host=${PHP7_HOST_XDEBUG} \n \
 xdebug.remote_port=${PHP7_PORT_XDEBUG} \n \
 xdebug.remote_log=/tmp/xdebug.log \n \
 xdebug.max_nesting_level=1000" >> ${PHP7_PATH_ROOT}/php/conf.d/override.ini \

@@ -1,5 +1,5 @@
 <template>
-    <div id="footer_component">
+    <div class="footer_component">
         <div class="left_column">
             <MenuRootComponent/>
             <div class="mainbar_element empty">
@@ -14,8 +14,8 @@
 
 <script>
     import Helper from "@/assets/js/Helper.js";
-    import MenuRootComponent from "@/components/MenuRootComponent.vue";
-    import TimeDateComponent from "@/components/TimeDateComponent.vue";
+    import MenuRootComponent from "@/components/MenuRoot.vue";
+    import TimeDateComponent from "@/components/TimeDate.vue";
 
     export default {
         name: "FooterComponent",
@@ -29,7 +29,7 @@
             focusNextWindow: Helper.focusNextWindow,
             focusCurrentWindow: Helper.focusCurrentWindow,
             mainbarElementLogic: function(event) {
-                const rootParent = this.findParent(event.target, "root");
+                /*const rootParent = this.findParent(event.target, "root");
                 const menuRootContainerParent = this.findParent(event.target, "menuRoot_container");
                 const windowOpenerParent = this.findParent(event.target, "window_opener");
                 const minimizedParent = this.findParent(event.target, "minimized");
@@ -53,23 +53,27 @@
 
                     let origin = mainbarElement.getAttribute("data-origin");
 
+                    this.$root.$refs.windowComponent.oldOrigin = origin;
+
                     let windowElement = document.querySelector(`.window[data-origin='${origin}']`);
 
                     if (windowElement.classList.contains("focused") === true) {
                         mainbarElement.classList.add("minimized");
 
-                        this.focusNextWindow(windowElement, (value) => {
-                            this.$root.$refs.windowComponent.connectWithContainer(value);
+                        this.focusNextWindow(windowElement, () => {
+                            //this.$root.$refs.containerComponent.connectWithContainer(value);
                         });
                     }
                     else {
                         mainbarElement.classList.remove("minimized");
 
-                        this.focusCurrentWindow(windowElement, (value) => {
-                            this.$root.$refs.windowComponent.connectWithContainer(value);
+                        this.focusCurrentWindow(windowElement, () => {
+                            //this.$root.$refs.containerComponent.connectWithContainer(value);
                         });
                     }
-                }
+                }*/
+
+                this.findParent(event.target, "root");
             }
         },
         data() {
@@ -82,9 +86,11 @@
                 this.body = document.querySelector("body");
 
                 this.body.addEventListener("click", this.mainbarElementLogic, {passive: true});
-            });
+            }, {passive: true});
         },
         beforeDestroy() {
+            window.removeEventListener("load", () => {}, false);
+
             if (this.body !== null)
                 this.body.removeEventListener("click", this.mainbarElementLogic, false);
         }
@@ -92,7 +98,7 @@
 </script>
 
 <style>
-    #footer_component {
+    .footer_component {
         display: flex;
         justify-content: space-between;
         height: 40px;
@@ -103,7 +109,15 @@
         bottom: 0;
     }
 
-    #footer_component .mainbar_element {
+    .footer_component .left_column .mainbar_element {
+        margin-left: 5px;
+    }
+
+    .footer_component .right_column .mainbar_element {
+        margin-right: 5px;
+    }
+
+    .footer_component .mainbar_element {
         text-align: center;
         display: inline-block;
         color: #ffffff;
@@ -112,33 +126,22 @@
         width: 50px;
         padding-top: 7px;
     }
-    #footer_component .mainbar_element img {
+    .footer_component .mainbar_element img {
         width: 25px;
         height: 25px;
     }
-    
-    #footer_component .mainbar_element.empty {
+    .footer_component .mainbar_element.empty {
         display: none;
     }
-
-    #footer_component .mainbar_element:hover, #footer_component .mainbar_element.active, #footer_component .mainbar_element.opened {
+    .footer_component .mainbar_element.active, .footer_component .mainbar_element.opened, .footer_component .mainbar_element:hover {
         background-color: rgba(255, 255, 255, 0.1);
     }
-
-    #footer_component .mainbar_element.minimized {
+    .footer_component .mainbar_element.minimized {
         height: 30px !important;
         background-color: transparent !important;
         border-bottom: 3px solid rgba(255, 255, 255, 0.5);
     }
-    #footer_component .mainbar_element.minimized:hover {
+    .footer_component .mainbar_element.minimized:hover {
         background-color: rgba(255, 255, 255, 0.1) !important;
-    }
-
-    #footer_component .left_column .mainbar_element {
-        margin-left: 5px;
-    }
-
-    #footer_component .right_column .mainbar_element {
-        margin-right: 5px;
     }
 </style>

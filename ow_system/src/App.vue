@@ -6,8 +6,8 @@
 </template>
 
 <script>
-    import BodyComponent from "@/components/BodyComponent.vue";
-    import FooterComponent from "@/components/FooterComponent.vue";
+    import BodyComponent from "@/components/Body.vue";
+    import FooterComponent from "@/components/Footer.vue";
 
     export default {
         name: "App",

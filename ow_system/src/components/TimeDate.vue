@@ -46,7 +46,7 @@
     }
 </script>
 
-<style>
+<style scoped>
     #timeDate_component {
         width: 90px !important;
         padding-top: 6px !important;
