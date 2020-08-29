@@ -1,7 +1,7 @@
 <template>
-    <div id="timeDate_component" class="mainbar_element root">
-        <p>{{time}}</p>
-        <p>{{date}}</p>
+    <div class="timeDate_component mainbar_element">
+        <p class="time"></p>
+        <p class="date"></p>
     </div>
 </template>
 
@@ -11,47 +11,57 @@
         //components: {},
         computed: {},
         methods: {
-            timeDateLogic: function() {
-                let currentDate = new Date();
+            init() {
+                this.timeElement = document.querySelector(".timeDate_component .time");
+                this.dateElement = document.querySelector(".timeDate_component .date");
 
-                let minute = currentDate.getMinutes();
-                minute = minute < 10 ? `0${minute}` : `${minute}`;
+                this._execute();
 
-                this.time = `${currentDate.getHours()}:${minute}`;
+                this.interval = setInterval(() => {
+                    this._execute();
+                }, 1000);
+            },
+            _execute() {
+                if (this.timeElement !== null && this.dateElement !== null) {
+                    let currentDate = new Date();
 
-                let month = currentDate.getMonth() + 1;
-                month = month < 10 ? `0${month}` : `${month}`;
+                    let month = currentDate.getMonth() + 1;
+                    month = month < 10 ? `0${month}` : `${month}`;
 
-                let day = currentDate.getDate();
-                day = day < 10 ? `0${day}` : `${day}`;
+                    let day = currentDate.getDate();
+                    day = day < 10 ? `0${day}` : `${day}`;
 
-                this.date = `${currentDate.getFullYear()}/${month}/${day}`;
+                    this.dateElement.innerHTML = `${currentDate.getFullYear()}/${month}/${day}`;
+
+                    let minute = currentDate.getMinutes();
+                    minute = minute < 10 ? `0${minute}` : `${minute}`;
+
+                    this.timeElement.innerHTML = `${currentDate.getHours()}:${minute}`;
+                }
             }
         },
-        data: function() {
+        data() {
             return {
-                time: null,
-                date: null,
-                timeDateInterval: null
+                timeElement: null,
+                dateElement: null,
+                interval: null
             };
         },
-        created: function() {
-            window.addEventListener("load", () => {
-                this.timeDateInterval = setInterval(this.timeDateLogic, 1000);
-            });
+        created() {
+            this.$root.$refs.timeDateComponent = this;
         },
-        beforeDestroy: function() {
-            clearInterval(this.timeDateInterval);
+        beforeDestroy() {
+            clearInterval(this.interval);
         }
     }
 </script>
 
 <style scoped>
-    #timeDate_component {
+    .timeDate_component {
         width: 90px !important;
         padding-top: 6px !important;
     }
-    #timeDate_component p {
+    .timeDate_component p {
         font-size: 12px;
     }
 </style>

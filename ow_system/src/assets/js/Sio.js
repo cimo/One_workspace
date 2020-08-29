@@ -6,7 +6,7 @@ const io = require("socket.io-client");
 
 const config = require("@/assets/js/Config.js");
 
-const socketIo = io(config.setting().nodejs.url);
+const socketIo = io(config.setting().websocket.url);
 
 const sendMessage = (socketTag, command, time) => {
     if (time !== undefined && time > 0) {

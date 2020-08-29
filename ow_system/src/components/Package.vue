@@ -1,5 +1,5 @@
 <template>
-    <div id="package_component">
+    <div class="package_component">
     </div>
 </template>
 
@@ -8,24 +8,19 @@
         name: "PackageComponent",
         //components: {},
         computed: {},
-        methods: {
-        },
-        data: function() {
+        methods: {},
+        data() {
             return {};
         },
-        created: function() {
-            window.addEventListener("load", () => {
-            });
+        created() {
+            this.$root.$refs.packageComponent = this;
         },
-        beforeDestroy: function() {
-            if (this.body !== null)
-                this.body.removeEventListener("click", () => {}, false);
-        }
+        beforeDestroy() {}
     }
 </script>
 
 <style scoped>
-    #package_component {
+    .package_component {
         display: none;
     }
 </style>

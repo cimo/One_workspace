@@ -1,5 +1,5 @@
 <template>
-    <div id="tool_component">
+    <div class="tool_component">
     </div>
 </template>
 
@@ -8,24 +8,19 @@
         name: "ToolComponent",
         //components: {},
         computed: {},
-        methods: {
-        },
-        data: function() {
+        methods: {},
+        data() {
             return {};
         },
-        created: function() {
-            window.addEventListener("load", () => {
-            });
+        created() {
+            this.$root.$refs.toolComponent = this;
         },
-        beforeDestroy: function() {
-            if (this.body !== null)
-                this.body.removeEventListener("click", () => {}, false);
-        }
+        beforeDestroy() {}
     }
 </script>
 
 <style scoped>
-    #tool_component {
+    .tool_component {
         display: none;
     }
 </style>

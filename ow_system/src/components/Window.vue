@@ -39,221 +39,204 @@
         },
         computed: {},
         methods: {
-            findParent: Helper.findParent,
-            focusNextWindow: Helper.focusNextWindow,
-            focusCurrentWindow: Helper.focusCurrentWindow,
-            dragInit: Helper.dragInit,
-            windowInit: function(windowOpener) {
+            _findParent: Helper.findParent,
+            _currentWindowElement: Helper.currentWindowElement,
+            _focusCurrentWindow: Helper.focusCurrentWindow,
+            _focusNextWindow: Helper.focusNextWindow,
+            _focusCurrentMainbarElement: Helper.focusCurrentMainbarElement,
+            _unMinimizeElement: Helper.unMinimizeElement,
+            _dragInit: Helper.dragInit,
+            _changeStatus(event) {
+                let overlayElement = event !== undefined ? this._findParent(event.target, ["overlay"]) : false;
+
+                if (overlayElement !== null && this.windowComponent !== null) {
+                    if (this.windowComponent.classList.contains("maximized") === false) {
+                        let clientRect = this.windowComponent.getBoundingClientRect();
+                        this.windowPosition[this.windowName].x = clientRect.x;
+                        this.windowPosition[this.windowName].y = clientRect.y;
+
+                        this.windowComponent.style.transform = "translate3d(0, 0, 0)";
+                        this.windowComponent.style.width = "calc(100% - 2px)";
+                        this.windowComponent.style.height = "calc(100% - 42px)";
+
+                        this.windowComponent.querySelector(".overlay").classList.remove("drag");
+                    }
+                    else {
+                        this.windowComponent.style.transform = `translate3d(${this.windowPosition[this.windowName].x}px, ${this.windowPosition[this.windowName].y}px, 0)`;
+                        this.windowComponent.style.width = this.windowSize[this.windowName].width;
+                        this.windowComponent.style.height = this.windowSize[this.windowName].height;
+
+                        this.windowComponent.querySelector(".overlay").classList.add("drag");
+                    }
+
+                    this.windowComponent.classList.toggle("maximized");
+
+                    this.resizeLogic();
+                }
+            },
+            _close() {
+                this.windowComponent = null;
+
+                delete this.windowPosition[this.windowName];
+                delete this.windowSize[this.windowName];
+
+                this.windowName = "";
+            },
+            init(windowOpener) {
                 let name = windowOpener.getAttribute("data-name");
                 let category = windowOpener.getAttribute("data-category");
 
-                let windowComponent = this.body.querySelector(`.window_component[data-origin='${name}']`);
-                let windowComponents = this.body.querySelectorAll(".window_component:not(.empty)");
-
-                windowComponents.forEach((value) => {
-                    value.classList.remove("focused");
-                });
+                let windowComponent = document.querySelector(`.window_component[data-name='${name}']`);
 
                 if (windowComponent === null) {
-                    let windowComponentEmpty = this.body.querySelector(".window_component.empty");
+                    this.windowName = name;
+
+                    let windowComponentEmpty = document.querySelector(".window_component.empty");
 
                     let newWindowComponent = windowComponentEmpty.cloneNode(true);
                     newWindowComponent.classList.remove("empty");
-                    newWindowComponent.setAttribute("data-origin", name);
+                    newWindowComponent.classList.add("focused");
+                    newWindowComponent.setAttribute("data-name", this.windowName);
                     newWindowComponent.setAttribute("data-category", category);
                     newWindowComponent.style.display = "block";
-                    newWindowComponent.classList.add("focused");
 
                     if (category === "container") {
-                        newWindowComponent.querySelector("#project_component").remove();
-                        newWindowComponent.querySelector("#tool_component").remove();
-                        newWindowComponent.querySelector("#package_component").remove();
+                        newWindowComponent.querySelector(".project_component").remove();
+                        newWindowComponent.querySelector(".tool_component").remove();
+                        newWindowComponent.querySelector(".package_component").remove();
                     }
                     else {
-                        newWindowComponent.querySelector("#project_component").remove();
-                        newWindowComponent.querySelector("#tool_component").remove();
-                        newWindowComponent.querySelector("#package_component").remove();
-                        newWindowComponent.querySelector("#container_component").remove();
+                        newWindowComponent.querySelector(".project_component").remove();
+                        newWindowComponent.querySelector(".tool_component").remove();
+                        newWindowComponent.querySelector(".package_component").remove();
+                        newWindowComponent.querySelector(".container_component").remove();
                     }
 
-                    let alt = windowOpener.querySelector("img").getAttribute("alt");
+                    let src = windowOpener.querySelector("img").getAttribute("src");
 
                     let icon = newWindowComponent.querySelector(".left_column img");
-                    icon.setAttribute("src", require(`@/assets/images/${alt}`));
+                    icon.setAttribute("src", src);
 
                     let title = newWindowComponent.querySelector(".left_column p");
-                    title.innerHTML = name;
+                    title.innerHTML = this.windowName;
 
-                    this.body.querySelector(".body_component").appendChild(newWindowComponent);
+                    let style = window.getComputedStyle(newWindowComponent);
+                    this.windowPosition[this.windowName] = {'x': 0, 'y': 0};
+                    this.windowSize[this.windowName] = {'width': style.width, 'height': style.height};
 
-                    this.dragInit(newWindowComponent, "window_component");
+                    document.querySelector(".body_component").appendChild(newWindowComponent);
+
+                    this.windowComponent = newWindowComponent;
+
+                    this._dragInit(newWindowComponent, ["window_component", "focused"]);
+
+                    this.$root.$refs.containerComponent.init(newWindowComponent);
+                    this.$root.$refs.footerComponent.init(windowOpener);
                 }
                 else
-                    windowComponent.classList.add("focused");
+                    this._unMinimizeElement(this.windowName);
+
+                this._focusCurrentWindow(this.windowComponent);
+
+                this._focusCurrentMainbarElement();
             },
-            windowLogic: function() {
-                /*const windowOpenerParent = this.findParent(event.target, "window_opener");
+            clickLogic(event) {
+                let windowComponent = this._findParent(event.target, ["window_component"]);
 
-                if (windowOpenerParent !== null) {
-                    let name = windowOpenerParent.getAttribute("data-name");
-                    let category = windowOpenerParent.getAttribute("data-category");
+                if (windowComponent !== null) {
+                    let currentWindowElement = this._currentWindowElement(windowComponent);
 
-                    if (name !== "VueJs") {
-                        let windowElement = this.body.querySelector(`.window[data-origin='${name}']`);
+                    this.windowName = currentWindowElement[0];
+                    this.windowComponent = windowComponent;
 
-                        if (windowElement === null) {
-                            let windowComponent = this.body.querySelector("#window_component");
+                    this._focusCurrentWindow(this.windowComponent);
 
-                            let newWindowComponent = windowComponent.cloneNode(true);
-                            newWindowComponent.classList.remove("empty");
-                            newWindowComponent.setAttribute("data-origin", name);
-                            newWindowComponent.setAttribute("data-category", category);
-                            newWindowComponent.style.display = "block";
-                            newWindowComponent.classList.add("focused");
+                    this._focusCurrentMainbarElement();
 
-                            if (category === "container") {
-                                newWindowComponent.querySelector("#project_component").remove();
-                                newWindowComponent.querySelector("#tool_component").remove();
-                                newWindowComponent.querySelector("#package_component").remove();
-                            }
-                            else {
-                                newWindowComponent.querySelector("#project_component").remove();
-                                newWindowComponent.querySelector("#tool_component").remove();
-                                newWindowComponent.querySelector("#package_component").remove();
-                                newWindowComponent.querySelector("#container_component").remove();
-                            }
+                    if (event.target.classList.contains("button_minimize") === true) {
+                        this.windowComponent.classList.add("minimized");
+                        this.windowComponent.style.display = "none";
 
-                            this.body.querySelector(".body_component").appendChild(newWindowComponent);
+                        this._focusNextWindow();
 
-                            let alt = windowOpenerParent.querySelector("img").getAttribute("alt");
+                        this.$root.$refs.footerComponent.minimize(this.windowComponent);
 
-                            let icon = newWindowComponent.querySelector(".left_column img");
-                            icon.setAttribute("src", require(`@/assets/images/${alt}`));
+                        this._focusCurrentMainbarElement();
+                    }
+                    else if (event.target.classList.contains("button_maximize") === true)
+                        this._changeStatus();
+                    else if (event.target.classList.contains("button_close") === true) {
+                        this.$root.$refs.commandComponent.close(this.windowComponent);
+                        this.$root.$refs.terminalComponent.close(this.windowComponent);
+                        this.$root.$refs.dataComponent.close(this.windowComponent);
 
-                            let title = newWindowComponent.querySelector(".left_column p");
-                            title.innerHTML = name;
+                        this.windowComponent.parentNode.removeChild(this.windowComponent);
 
-                            this.dragInit(newWindowComponent, "window");
+                        this._focusNextWindow();
 
-                            newWindowComponent.addEventListener("click", (event) => {
-                                if (this.oldOrigin !== "" && this.oldOrigin !== name) {
-                                    const rightColumnParent = this.findParent(event.target, "right_column");
+                        this.$root.$refs.footerComponent.remove(this.windowComponent);
 
-                                    if (rightColumnParent === null) {
-                                        this.oldOrigin = name;
+                        this._focusCurrentMainbarElement();
 
-                                        this.focusCurrentWindow(newWindowComponent, () => {
-                                            //this.$root.$refs.containerComponent.connectWithContainer(value);
-                                        });
-                                    }
-                                }
-                            }, {passive: true});
+                        this._close();
+                    }
+                }
+                else {
+                    let windowOpener = this._findParent(event.target, ["window_opener"]);
+                    let mainbarElement = this._findParent(event.target, ["mainbar_element", "program"]);
 
-                            let newMainbarElement = this.body.querySelector(".footer_component .left_column .mainbar_element.empty").cloneNode(true);
-                            newMainbarElement.classList.remove("empty");
-                            newMainbarElement.classList.add("opened");
-                            newMainbarElement.setAttribute("data-origin", name);
-                            newMainbarElement.querySelector("img").setAttribute("src", require(`@/assets/images/${alt}`));
-                            newMainbarElement.querySelector("img").setAttribute("alt", alt);
-                            this.body.querySelector(".footer_component .left_column").appendChild(newMainbarElement);
-                        }
+                    if (windowOpener === null && mainbarElement === null)
+                        this._focusCurrentWindow();
+                }
+            },
+            doubleClickLogic(event) {
+                this._changeStatus(event);
+            },
+            resizeLogic() {
+                let currentWindowElement = this._currentWindowElement(this.windowComponent);
+
+                if (window.innerWidth < 840) {
+                    let windowComponentList = document.querySelectorAll(".window_component:not(.empty)");
+
+                    for (const value of windowComponentList) {
+                        value.style.transform = "translate3d(0, 0, 0)";
                     }
                 }
 
-                if (event.target.classList.contains("button_minimize") === true) {
-                    const windowParent = this.findParent(event.target, "window");
-
-                    let mainbarOpenedElements = this.body.querySelectorAll(".mainbar_element.opened");
-
-                    mainbarOpenedElements.forEach((value) => {
-                        if (value.getAttribute("data-origin") === windowParent.getAttribute("data-origin")) {
-                            value.classList.remove("active");
-                            value.classList.add("minimized");
-
-                            this.focusNextWindow(windowParent, () => {
-                                //this.$root.$refs.containerComponent.connectWithContainer(value);
-                            });
-                        }
-                    });
-
-                    windowParent.style.display = "none";
-                }
-                else if (event.target.classList.contains("button_maximize") === true) {
-                    const windowParent = this.findParent(event.target, "window");
-
-                    if (windowParent.classList.contains("maximized") === false) {
-                        windowParent.style.width = "calc(100% - 2px)";
-                        windowParent.style.height = "calc(100% - 42px)";
-                        windowParent.querySelector(".overlay").classList.remove("drag");
-                    }
-                    else {
-                        windowParent.style.width = this.windowWidth;
-                        windowParent.style.height = this.windowHeight;
-                        windowParent.querySelector(".overlay").classList.add("drag");
-                    }
-
-                    windowParent.classList.toggle("maximized");
-
-                    windowParent.style.top = 0;
-                    windowParent.style.left = 0;
-                    windowParent.style.transform = "none";
-                }
-                else if (event.target.classList.contains("button_close") === true) {
-                    const windowParent = this.findParent(event.target, "window");
-
-                    let mainbarOpenedElements = this.body.querySelectorAll(".mainbar_element.opened");
-
-                    this.focusNextWindow(windowParent, () => {
-                        //this.$root.$refs.containerComponent.connectWithContainer(value);
-                    });
-
-                    mainbarOpenedElements.forEach((value) => {
-                        if (value.getAttribute("data-origin") === windowParent.getAttribute("data-origin"))
-                            value.parentNode.removeChild(value);
-                    });
-
-                    windowParent.parentNode.removeChild(windowParent);
-
-                    this.$root.$refs.containerComponent.disconnectFromContainer();
-                }*/
+                this.$root.$refs.terminalComponent.resizeLogic(this.windowComponent, currentWindowElement);
             }
         },
-        data: function() {
+        data() {
             return {
-                body: null,
-                oldOrigin: "",
-                windowWidth: 0,
-                windowHeight: 0
+                windowComponent: null,
+                windowPosition: [],
+                windowSize: [],
+                windowName: ""
             };
         },
-        created: function() {
+        created() {
             this.$root.$refs.windowComponent = this;
-
-            window.addEventListener("load", () => {
-                this.body = document.querySelector("body");
-
-                let style = window.getComputedStyle(this.body.querySelector(".window_component.empty"));
-                this.windowWidth = style.width;
-                this.windowHeight = style.height;
-
-                this.body.addEventListener("click", this.windowLogic, {passive: true});
-            }, {passive: true});
         },
-        beforeDestroy: function() {
-            window.removeEventListener("load", () => {}, false);
-
-            if (this.body !== null)
-                this.body.removeEventListener("click", this.windowLogic, false);
-        }
+        beforeDestroy() {}
     }
 </script>
 
 <style scoped>
+    @media(max-width: 839px) {
+        .window_component {
+            width: 80%;
+        }
+    }
+    @media(min-width: 840px) {
+        .window_component {
+            width: 50%;
+        }
+    }
+
     .window_component {
         display: none;
         position: fixed;
-        width: 70%;
-        height: 80%;
+        height: 70%;
         border: 1px solid #0078d7;
 
         box-shadow: 0px 0px 5px #000000;
@@ -281,15 +264,19 @@
         cursor: default;
     }
     .window_component .header .left_column img {
-        width: 18px;
-        height: 18px;
-        margin: 5px;
+        position: relative;
+        top: 50%;
+        left: 8px;
+        transform: translate(0, -50%);
+        display: block;
+        width: 20px;
     }
     .window_component .header .left_column p {
         color: #ffffff;
         margin: 5px;
-        display: inline-block;
-        vertical-align: top;
+        position: absolute;
+        top: 0;
+        left: 30px;
     }
     .window_component .header .right_column .button {
         width: 18px;
@@ -306,7 +293,7 @@
 
     .window_component .body {
         position: relative;
-        background: #2b2b2b;
+        background: #232323;
         height: calc(100% - 28px);
         color: #ffffff;
     }

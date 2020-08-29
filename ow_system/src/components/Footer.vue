@@ -2,8 +2,8 @@
     <div class="footer_component">
         <div class="left_column">
             <MenuRootComponent/>
-            <div class="mainbar_element empty">
-                <img src="" alt=""/>
+            <div class="mainbar_element program empty">
+                <img class="icon_window" src="" alt=""/>
             </div>
         </div>
         <div class="right_column">
@@ -25,75 +25,64 @@
         },
         computed: {},
         methods: {
-            findParent: Helper.findParent,
-            focusNextWindow: Helper.focusNextWindow,
-            focusCurrentWindow: Helper.focusCurrentWindow,
-            mainbarElementLogic: function(event) {
-                /*const rootParent = this.findParent(event.target, "root");
-                const menuRootContainerParent = this.findParent(event.target, "menuRoot_container");
-                const windowOpenerParent = this.findParent(event.target, "window_opener");
-                const minimizedParent = this.findParent(event.target, "minimized");
-                const openedParent = this.findParent(event.target, "opened");
+            _findParent: Helper.findParent,
+            _unMinimizeElement: Helper.unMinimizeElement,
+            init(windowOpener) {
+                let name = windowOpener.getAttribute("data-name");
+                let category = windowOpener.getAttribute("data-category");
 
-                let mainbarElements = document.querySelectorAll(".mainbar_element");
+                let mainbarElementEmpty = document.querySelector(".footer_component .left_column .mainbar_element.empty");
 
-                mainbarElements.forEach((value) => {
-                    if (rootParent !== value)
-                        value.classList.remove("active");
-                });
+                let newMainbarElement = mainbarElementEmpty.cloneNode(true);
+                newMainbarElement.classList.remove("empty");
+                newMainbarElement.classList.add("focused");
+                newMainbarElement.setAttribute("data-name", name);
+                newMainbarElement.setAttribute("data-category", category);
 
-                if (rootParent !== null && menuRootContainerParent === null)
-                    rootParent.classList.toggle("active");
+                let src = windowOpener.querySelector("img").getAttribute("src");
 
-                if (windowOpenerParent !== null)
-                    rootParent.classList.remove("active");
+                let icon = newMainbarElement.querySelector("img");
+                icon.setAttribute("src", src);
 
-                if (minimizedParent !== null || openedParent !== null) {
-                    let mainbarElement = minimizedParent !== null ? minimizedParent : openedParent;
+                document.querySelector(".footer_component .left_column").appendChild(newMainbarElement);
+            },
+            clickLogic(event) {
+                let mainbarElement = this._findParent(event.target, ["mainbar_element"]);
 
-                    let origin = mainbarElement.getAttribute("data-origin");
+                if (mainbarElement !== null) {
+                    let name = mainbarElement.getAttribute("data-name");
+                    let windowComponent = document.querySelector(`.window_component[data-name='${name}']`);
 
-                    this.$root.$refs.windowComponent.oldOrigin = origin;
+                    if (mainbarElement.classList.contains("focused") === true)
+                        this.minimize(windowComponent);
+                    else
+                        this._unMinimizeElement(name);
+                }
+            },
+            minimize(windowComponent) {
+                let name = windowComponent.getAttribute("data-name");
 
-                    let windowElement = document.querySelector(`.window[data-origin='${origin}']`);
+                let mainbarElement = document.querySelector(`.footer_component .left_column .mainbar_element[data-name='${name}']`);
 
-                    if (windowElement.classList.contains("focused") === true) {
-                        mainbarElement.classList.add("minimized");
+                mainbarElement.classList.add("minimized");
 
-                        this.focusNextWindow(windowElement, () => {
-                            //this.$root.$refs.containerComponent.connectWithContainer(value);
-                        });
-                    }
-                    else {
-                        mainbarElement.classList.remove("minimized");
+                windowComponent.querySelector(".button_minimize").click();
+            },
+            remove(windowComponent) {
+                let name = windowComponent.getAttribute("data-name");
 
-                        this.focusCurrentWindow(windowElement, () => {
-                            //this.$root.$refs.containerComponent.connectWithContainer(value);
-                        });
-                    }
-                }*/
+                let mainbarElement = document.querySelector(`.footer_component .left_column .mainbar_element[data-name='${name}']`);
 
-                this.findParent(event.target, "root");
+                mainbarElement.parentNode.removeChild(mainbarElement);
             }
         },
         data() {
-            return {
-                body: null
-            };
+            return {};
         },
         created() {
-            window.addEventListener("load", () => {
-                this.body = document.querySelector("body");
-
-                this.body.addEventListener("click", this.mainbarElementLogic, {passive: true});
-            }, {passive: true});
+            this.$root.$refs.footerComponent = this;
         },
-        beforeDestroy() {
-            window.removeEventListener("load", () => {}, false);
-
-            if (this.body !== null)
-                this.body.removeEventListener("click", this.mainbarElementLogic, false);
-        }
+        beforeDestroy() {}
     }
 </script>
 
@@ -122,18 +111,25 @@
         display: inline-block;
         color: #ffffff;
         cursor: pointer;
-        height: 33px;
+        height: 37px;
         width: 50px;
-        padding-top: 7px;
+        padding-top: 2px;
     }
-    .footer_component .mainbar_element img {
+    .footer_component .mainbar_element .icon_window, .menuRoot_image {
+        position: relative;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        display: block;
         width: 25px;
-        height: 25px;
     }
     .footer_component .mainbar_element.empty {
         display: none;
     }
-    .footer_component .mainbar_element.active, .footer_component .mainbar_element.opened, .footer_component .mainbar_element:hover {
+    .footer_component .mainbar_element.focused {
+        background-color: rgba(0, 120, 215, 0.5);
+    }
+    .footer_component .mainbar_element:hover {
         background-color: rgba(255, 255, 255, 0.1);
     }
     .footer_component .mainbar_element.minimized {

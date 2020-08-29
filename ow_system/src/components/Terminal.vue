@@ -1,118 +1,153 @@
 <template>
-    <div class="terminal_component">
-        <pre class="output empty"></pre>
-        <div class="cmd_container">
-            <div class="prompt">
-                <p>[cimo@<span class="cwd">one_workspace</span>] #</p>
-            </div>
-            <input class="cmd" value=""/>
-        </div>
-    </div>
+    <div class="terminal_component"></div>
 </template>
 
 <script>
     import Helper from "@/assets/js/Helper.js";
     import Sio from "@/assets/js/Sio.js";
 
+    import {Terminal} from "xterm";
+    import {FitAddon} from "xterm-addon-fit";
+    import "xterm/css/xterm.css";
+
     export default {
         name: "TerminalComponent",
         //components: {},
         computed: {},
         methods: {
-            findParent: Helper.findParent,
-            terminalInit: function() {
-                this.currentWindow = this.body.querySelector(".window.focused");
+            _findParent: Helper.findParent,
+            _currentWindowElement: Helper.currentWindowElement,
+            _createXterm() {
+                if (this.windowComponent !== null && this.name !== null && this.containerName !== null) {
+                    Sio.sendMessage("t_pty_start", {'tag': this.containerName});
 
-                let cmdContainer = this.currentWindow.querySelector(".terminal_component .cmd_container");
-                cmdContainer.querySelector(".cmd").focus();
-            },
-            executeCommand: function(event) {
-                let terminalComponent = this.findParent(event.target, "terminal_component");
+                    let terminalComponent = this.windowComponent.querySelector(".terminal_component");
+                    let terminal = terminalComponent.querySelector(".terminal.xterm");
 
-                if (terminalComponent !== null) {
-                    if (event.keyCode === 13) {
-                        Sio.sendMessage("t_cmd_exec", {'cmd': event.target.value});
+                    if (terminal !== null)
+                        terminal.remove();
 
-                        Sio.readMessage("t_cmd_exec", (data) => {
-                            console.log(data);
+                    this.xtermList[this.containerName] = new Terminal({
+                        cursorBlink: true
+                    });
+                    this.fitAddonList[this.containerName] = new FitAddon();
+                    this.xtermList[this.containerName].loadAddon(this.fitAddonList[this.containerName]);
+                    this.xtermList[this.containerName].open(terminalComponent);
+                    this.xtermList[this.containerName].focus();
+                    this.fitAddonList[this.containerName].fit();
 
-                            if (data.output !== "" && data.output !== 0) {
-                                let outputElement = this.currentWindow.querySelector(".terminal_component .output.empty");
-
-                                let newOutputElement = outputElement.cloneNode(true);
-                                newOutputElement.classList.remove("empty");
-                                newOutputElement.innerHTML = data.output;
-                                newOutputElement.style.display = "block";
-                                this.currentWindow.querySelector(".terminal_component").appendChild(newOutputElement);
-                            }
-
-                            let cmdContainer = this.currentWindow.querySelector(".terminal_component .cmd_container");
-
-                            let newCmdContainer = cmdContainer.cloneNode(true);
-                            newCmdContainer.querySelector(".cmd").value = "";
-                            this.currentWindow.querySelector(".terminal_component").appendChild(newCmdContainer);
-
-                            cmdContainer.classList.remove("cmd_container");
-                            cmdContainer.classList.add("cmd_container_old");
-                            cmdContainer.querySelector(".cmd").setAttribute("disabled", "disabled");
-
-                            cmdContainer = this.currentWindow.querySelector(".terminal_component .cmd_container");
-                            cmdContainer.querySelector(".cmd").focus();
-
-                            if (data.output === "" || data.output === 0) {
-                                let cwdElements = this.currentWindow.querySelectorAll(".terminal_component .prompt .cwd");
-                                cwdElements[cwdElements.length - 1].innerHTML = data.cwd;
-                            }
-
-                            Sio.stopRead("t_cmd_exec");
-                        });
+                    if (this.name === "NodeJs")
+                        Sio.sendMessage("t_pty_i", {'tag': this.containerName, 'cmd': `history -c && history -w && clear\r`});
+                    else {
+                        Sio.sendMessage("t_pty_i", {'tag': this.containerName, 'cmd': `docker exec -it ${this.containerName} /bin/bash\r`});
+                        Sio.sendMessage("t_pty_i", {'tag': this.containerName, 'cmd': `history -c && history -w && clear\r`});
                     }
+
+                    this.xtermList[this.containerName].onData((event) => {
+                        Sio.sendMessage("t_pty_i", {'tag': this.containerName, 'cmd': event});
+                    });
+
+                    Sio.readMessage(`t_pty_o_${this.containerName}`, (data) => {
+                        if (terminalComponent !== null) {
+                            if ((this.name !== "NodeJs" && data.trim() === "exit") || data === "xterm_reset") {
+                                Sio.stopRead(`t_pty_o_${this.containerName}`);
+
+                                this._createXterm();
+                            }
+                            else
+                                this.xtermList[this.containerName].write(data);
+                        }
+                    });
+                }
+            },
+            init(windowComponent) {
+                let currentWindowElement = this._currentWindowElement(windowComponent);
+
+                if (currentWindowElement !== null) {
+                    this.name = currentWindowElement[0];
+                    this.containerName = currentWindowElement[3];
+                    this.windowComponent = windowComponent;
+
+                    let terminal = this.windowComponent.querySelector(".terminal.xterm");
+
+                    if (terminal === null)
+                        this._createXterm();
+                }
+            },
+            clickLogic(event) {
+                let windowComponent = this._findParent(event.target, ["window_component"]);
+                let currentWindowElement = this._currentWindowElement(windowComponent);
+
+                if (currentWindowElement !== null) {
+                    this.name = currentWindowElement[0];
+                    this.containerName = currentWindowElement[3];
+                    this.windowComponent = windowComponent;
+
+                    if (this.xtermList[this.containerName] !== undefined)
+                        this.xtermList[this.containerName].focus();
+                }
+            },
+            resizeLogic(windowComponent, currentWindowElement) {
+                if (currentWindowElement !== null) {
+                    this.name = currentWindowElement[0];
+                    this.containerName = currentWindowElement[3];
+                    this.windowComponent = windowComponent;
+
+                    let terminalComponent = this.windowComponent.querySelector(".terminal_component");
+                    let terminal = terminalComponent.querySelector(".terminal.xterm");
+
+                    if (terminal !== null && this.fitAddonList[this.containerName] !== undefined) {
+                        let clientRect = terminalComponent.getBoundingClientRect();
+                        terminal.style.height = `${clientRect.height}px`;
+
+                        this.fitAddonList[this.containerName].fit();
+                    }
+                }
+            },
+            close(windowComponent) {
+                let currentWindowElement = this._currentWindowElement(windowComponent);
+
+                if (currentWindowElement !== null) {
+                    this.name = currentWindowElement[0];
+                    this.containerName = currentWindowElement[3];
+                    this.windowComponent = windowComponent;
+
+                    Sio.sendMessage("t_pty_close", {'tag': this.containerName});
+                    Sio.stopRead(`t_pty_o_${this.containerName}`);
+
+                    delete this.xtermList[this.containerName];
+                    delete this.fitAddonList[this.containerName];
+
+                    this.windowComponent = null;
+                    this.name = null;
+                    this.containerName = null;
                 }
             }
         },
         data() {
             return {
-                body: null,
-                currentWindow: null
+                windowComponent: null,
+                name: null,
+                containerName: null,
+                xtermList: [],
+                fitAddonList: []
             };
         },
         created() {
             this.$root.$refs.terminalComponent = this;
-
-            window.addEventListener("load", () => {
-                this.body = document.querySelector("body");
-
-                this.body.addEventListener("keyup", this.executeCommand, {passive: true});
-            }, {passive: true});
         },
-        beforeDestroy() {
-            this.body.removeEventListener("keyup", this.executeCommand, false);
-        }
+        beforeDestroy() {}
     }
 </script>
 
 <style scoped>
     .terminal_component {
-        padding: 10px;
-    }
-
-    .terminal_component .output.empty {
         display: none;
-    }
-
-    .terminal_component .prompt {
-        color: #96b38a;
-        display: inline-block;
-    }
-
-    .terminal_component .cmd {
-        display: inline-block;
-        background-color: transparent;
-        margin-left: 5px;
-        width: 79%;
-        border: none;
-        outline: none;
-        font: inherit;
-        color: inherit;
+        position: absolute;
+        top: 28px;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 0;
     }
 </style>

@@ -7,12 +7,11 @@ Is a docker service container for have, in one space, a large and complete devel
 
 | Info: |
 |:---|
-| Ui tools for increase your productivity |
+| Secure and fast ui tools for increase your productivity |
 | Cross platform (Windows docker, Linux docker, Mac docker) |
 
 | Project: |
 |:---|
-| Create |
 | Explore |
 
 | Tool: |
@@ -37,7 +36,6 @@ Is a docker service container for have, in one space, a large and complete devel
 | MySql 5.7 |
 | PostgreSql 10.13 |
 | NodeJs 12.18.1 |
-| Python 3.8.3 (Coming soon...) |
 
 ## Instructions:
 1) Copy file in your folder (for example /home/cimo/One_workspace).

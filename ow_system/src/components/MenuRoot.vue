@@ -5,40 +5,40 @@
         <div class="menuRoot_container">
             <div class="menuRoot_side">
                 <div class="menuRoot_side_container">
-                    <div v-for="(value, key) in sideItems" v-bind:key="`${key}-${value.name}`" class="window_opener" v-bind:data-category="value.category" v-bind:data-name="value.name">
+                    <div v-for="(value, key) in menuRoot.sideItems" v-bind:key="`${key}-${value.name}`" class="window_opener" v-bind:data-category="value.category" v-bind:data-name="value.name">
                         <div class="item">
-                            <img v-bind:src="value.imagePath" v-bind:alt="value.imageName"/>
+                            <img class="icon" v-bind:src="value.imagePath" v-bind:alt="value.imageName"/>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="menuRoot_panel">
                 <p class="label">Project</p>
-                <div v-for="(value, key) in projectItems" v-bind:key="`${key}-${value.name}`" class="window_opener" v-bind:data-category="value.category" v-bind:data-name="value.name">
+                <div v-for="(value, key) in menuRoot.projectItems" v-bind:key="`${key}-${value.name}`" class="window_opener" v-bind:data-category="value.category" v-bind:data-name="value.name">
                     <div class="program">
-                        <img v-bind:src="value.imagePath" v-bind:alt="value.imageName"/>
-                        <p>{{value.name}}</p>
+                        <img class="icon" v-bind:src="value.imagePath" v-bind:alt="value.imageName"/>
+                        <p class="text">{{value.name}}</p>
                     </div>
                 </div>
                 <p class="label">Tool</p>
-                <div v-for="(value, key) in toolItems" v-bind:key="`${key}-${value.name}`" class="window_opener" v-bind:data-category="value.category" v-bind:data-name="value.name">
+                <div v-for="(value, key) in menuRoot.toolItems" v-bind:key="`${key}-${value.name}`" class="window_opener" v-bind:data-category="value.category" v-bind:data-name="value.name">
                     <div class="program">
-                        <img v-bind:src="value.imagePath" v-bind:alt="value.imageName"/>
-                        <p>{{value.name}}</p>
+                        <img class="icon" v-bind:src="value.imagePath" v-bind:alt="value.imageName"/>
+                        <p class="text">{{value.name}}</p>
                     </div>
                 </div>
                 <p class="label">Package</p>
-                <div v-for="(value, key) in packageItems" v-bind:key="`${key}-${value.name}`" class="window_opener" v-bind:data-category="value.category" v-bind:data-name="value.name">
+                <div v-for="(value, key) in menuRoot.packageItems" v-bind:key="`${key}-${value.name}`" class="window_opener" v-bind:data-category="value.category" v-bind:data-name="value.name">
                     <div class="program">
-                        <img v-bind:src="value.imagePath" v-bind:alt="value.imageName"/>
-                        <p>{{value.name}}</p>
+                        <img class="icon" v-bind:src="value.imagePath" v-bind:alt="value.imageName"/>
+                        <p class="text">{{value.name}}</p>
                     </div>
                 </div>
                 <p class="label">Container</p>
-                <div v-for="(value, key) in containerItems" v-bind:key="`${key}-${value.name}`" class="window_opener" v-bind:data-category="value.category" v-bind:data-name="value.name" v-bind:data-container_name="value.containerName">
+                <div v-for="(value, key) in menuRoot.containerItems" v-bind:key="`${key}-${value.name}`" class="window_opener" v-bind:data-category="value.category" v-bind:data-name="value.name" v-bind:data-container_name="value.containerName">
                     <div class="program">
-                        <img v-bind:src="value.imagePath" v-bind:alt="value.imageName"/>
-                        <p>{{value.name}}</p>
+                        <img class="icon" v-bind:src="value.imagePath" v-bind:alt="value.imageName"/>
+                        <p class="text">{{value.name}}</p>
                     </div>
                 </div>
             </div>
@@ -52,181 +52,60 @@
 
     export default {
         name: "MenuRootComponent",
-        /*components: {
-        },*/
         computed: {},
         methods: {
-            setting: Config.setting,
-            findParent: Helper.findParent,
-            focusCurrentWindow: Helper.focusCurrentWindow,
-            menuRootLogic: function(event) {
-                let menuRootComponent = this.findParent(event.target, "menuRoot_component");
-                let menuRootContainer = this.body.querySelector(".menuRoot_container");
+            _setting: Config.setting,
+            _findParent: Helper.findParent,
+            clickLogic(event) {
+                let menuRootComponent = this._findParent(event.target, ["menuRoot_component"]);
 
-                if (menuRootComponent === null) {
-                    menuRootContainer.style.display = "none";
+                if (menuRootComponent !== null) {
+                    this.menuRootContainer = menuRootComponent.querySelector(".menuRoot_container");
 
-                    return;
-                }
+                    if (menuRootComponent === null) {
+                        this.menuRootContainer.style.display = "none";
 
-                if (event.target.classList.contains("menuRoot_component") === true || event.target.classList.contains("menuRoot_image") === true) {
-                    if (menuRootContainer.style.display === "" || menuRootContainer.style.display === "none")
-                        menuRootContainer.style.display = "block";
-                    else
-                        menuRootContainer.style.display = "none";
-                }
-
-                const windowOpener = this.findParent(event.target, "window_opener");
-
-                if (windowOpener !== null) {
-                    let name = windowOpener.getAttribute("data-name");
-
-                    this.$root.$refs.windowComponent.oldOrigin = name;
-
-                    if (name === "VueJs") {
-                        let tab = window.open(`http://localhost:${this.setting().vuejs.ui_port}`, "_blank");
-                        tab.focus();
+                        return;
                     }
 
-                    menuRootContainer.style.display = "none";
+                    if (event.target.classList.contains("menuRoot_component") === true || event.target.classList.contains("menuRoot_image") === true) {
+                        if (this.menuRootContainer.style.display === "" || this.menuRootContainer.style.display === "none")
+                            this.menuRootContainer.style.display = "block";
+                        else
+                            this.menuRootContainer.style.display = "none";
+                    }
 
-                    this.$root.$refs.windowComponent.windowInit(windowOpener);
+                    const windowOpener = this._findParent(event.target, ["window_opener"]);
 
-                    //this.focusCurrentWindow(windowElement);
+                    if (windowOpener !== null) {
+                        let name = windowOpener.getAttribute("data-name");
+
+                        if (name === "VueJs") {
+                            let tab = window.open(`http://localhost:${this._setting().vuejs.ui_port}`, "_blank");
+                            tab.focus();
+                        }
+                        else
+                            this.$root.$refs.windowComponent.init(windowOpener);
+
+                        this.menuRootContainer.style.display = "none";
+                    }
                 }
+                else if (this.menuRootContainer !== null)
+                    this.menuRootContainer.style.display = "none";
             }
         },
         data() {
+            let menuRoot = this._setting().menu_root;
+
             return {
-                body: null,
-                sideItems: [
-                    {
-                        category: "side",
-                        name: "Setting",
-                        imagePath: require("@/assets/images/setting.svg"),
-                        imageName: "setting.svg"
-                    }
-                ],
-                projectItems: [
-                    {
-                        category: "project",
-                        name: "Explore",
-                        imagePath: require("@/assets/images/explore.svg"),
-                        imageName: "explore.svg"
-                    }
-                ],
-                toolItems: [
-                    {
-                        category: "tool",
-                        name: "Git",
-                        imagePath: require("@/assets/images/git.svg"),
-                        imageName: "git.svg"
-                    },
-                    {
-                        category: "tool",
-                        name: "Ssh",
-                        imagePath: require("@/assets/images/ssh.svg"),
-                        imageName: "ssh.svg"
-                    },
-                    {
-                        category: "tool",
-                        name: "VueJs",
-                        imagePath: require("@/assets/images/vuejs.svg"),
-                        imageName: "vuejs.svg"
-                    },
-                    {
-                        category: "tool",
-                        name: "Terser",
-                        imagePath: require("@/assets/images/terser.svg"),
-                        imageName: "terser.svg"
-                    },
-                    {
-                        category: "tool",
-                        name: "Sass",
-                        imagePath: require("@/assets/images/sass.svg"),
-                        imageName: "sass.svg"
-                    }
-                ],
-                packageItems: [
-                    {
-                        category: "package",
-                        name: "Npm",
-                        imagePath: require("@/assets/images/npm.svg"),
-                        imageName: "npm.svg"
-                    },
-                    {
-                        category: "package",
-                        name: "Composer",
-                        imagePath: require("@/assets/images/composer.svg"),
-                        imageName: "composer.svg"
-                    }
-                ],
-                containerItems: [
-                    {
-                        category: "container",
-                        name: "NodeJs",
-                        containerName: "NodeJs_12.18.1",
-                        imagePath: require("@/assets/images/nodejs.svg"),
-                        imageName: "nodejs.svg"
-                    },
-                    {
-                        category: "container",
-                        name: "Apache",
-                        containerName: "Apache_2.4",
-                        imagePath: require("@/assets/images/apache.svg"),
-                        imageName: "apache.svg"
-                    },
-                    {
-                        category: "container",
-                        name: "Php 5",
-                        containerName: "Php_5.6-fpm",
-                        imagePath: require("@/assets/images/php.svg"),
-                        imageName: "php.svg"
-                    },
-                    {
-                        category: "container",
-                        name: "Php 7",
-                        containerName: "Php_7.4-fpm",
-                        imagePath: require("@/assets/images/php.svg"),
-                        imageName: "php.svg"
-                    },
-                    {
-                        category: "container",
-                        name: "MySql 5.6",
-                        containerName: "MySql_5.6",
-                        imagePath: require("@/assets/images/mysql.svg"),
-                        imageName: "mysql.svg"
-                    },
-                    {
-                        category: "container",
-                        name: "MySql 5.7",
-                        containerName: "MySql_5.7",
-                        imagePath: require("@/assets/images/mysql.svg"),
-                        imageName: "mysql.svg"
-                    },
-                    {
-                        category: "container",
-                        name: "PostgreSql",
-                        containerName: "PostgreSql_10.13",
-                        imagePath: require("@/assets/images/postgresql.svg"),
-                        imageName: "postgresql.svg"
-                    }
-                ]
+                menuRootContainer: null,
+                menuRoot
             };
         },
         created() {
-            window.addEventListener("load", () => {
-                this.body = document.querySelector("body");
-
-                this.body.addEventListener("click", this.menuRootLogic, {passive: true});
-            }, {passive: true});
+            this.$root.$refs.menuRootComponent = this;
         },
-        beforeDestroy() {
-            window.removeEventListener("load", () => {}, false);
-
-            if (this.body !== null)
-                this.body.removeEventListener("click", this.menuRootLogic, false);
-        }
+        beforeDestroy() {}
     }
 </script>
 
@@ -263,10 +142,12 @@
         cursor: pointer;
     }
     .menuRoot_component .menuRoot_container .menuRoot_side .menuRoot_side_container .window_opener .item:hover {
-        background-color: #00aced;
+        background-color: #41a4f3;
     }
-    .menuRoot_component .menuRoot_container .menuRoot_side .menuRoot_side_container .window_opener .item img {
+    .menuRoot_component .menuRoot_container .menuRoot_side .menuRoot_side_container .window_opener .item .icon {
         margin-top: 8px;
+        width: 25px;
+        height: 25px;
     }
 
     .menuRoot_component .menuRoot_container .menuRoot_panel {
@@ -308,12 +189,18 @@
         height: 100%;
         position: relative;
     }
-    .menuRoot_component .menuRoot_container .menuRoot_panel .window_opener .program img {
-        width: 40px;
-        height: 40px;
-        margin-top: 35px;
+    .menuRoot_component .menuRoot_container .menuRoot_panel .window_opener .program:hover {
+        background-color: #41a4f3;
     }
-    .menuRoot_component .menuRoot_container .menuRoot_panel .window_opener .program p {
+    .menuRoot_component .menuRoot_container .menuRoot_panel .window_opener .program .icon {
+        position: relative;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        display: block;
+        width: 40px;
+    }
+    .menuRoot_component .menuRoot_container .menuRoot_panel .window_opener .program .text {
         position: absolute;
         color: #ffffff;
         bottom: 2px;

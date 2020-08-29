@@ -20,12 +20,8 @@
         data() {
             return {};
         },
-        created() {
-            window.addEventListener("load", () => {
-            });
-        },
-        beforeDestroy() {
-        }
+        created() {},
+        beforeDestroy() {}
     }
 </script>
 

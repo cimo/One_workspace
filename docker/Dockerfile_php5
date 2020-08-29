@@ -25,7 +25,7 @@ COPY ${PATH_ROOT}/sshd_config /etc/ssh/sshd_config
 COPY ${PATH_ROOT}/key/id_rsa /tmp/key/id_rsa
 COPY ${PATH_ROOT}/key/authorized_keys /tmp/key/authorized_keys
 COPY ${PATH_ROOT}/zz-docker_php5.conf ${PHP5_PATH_ROOT}/php-fpm.d/zz-docker.conf
-COPY ${PATH_ROOT}/php_override.ini ${PHP5_PATH_ROOT}/php/conf.d/override.ini
+COPY ${PATH_ROOT}/php5_override.ini ${PHP5_PATH_ROOT}/php/conf.d/override.ini
 COPY ${PATH_ROOT}/entrypoint_php.sh /usr/local/bin/entrypoint.sh
 
 # System
@@ -113,23 +113,6 @@ zlib1g-dev \
 && docker-php-ext-install pdo_pgsql \
 && docker-php-ext-install bcmath \
 && docker-php-ext-install gmp \
-# Ini file setting
-&& echo "\n\n \
-opcache.enable=1 \n \
-opcache.memory_consumption=256 \n \
-opcache.max_accelerated_files=20000 \n \
-opcache.revalidate_freq=0 \n \
-opcache.validate_timestamps=0 \n \
-opcache.interned_strings_buffer=16 \n \
-opcache.fast_shutdown=1" >> ${PHP5_PATH_ROOT}/php/conf.d/override.ini \
-&& echo "\n \
-xdebug.remote_enable=1 \n \
-xdebug.remote_handler=dbgp \n \
-xdebug.idekey=${PHP5_KEY_XDEBUG} \n \
-xdebug.remote_host=${PHP5_HOST_XDEBUG} \n \
-xdebug.remote_port=${PHP5_PORT_XDEBUG} \n \
-xdebug.remote_log=/tmp/xdebug.log \n \
-xdebug.max_nesting_level=1000" >> ${PHP5_PATH_ROOT}/php/conf.d/override.ini \
 # Composer
 && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
 # Clean

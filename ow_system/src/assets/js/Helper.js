@@ -2,137 +2,180 @@
 
 /* global */
 
-let target = null;
+let dragTarget = null;
+let dragTagList = [];
+let dragActive = false;
+let dragInitialX = 0;
+let dragInitialY = 0;
+let dragCurrentX = 0;
+let dragCurrentY = 0;
 
-let tag = "";
-
-let dragElementParent = null;
-
-let active = false;
-
-let xInitial = 0;
-let yInitial = 0;
-
-let xCurrent = 0;
-let yCurrent = 0;
-
-const findParent = (element, name) => {
+const findParent = (element, tags) => {
     if (element !== null) {
-        if (element.classList.contains(name) === true)
+        if (tags.every(tags => element.classList.contains(tags)) === true)
             return element;
         else
-            return findParent(element.parentElement, name);
+            return findParent(element.parentElement, tags);
     }
 
     return null;
 };
 
-const focusCurrentWindow = (window, callback) => {
-    if (window !== null) {
-        let windows = document.querySelectorAll(".window");
+const currentWindowElement = (element) => {
+    if (element !== null && element.classList.contains("window_component") === true) {
+        let name = element.getAttribute("data-name");
+        let category = element.getAttribute("data-category");
+        let windowOpener = document.querySelector(`.window_opener[data-name='${name}']`);
+        let containerName = windowOpener.getAttribute("data-container_name");
 
-        windows.forEach((value) => {
-            value.classList.remove("focused");
-        });
+        return [name, category, windowOpener, containerName];
+    }
 
-        window.parentNode.appendChild(window);
-        window.classList.add("focused");
-        window.style.display = "block";
+    return null;
+};
 
-        let name = window.getAttribute("data-name");
+const focusCurrentWindow = (windowComponent) => {
+    let windowComponentList = document.querySelectorAll(".window_component:not(.empty)");
 
-        let minimized = document.querySelector(`.minimized[data-origin='${name}']`);
+    for (const value of windowComponentList) {
+        value.classList.remove("focused");
+    }
 
-        if (minimized !== null)
-            minimized.classList.remove("minimized");
-
-        if (callback !== undefined)
-            callback(window);
+    if (windowComponent !== null && windowComponent !== undefined) {
+        windowComponent.style.display = "block";
+        windowComponent.classList.add("focused");
+        windowComponent.parentNode.appendChild(windowComponent);
     }
 };
 
-const focusNextWindow = (window, callback) => {
-    if (window !== null && window.classList.contains("empty") === false) {
-        window.classList.remove("focused");
-        window.style.display = "none";
+const focusNextWindow = () => {
+    let windowComponentList = document.querySelectorAll(".window_component:not(.empty)");
 
-        let origin =  window.previousSibling.getAttribute("data-origin");
-        let mainbarElement = document.querySelector(`.mainbar_element[data-origin='${origin}']`);
+    for (const value of windowComponentList) {
+        value.classList.remove("focused");
+    }
+
+    windowComponentList = document.querySelectorAll(".window_component:not(.empty):not(.minimized)");
+
+    if (windowComponentList.length > 0) {
+        let windowComponent = windowComponentList[windowComponentList.length - 1];
+
+        if (windowComponent !== null)
+            windowComponent.classList.add("focused");
+    }
+};
+
+const focusCurrentMainbarElement = () => {
+    let mainbarElementList = document.querySelectorAll(".footer_component .left_column .mainbar_element:not(.empty)");
+
+    for (const value of mainbarElementList) {
+        value.classList.remove("focused");
+    }
+
+    let focusedComponent = document.querySelector(".window_component.focused");
+
+    if (focusedComponent !== null) {
+        let name = focusedComponent.getAttribute("data-name");
+
+        let mainbarElement = document.querySelector(`.footer_component .left_column .mainbar_element[data-name='${name}']`);
+
+        if (mainbarElement !== null)
+            mainbarElement.classList.add("focused");
+    }
+};
+
+const unMinimizeElement = (name) => {
+    if (name !== null && name !== undefined) {
+        let windowComponentList = document.querySelectorAll(".window_component:not(.empty)");
+
+        for (const value of windowComponentList) {
+            value.classList.remove("focused");
+        }
+
+        let windowComponent = document.querySelector(`.window_component[data-name='${name}']`);
+
+        if (windowComponent !== null) {
+            windowComponent.classList.remove("minimized");
+            windowComponent.classList.add("focused");
+            windowComponent.style.display = "block";
+            windowComponent.parentNode.appendChild(windowComponent);
+        }
+
+        let mainbarElementList = document.querySelectorAll(".footer_component .left_column .mainbar_element:not(.empty)");
+
+        for (const value of mainbarElementList) {
+            value.classList.remove("focused");
+        }
+
+        let mainbarElement = document.querySelector(`.footer_component .left_column .mainbar_element[data-name='${name}']`);
 
         if (mainbarElement !== null) {
-            let newWindow = document.querySelector(`.window[data-origin='${origin}']`);
-
-            if (mainbarElement.classList.contains("opened") === true && mainbarElement.classList.contains("minimized") === false) {
-                newWindow.classList.add("focused");
-
-                if (callback !== undefined)
-                    callback(newWindow);
-            }
-            else
-                focusNextWindow(newWindow, callback);
+            mainbarElement.classList.remove("minimized");
+            mainbarElement.classList.add("focused");
         }
     }
 };
 
-const dragInit = (parent, tagValue) => {
-    target = parent.querySelector(".drag");
+const dragInit = (parent, tagList) => {
+    if (parent !== null && parent !== undefined) {
+        dragTagList = tagList;
 
-    target.addEventListener("mousedown", dragStart, {passive: true});
-    target.addEventListener("mousemove", dragMove, {passive: true});
-    target.addEventListener("mouseup", dragEnd, {passive: true});
+        document.addEventListener("mousedown", _dragStart, {passive: true});
+        document.addEventListener("mousemove", _dragMove, {passive: true});
+        document.addEventListener("mouseup", _dragEnd, {passive: true});
 
-    target.addEventListener("touchstart", dragStart, {passive: true});
-    target.addEventListener("touchmove", dragMove, {passive: true});
-    target.addEventListener("touchend", dragEnd, {passive: true});
-
-    tag = tagValue;
+        document.addEventListener("touchstart", _dragStart, {passive: true});
+        document.addEventListener("touchmove", _dragMove, {passive: true});
+        document.addEventListener("touchend", _dragEnd, {passive: true});
+    }
 };
 
-const dragStart = (event) => {
-    dragElementParent = findParent(event.target, tag);
+const _dragStart = (event) => {
+    dragTarget = findParent(event.target, dragTagList);
 
-    if (event.target.classList.contains("drag") === true && dragElementParent.classList.contains("focused") === true) {
-        let dragElementParentBounding = dragElementParent.getBoundingClientRect();
+    if (dragTarget !== null && event.target.classList.contains("drag") === true) {
+        let clientRect = dragTarget.getBoundingClientRect();
 
         if (event.target.type === "touchstart") {
-            xInitial = event.touches[0].clientX - dragElementParentBounding.left;
-            yInitial = event.touches[0].clientY - dragElementParentBounding.top;
+            dragInitialX = event.touches[0].clientX - clientRect.x;
+            dragInitialY = event.touches[0].clientY - clientRect.y;
         } else {
-            xInitial = event.clientX - dragElementParentBounding.left;
-            yInitial = event.clientY - dragElementParentBounding.top;
+            dragInitialX = event.clientX - clientRect.x;
+            dragInitialY = event.clientY - clientRect.y;
         }
 
-        active = true;
+        dragActive = true;
     }
-    else
-        dragEnd();
 };
 
-const dragMove = (event) => {
-    if (active === true) {
+const _dragMove = (event) => {
+    if (dragActive === true) {
         if (event.type === "touchmove") {
-            xCurrent = event.touches[0].clientX - xInitial;
-            yCurrent = event.touches[0].clientY - yInitial;
+            dragCurrentX = event.touches[0].clientX - dragInitialX;
+            dragCurrentY = event.touches[0].clientY - dragInitialY;
         }
         else {
-            xCurrent = event.clientX - xInitial;
-            yCurrent = event.clientY - yInitial;
+            dragCurrentX = event.clientX - dragInitialX;
+            dragCurrentY = event.clientY - dragInitialY;
         }
 
-        dragElementParent.style.transform = `translate3d(${xCurrent}px, ${yCurrent}px, 0)`;
+        dragTarget.style.transform = `translate3d(${dragCurrentX}px, ${dragCurrentY}px, 0)`;
     }
 };
 
-const dragEnd = () => {
-    dragElementParent = null;
-
-    active = false;
-
-    xInitial = 0;
-    yInitial = 0;
+const _dragEnd = () => {
+    dragTarget = null;
+    dragActive = false;
+    dragInitialX = 0;
+    dragInitialY = 0;
+    dragCurrentX = 0;
+    dragCurrentY = 0;
 };
 
 exports.findParent = findParent;
+exports.currentWindowElement = currentWindowElement;
 exports.focusCurrentWindow = focusCurrentWindow;
 exports.focusNextWindow = focusNextWindow;
+exports.focusCurrentMainbarElement = focusCurrentMainbarElement;
+exports.unMinimizeElement = unMinimizeElement;
 exports.dragInit = dragInit;

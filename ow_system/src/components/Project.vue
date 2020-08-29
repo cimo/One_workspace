@@ -1,5 +1,5 @@
 <template>
-    <div id="project_component">
+    <div class="project_component">
     </div>
 </template>
 
@@ -8,24 +8,19 @@
         name: "ProjectComponent",
         //components: {},
         computed: {},
-        methods: {
-        },
-        data: function() {
+        methods: {},
+        data() {
             return {};
         },
-        created: function() {
-            window.addEventListener("load", () => {
-            });
+        created() {
+            this.$root.$refs.projectComponent = this;
         },
-        beforeDestroy: function() {
-            if (this.body !== null)
-                this.body.removeEventListener("click", () => {}, false);
-        }
+        beforeDestroy() {}
     }
 </script>
 
 <style scoped>
-    #project_component {
+    .project_component {
         display: none;
     }
 </style>
