@@ -104,6 +104,15 @@
                         newWindowComponent.querySelector(".project_component").remove();
                         newWindowComponent.querySelector(".tool_component").remove();
                         newWindowComponent.querySelector(".package_component").remove();
+
+                        this.$root.$refs.containerComponent.init(newWindowComponent);
+                    }
+                    else if (category === "package") {
+                        newWindowComponent.querySelector(".project_component").remove();
+                        newWindowComponent.querySelector(".tool_component").remove();
+                        newWindowComponent.querySelector(".container_component").remove();
+
+                        this.$root.$refs.packageComponent.init(newWindowComponent);
                     }
                     else {
                         newWindowComponent.querySelector(".project_component").remove();
@@ -130,7 +139,6 @@
 
                     this._dragInit(newWindowComponent, ["window_component", "focused"]);
 
-                    this.$root.$refs.containerComponent.init(newWindowComponent);
                     this.$root.$refs.footerComponent.init(windowOpener);
                 }
                 else
@@ -166,9 +174,9 @@
                     else if (event.target.classList.contains("button_maximize") === true)
                         this._changeStatus();
                     else if (event.target.classList.contains("button_close") === true) {
-                        this.$root.$refs.commandComponent.close(this.windowComponent);
-                        this.$root.$refs.terminalComponent.close(this.windowComponent);
-                        this.$root.$refs.dataComponent.close(this.windowComponent);
+                        this.$root.$refs.containerCommandComponent.close(this.windowComponent);
+                        this.$root.$refs.containerTerminalComponent.close(this.windowComponent);
+                        this.$root.$refs.containerDataComponent.close(this.windowComponent);
 
                         this.windowComponent.parentNode.removeChild(this.windowComponent);
 
@@ -185,8 +193,11 @@
                     let windowOpener = this._findParent(event.target, ["window_opener"]);
                     let mainbarElement = this._findParent(event.target, ["mainbar_element", "program"]);
 
-                    if (windowOpener === null && mainbarElement === null)
+                    if (windowOpener === null && mainbarElement === null) {
                         this._focusCurrentWindow();
+
+                        this._focusCurrentMainbarElement();
+                    }
                 }
             },
             doubleClickLogic(event) {
@@ -203,7 +214,7 @@
                     }
                 }
 
-                this.$root.$refs.terminalComponent.resizeLogic(this.windowComponent, currentWindowElement);
+                this.$root.$refs.containerTerminalComponent.resizeLogic(this.windowComponent, currentWindowElement);
             }
         },
         data() {

@@ -116,6 +116,11 @@
         bottom: 40px;
         top: 100px;
         left: 0;
+        width: 410px;
+
+        box-shadow: 1px -1px 5px -1px #000000, 1px 0px 5px -1px #000000;
+        -webkit-box-shadow: 1px -1px 5px -1px #000000, 1px 0px 5px -1px #000000;
+        -moz-box-shadow: 1px -1px 5px -1px #000000, 1px 0px 5px -1px #000000;
     }
 
     .menuRoot_component .menuRoot_container .menuRoot_side {

@@ -11,7 +11,7 @@
     import "xterm/css/xterm.css";
 
     export default {
-        name: "TerminalComponent",
+        name: "ContainerTerminalComponent",
         //components: {},
         computed: {},
         methods: {
@@ -134,7 +134,7 @@
             };
         },
         created() {
-            this.$root.$refs.terminalComponent = this;
+            this.$root.$refs.containerTerminalComponent = this;
         },
         beforeDestroy() {}
     }

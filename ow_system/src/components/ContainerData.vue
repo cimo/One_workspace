@@ -24,7 +24,7 @@
     import Sio from "@/assets/js/Sio.js";
 
     export default {
-        name: "DataComponent",
+        name: "ContainerDataComponent",
         //components: {},
         computed: {},
         methods: {
@@ -84,7 +84,7 @@
             }
         },
         created() {
-            this.$root.$refs.dataComponent = this;
+            this.$root.$refs.containerDataComponent = this;
         },
         beforeDestroy() {}
     }

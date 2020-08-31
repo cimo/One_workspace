@@ -10,7 +10,7 @@
                 <p class="text">Start a container</p>
             </div>
             <div class="right">
-                <button class="button_command">Start</button>
+                <div class="button_command">Start</div>
             </div>
         </div>
         <div class="section">
@@ -18,7 +18,7 @@
                 <p class="text">Restart a container</p>
             </div>
             <div class="right">
-                <button class="button_command">Restart</button>
+                <div class="button_command">Restart</div>
             </div>
         </div>
         <div class="section">
@@ -26,7 +26,7 @@
                 <p class="text">Stop a container</p>
             </div>
             <div class="right">
-                <button class="button_command">Stop</button>
+                <div class="button_command">Stop</div>
             </div>
         </div>
     </div>
@@ -37,7 +37,7 @@
     import Sio from "@/assets/js/Sio.js";
 
     export default {
-        name: "CommandComponent",
+        name: "ContainerCommandComponent",
         //components: {},
         computed: {},
         methods: {
@@ -148,7 +148,7 @@
             }
         },
         created() {
-            this.$root.$refs.commandComponent = this;
+            this.$root.$refs.containerCommandComponent = this;
         },
         beforeDestroy() {}
     }
@@ -169,11 +169,11 @@
     }
     .command_component .section .left {
         display: inline-block;
-        width: 74%;
+        width: 70%;
     }
     .command_component .section .right {
         display: inline-block;
-        width: 25%;
+        width: 30%;
         text-align: center;
     }
     .command_component .section .right .text {
@@ -181,5 +181,16 @@
     }
     .command_component .section .right .button_command {
         cursor: pointer;
+        width: 200px;
+        height: 34px;
+        line-height: 34px;
+        background-color: #505050;
+    }
+    .command_component .section .right .button_command:hover {
+        background-color: #707070;
+        border: 1px solid #f7f7f7;
+        width: 198px;
+        height: 32px;
+        line-height: 32px;
     }
 </style>

@@ -72,7 +72,7 @@ const focusCurrentMainbarElement = () => {
         value.classList.remove("focused");
     }
 
-    let focusedComponent = document.querySelector(".window_component.focused");
+    let focusedComponent = document.querySelector(".window_component:not(.empty):not(.minimized).focused");
 
     if (focusedComponent !== null) {
         let name = focusedComponent.getAttribute("data-name");

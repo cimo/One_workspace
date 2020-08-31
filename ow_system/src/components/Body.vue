@@ -25,8 +25,9 @@
                 this.$root.$refs.footerComponent.clickLogic(event);
                 this.$root.$refs.windowComponent.clickLogic(event);
                 this.$root.$refs.containerComponent.clickLogic(event);
-                this.$root.$refs.commandComponent.clickLogic(event);
-                this.$root.$refs.terminalComponent.clickLogic(event);
+                this.$root.$refs.containerCommandComponent.clickLogic(event);
+                this.$root.$refs.containerTerminalComponent.clickLogic(event);
+                this.$root.$refs.packageComponent.clickLogic(event);
             },
             _doubleClickEvent(event) {
                 this.$root.$refs.windowComponent.doubleClickLogic(event);

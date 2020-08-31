@@ -5,30 +5,30 @@
             <p class="button">Terminal</p>
             <p class="button">Data</p>
         </div>
-        <CommandComponent/>
-        <TerminalComponent/>
-        <DataComponent/>
+        <ContainerCommandComponent/>
+        <ContainerTerminalComponent/>
+        <ContainerDataComponent/>
     </div>
 </template>
 
 <script>
     import Helper from "@/assets/js/Helper.js";
-    import CommandComponent from "@/components/Command.vue";
-    import TerminalComponent from "@/components/Terminal.vue";
-    import DataComponent from "@/components/Data.vue";
+    import ContainerCommandComponent from "@/components/ContainerCommand.vue";
+    import ContainerTerminalComponent from "@/components/ContainerTerminal.vue";
+    import ContainerDataComponent from "@/components/ContainerData.vue";
 
     export default {
         name: "ContainerComponent",
         components: {
-            CommandComponent,
-            TerminalComponent,
-            DataComponent
+            ContainerCommandComponent,
+            ContainerTerminalComponent,
+            ContainerDataComponent
         },
         computed: {},
         methods: {
             _findParent: Helper.findParent,
             init(windowComponent) {
-                this.$root.$refs.commandComponent.init(windowComponent);
+                this.$root.$refs.containerCommandComponent.init(windowComponent);
             },
             clickLogic(event) {
                 let menuElement = this._findParent(event.target, ["menu"]);
@@ -52,19 +52,19 @@
                             windowComponent.querySelector(".container_component .terminal_component").style.display = "none";
                             windowComponent.querySelector(".container_component .data_component").style.display = "none";
 
-                            this.$root.$refs.commandComponent.init(windowComponent);
+                            this.$root.$refs.containerCommandComponent.init(windowComponent);
                         } else if (index === 1) {
                             windowComponent.querySelector(".container_component .command_component").style.display = "none";
                             windowComponent.querySelector(".container_component .terminal_component").style.display = "block";
                             windowComponent.querySelector(".container_component .data_component").style.display = "none";
 
-                            this.$root.$refs.terminalComponent.init(windowComponent);
+                            this.$root.$refs.containerTerminalComponent.init(windowComponent);
                         } else if (index === 2) {
                             windowComponent.querySelector(".container_component .command_component").style.display = "none";
                             windowComponent.querySelector(".container_component .terminal_component").style.display = "none";
                             windowComponent.querySelector(".container_component .data_component").style.display = "block";
 
-                            this.$root.$refs.dataComponent.init(windowComponent);
+                            this.$root.$refs.containerDataComponent.init(windowComponent);
                         }
                     }
                 }
