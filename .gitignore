@@ -57,7 +57,7 @@ _system/module/custom/*
 !_system/module/custom/.gitkeep
 _system/style/custom/*
 !_system/style/custom/.gitkeep
-nodejs/node_modules
+core/node_modules
 ow_system/node_modules
 project/*
 !project/.digest_htpasswd
