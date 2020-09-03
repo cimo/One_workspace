@@ -17,6 +17,7 @@
             _loadEvent() {
                 document.addEventListener("click", this._clickEvent, {passive: true});
                 document.addEventListener("dblclick", this._doubleClickEvent, {passive: true});
+                document.addEventListener("change", this._changeEvent, {passive: true});
 
                 this.$root.$refs.timeDateComponent.init();
             },
@@ -24,6 +25,7 @@
                 this.$root.$refs.menuRootComponent.clickLogic(event);
                 this.$root.$refs.footerComponent.clickLogic(event);
                 this.$root.$refs.windowComponent.clickLogic(event);
+                this.$root.$refs.projectComponent.clickLogic(event);
                 this.$root.$refs.containerComponent.clickLogic(event);
                 this.$root.$refs.containerCommandComponent.clickLogic(event);
                 this.$root.$refs.containerTerminalComponent.clickLogic(event);
@@ -31,6 +33,9 @@
             },
             _doubleClickEvent(event) {
                 this.$root.$refs.windowComponent.doubleClickLogic(event);
+            },
+            _changeEvent(event) {
+                this.$root.$refs.projectComponent.changeLogic(event);
             },
             _resizeEvent() {
                 this.$root.$refs.windowComponent.resizeLogic();

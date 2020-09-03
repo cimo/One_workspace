@@ -35,6 +35,12 @@ const currentWindowElement = (element) => {
 };
 
 const focusCurrentWindow = (windowComponent) => {
+    let focusedComponent = document.querySelector(".window_component.focused");
+    let nameFocused = "";
+
+    if (focusedComponent !== null)
+        nameFocused = focusedComponent.getAttribute("data-name");
+
     let windowComponentList = document.querySelectorAll(".window_component:not(.empty)");
 
     for (const value of windowComponentList) {
@@ -42,9 +48,13 @@ const focusCurrentWindow = (windowComponent) => {
     }
 
     if (windowComponent !== null && windowComponent !== undefined) {
+        let name = windowComponent.getAttribute("data-name");
+
         windowComponent.style.display = "block";
         windowComponent.classList.add("focused");
-        windowComponent.parentNode.appendChild(windowComponent);
+
+        if (nameFocused !== name)
+            windowComponent.parentNode.appendChild(windowComponent);
     }
 };
 

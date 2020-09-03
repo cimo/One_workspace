@@ -8,7 +8,9 @@
         name: "ToolComponent",
         //components: {},
         computed: {},
-        methods: {},
+        methods: {
+            init() {}
+        },
         data() {
             return {};
         },

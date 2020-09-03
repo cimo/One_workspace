@@ -49,12 +49,6 @@ const setting = function() {
                 },
                 {
                     category: "tool",
-                    name: "VueJs",
-                    imagePath: require("@/assets/images/vuejs.svg"),
-                    imageName: "vuejs.svg"
-                },
-                {
-                    category: "tool",
                     name: "Terser",
                     imagePath: require("@/assets/images/terser.svg"),
                     imageName: "terser.svg"
@@ -64,6 +58,12 @@ const setting = function() {
                     name: "Sass",
                     imagePath: require("@/assets/images/sass.svg"),
                     imageName: "sass.svg"
+                },
+                {
+                    category: "tool",
+                    name: "VueJs",
+                    imagePath: require("@/assets/images/vuejs.svg"),
+                    imageName: "vuejs.svg"
                 }
             ],
             packageItems: [

@@ -94,13 +94,16 @@
                     this.windowComponent = windowComponent;
 
                     let terminalComponent = this.windowComponent.querySelector(".terminal_component");
-                    let terminal = terminalComponent.querySelector(".terminal.xterm");
 
-                    if (terminal !== null && this.fitAddonList[this.containerName] !== undefined) {
-                        let clientRect = terminalComponent.getBoundingClientRect();
-                        terminal.style.height = `${clientRect.height}px`;
+                    if (terminalComponent !== null) {
+                        let terminal = terminalComponent.querySelector(".terminal.xterm");
 
-                        this.fitAddonList[this.containerName].fit();
+                        if (terminal !== null && this.fitAddonList[this.containerName] !== undefined) {
+                            let clientRect = terminalComponent.getBoundingClientRect();
+                            terminal.style.height = `${clientRect.height}px`;
+
+                            this.fitAddonList[this.containerName].fit();
+                        }
                     }
                 }
             },

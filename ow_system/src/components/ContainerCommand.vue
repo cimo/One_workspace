@@ -10,7 +10,7 @@
                 <p class="text">Start a container</p>
             </div>
             <div class="right">
-                <div class="button_command">Start</div>
+                <div class="button_cmd_window cmd">Start</div>
             </div>
         </div>
         <div class="section">
@@ -18,7 +18,7 @@
                 <p class="text">Restart a container</p>
             </div>
             <div class="right">
-                <div class="button_command">Restart</div>
+                <div class="button_cmd_window cmd">Restart</div>
             </div>
         </div>
         <div class="section">
@@ -26,7 +26,7 @@
                 <p class="text">Stop a container</p>
             </div>
             <div class="right">
-                <div class="button_command">Stop</div>
+                <div class="button_cmd_window cmd">Stop</div>
             </div>
         </div>
     </div>
@@ -77,7 +77,7 @@
 
                     this.statusOldList[containerName] = null;
                     this.statusElementList[containerName] = this.windowComponentList[containerName].querySelector(".command_component .left .status");
-                    this.buttonCommandList[containerName] = this.windowComponentList[containerName].querySelectorAll(".command_component .right .button_command");
+                    this.buttonCommandList[containerName] = this.windowComponentList[containerName].querySelectorAll(".command_component .right .cmd");
 
                     this._checkStatus(containerName);
                 }
@@ -90,7 +90,7 @@
                     let containerName = currentWindowElement[3];
                     this.windowComponentList[containerName] = windowComponent;
 
-                    if (event.target.classList.contains("button_command") === true) {
+                    if (event.target.classList.contains("cmd") === true) {
                         let index = Array.from(this.buttonCommandList[containerName]).indexOf(event.target);
 
                         if (index === 0 && this.statusList[containerName] === -1) {
@@ -175,22 +175,5 @@
         display: inline-block;
         width: 30%;
         text-align: center;
-    }
-    .command_component .section .right .text {
-        display: inline-block;
-    }
-    .command_component .section .right .button_command {
-        cursor: pointer;
-        width: 200px;
-        height: 34px;
-        line-height: 34px;
-        background-color: #505050;
-    }
-    .command_component .section .right .button_command:hover {
-        background-color: #707070;
-        border: 1px solid #f7f7f7;
-        width: 198px;
-        height: 32px;
-        line-height: 32px;
     }
 </style>

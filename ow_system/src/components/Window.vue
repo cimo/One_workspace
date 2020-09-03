@@ -100,12 +100,19 @@
                     newWindowComponent.setAttribute("data-category", category);
                     newWindowComponent.style.display = "block";
 
-                    if (category === "container") {
-                        newWindowComponent.querySelector(".project_component").remove();
+                    if (category === "project") {
                         newWindowComponent.querySelector(".tool_component").remove();
                         newWindowComponent.querySelector(".package_component").remove();
+                        newWindowComponent.querySelector(".container_component").remove();
 
-                        this.$root.$refs.containerComponent.init(newWindowComponent);
+                        this.$root.$refs.projectComponent.init(newWindowComponent);
+                    }
+                    else if (category === "tool") {
+                        newWindowComponent.querySelector(".project_component").remove();
+                        newWindowComponent.querySelector(".package_component").remove();
+                        newWindowComponent.querySelector(".container_component").remove();
+
+                        this.$root.$refs.toolComponent.init(newWindowComponent);
                     }
                     else if (category === "package") {
                         newWindowComponent.querySelector(".project_component").remove();
@@ -113,6 +120,13 @@
                         newWindowComponent.querySelector(".container_component").remove();
 
                         this.$root.$refs.packageComponent.init(newWindowComponent);
+                    }
+                    else if (category === "container") {
+                        newWindowComponent.querySelector(".project_component").remove();
+                        newWindowComponent.querySelector(".tool_component").remove();
+                        newWindowComponent.querySelector(".package_component").remove();
+
+                        this.$root.$refs.containerComponent.init(newWindowComponent);
                     }
                     else {
                         newWindowComponent.querySelector(".project_component").remove();

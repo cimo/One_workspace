@@ -118,4 +118,23 @@
         margin: 0;
         padding: 0;
     }
+
+    .button_cmd_window {
+        cursor: pointer;
+        width: 150px;
+        height: 34px;
+        line-height: 34px;
+        background-color: #505050;
+        text-align: center;
+    }
+    .button_cmd_window:hover {
+        background-color: #707070;
+        border: 1px solid #f7f7f7;
+        width: 148px;
+        height: 32px;
+        line-height: 32px;
+    }
+    .button_cmd_window:active {
+        background-color: #9b9b9b;
+    }
 </style>
