@@ -1,16 +1,19 @@
 <template>
     <div class="body_component">
         <WindowComponent/>
+        <PromptComponent/>
     </div>
 </template>
 
 <script>
     import WindowComponent from "@/components/Window.vue";
+    import PromptComponent from "@/components/Prompt.vue";
 
     export default {
         name: "BodyComponent",
         components: {
-            WindowComponent
+            WindowComponent,
+            PromptComponent
         },
         computed: {},
         methods: {
@@ -20,6 +23,7 @@
                 document.addEventListener("change", this._changeEvent, {passive: true});
 
                 this.$root.$refs.timeDateComponent.init();
+                this.$root.$refs.promptComponent.init();
             },
             _clickEvent(event) {
                 this.$root.$refs.menuRootComponent.clickLogic(event);

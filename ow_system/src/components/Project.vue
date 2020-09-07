@@ -123,8 +123,6 @@
                                             option.value = this.inputName.value;
                                             option.text = this.inputName.value;
                                             this.selectModify.appendChild(option);
-
-                                            
                                         }
 
                                         Sio.stopRead("t_exec_stream_o_project");

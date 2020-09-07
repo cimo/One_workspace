@@ -5,10 +5,10 @@
 let dragTarget = null;
 let dragTagList = [];
 let dragActive = false;
-let dragInitialX = 0;
-let dragInitialY = 0;
-let dragCurrentX = 0;
-let dragCurrentY = 0;
+let dragOffsetX = 0;
+let dragOffsetY = 0;
+let dragStartX = 0;
+let dragStartY = 0;
 
 const findParent = (element, tags) => {
     if (element !== null) {
@@ -128,7 +128,7 @@ const unMinimizeElement = (name) => {
 
 const dragInit = (parent, tagList) => {
     if (parent !== null && parent !== undefined) {
-        dragTagList = tagList;
+        dragTagList.push(tagList);
 
         document.addEventListener("mousedown", _dragStart, {passive: true});
         document.addEventListener("mousemove", _dragMove, {passive: true});
@@ -141,45 +141,35 @@ const dragInit = (parent, tagList) => {
 };
 
 const _dragStart = (event) => {
-    dragTarget = findParent(event.target, dragTagList);
+    for (const value of dragTagList) {
+        dragTarget = findParent(event.target, value);
 
-    if (dragTarget !== null && event.target.classList.contains("drag") === true) {
-        let clientRect = dragTarget.getBoundingClientRect();
+        if (dragTarget !== null && event.target.classList.contains("drag") === true) {
+            dragOffsetX = dragTarget.offsetLeft;
+            dragOffsetY = dragTarget.offsetTop;
 
-        if (event.target.type === "touchstart") {
-            dragInitialX = event.touches[0].clientX - clientRect.x;
-            dragInitialY = event.touches[0].clientY - clientRect.y;
-        } else {
-            dragInitialX = event.clientX - clientRect.x;
-            dragInitialY = event.clientY - clientRect.y;
+            dragStartX = event.type === "touchstart" ? event.touches[0].clientX : event.clientX;
+            dragStartY = event.type === "touchstart" ? event.touches[0].clientY : event.clientY;
+
+            dragActive = true;
+
+            break;
         }
-
-        dragActive = true;
     }
 };
 
 const _dragMove = (event) => {
     if (dragActive === true) {
-        if (event.type === "touchmove") {
-            dragCurrentX = event.touches[0].clientX - dragInitialX;
-            dragCurrentY = event.touches[0].clientY - dragInitialY;
-        }
-        else {
-            dragCurrentX = event.clientX - dragInitialX;
-            dragCurrentY = event.clientY - dragInitialY;
-        }
+        let dragCurrentX = dragOffsetX + (event.type === "touchstart" ? event.touches[0].clientX : event.clientX) - dragStartX;
+        let dragCurrentY = dragOffsetY + (event.type === "touchstart" ? event.touches[0].clientY : event.clientY) - dragStartY;
 
-        dragTarget.style.transform = `translate3d(${dragCurrentX}px, ${dragCurrentY}px, 0)`;
+        dragTarget.style.left = `${dragCurrentX}px`;
+        dragTarget.style.top = `${dragCurrentY}px`;
     }
 };
 
 const _dragEnd = () => {
-    dragTarget = null;
     dragActive = false;
-    dragInitialX = 0;
-    dragInitialY = 0;
-    dragCurrentX = 0;
-    dragCurrentY = 0;
 };
 
 exports.findParent = findParent;

@@ -55,14 +55,18 @@
                         this.windowPosition[this.windowName].x = clientRect.x;
                         this.windowPosition[this.windowName].y = clientRect.y;
 
-                        this.windowComponent.style.transform = "translate3d(0, 0, 0)";
+                        this.windowComponent.style.left = "0";
+                        this.windowComponent.style.top = "0";
+
                         this.windowComponent.style.width = "calc(100% - 2px)";
-                        this.windowComponent.style.height = "calc(100% - 42px)";
+                        this.windowComponent.style.height = "calc(100% - 44px)";
 
                         this.windowComponent.querySelector(".overlay").classList.remove("drag");
                     }
                     else {
-                        this.windowComponent.style.transform = `translate3d(${this.windowPosition[this.windowName].x}px, ${this.windowPosition[this.windowName].y}px, 0)`;
+                        this.windowComponent.style.left = `${this.windowPosition[this.windowName].x}px`;
+                        this.windowComponent.style.top = `${this.windowPosition[this.windowName].y}px`;
+
                         this.windowComponent.style.width = this.windowSize[this.windowName].width;
                         this.windowComponent.style.height = this.windowSize[this.windowName].height;
 
