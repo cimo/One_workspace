@@ -27,6 +27,7 @@
         methods: {
             _findParent: Helper.findParent,
             _unMinimizeElement: Helper.unMinimizeElement,
+            _promptLogic: Helper.promptLogic,
             init(windowOpener) {
                 let name = windowOpener.getAttribute("data-name");
                 let category = windowOpener.getAttribute("data-category");
@@ -47,6 +48,9 @@
                 document.querySelector(".footer_component .left_column").appendChild(newMainbarElement);
             },
             clickLogic(event) {
+                if (this._promptLogic() === true)
+                    return false;
+
                 let mainbarElement = this._findParent(event.target, ["mainbar_element"]);
 
                 if (mainbarElement !== null) {
@@ -134,7 +138,7 @@
         background-color: rgba(255, 255, 255, 0.1);
     }
     .footer_component .mainbar_element.minimized {
-        height: 30px !important;
+        height: 34px !important;
         background-color: transparent !important;
         border-bottom: 3px solid rgba(255, 255, 255, 0.5);
     }

@@ -10,6 +10,11 @@
                 <textarea name="description" rows="4"></textarea>
             </div>
             <div class="section">
+                <p class="text">Folder name:</p>
+                <input type="text" name="folder_name" value=""/>
+            </div>
+            <div class="section">
+                <p>List:</p>
                 <select class="edit" name="edit">
                     <option value="0">Edit exist project</option>
                 </select>
@@ -59,6 +64,7 @@
 
                     this.inputName = this.windowComponent.querySelector("input[name='name']");
                     this.textareaDescription = this.windowComponent.querySelector("textarea[name='description']");
+                    this.folderName = this.windowComponent.querySelector("input[name='folder_name']");
                     this.checkboxGit = this.windowComponent.querySelector("input[name='git']");
                     this.checkboxSsh = this.windowComponent.querySelector("input[name='ssh']");
                     this.checkboxTerser = this.windowComponent.querySelector("input[name='terser']");
@@ -99,13 +105,15 @@
                     if (currentWindowElement !== null) {
                         this.windowComponent = windowComponent;
 
-                        this.path = "/home/user_1/root/ow_system/setting";
+                        this.pathSetting = "/home/user_1/root/ow_system/setting";
+                        this.pathFolder = "/home/user_1/root/project";
 
                         if (event.target.classList.contains("save") === true) {
                             if (this.inputName.value !== "") {
                                 let content = {
                                     'name': this.inputName.value,
                                     'description': this.textareaDescription.value,
+                                    'folderName': this.folderName.value,
                                     'git': this.checkboxGit.checked === true ? true : false,
                                     'ssh': this.checkboxSsh.checked === true ? true : false,
                                     'terser': this.checkboxTerser.checked === true ? true : false,
@@ -114,7 +122,8 @@
                                     'composer': this.checkboxComposer.checked === true ? true : false
                                 };
 
-                                Sio.sendMessage("t_exec_stream_i", {'tag': "project", 'cmd': "write", 'path': `${this.path}/${this.inputName.value}.set`, 'content': JSON.stringify(content)});
+                                // Create setting file
+                                Sio.sendMessage("t_exec_stream_i", {'tag': "project", 'cmd': "write", 'path': `${this.pathSetting}/${this.inputName.value}.set`, 'content': JSON.stringify(content)});
 
                                 Sio.readMessage("t_exec_stream_o_project", (data) => {
                                     if (data.chunk === "end") {
@@ -123,32 +132,46 @@
                                             option.value = this.inputName.value;
                                             option.text = this.inputName.value;
                                             this.selectModify.appendChild(option);
+
+                                            this.selectModify.querySelector(`option[value='${this.inputName.value}'`).selected = true;
                                         }
 
                                         Sio.stopRead("t_exec_stream_o_project");
                                     }
                                 });
+
+                                // Create folder root
+                                Sio.sendMessage("t_exec_i", {'tag': "project", 'cmd': `mkdir -p ${this.pathFolder}/${this.folderName.value}/root`});
+
+                                Sio.readMessage("t_exec_o_project", () => {
+                                    Sio.stopRead("t_exec_o_project");
+                                });
                             }
                         }
                         else if (event.target.classList.contains("delete") === true) {
-                            Sio.sendMessage("t_exec_i", {'tag': "project", 'cmd': `rm ${this.path}/${this.inputName.value}.set`});
+                            if (this.selectModify.selectedIndex > 0) {
+                                this.$root.$refs.promptComponent.show(this.windowComponent, "You really want to delete this project?<br>(The root folder will be preserved).", () => {
+                                    Sio.sendMessage("t_exec_i", {'tag': "project", 'cmd': `rm ${this.pathSetting}/${this.inputName.value}.set`});
 
-                            Sio.readMessage("t_exec_o_project", () => {
-                                if (this.selectModify.selectedIndex > 0 && this.selectModify.options[this.selectModify.selectedIndex].value !== null) {
-                                    this.inputName.value = "";
-                                    this.textareaDescription.value = "";
-                                    this.checkboxGit.checked = false;
-                                    this.checkboxSsh.checked = false;
-                                    this.checkboxTerser.checked = false;
-                                    this.checkboxSass.checked = false;
-                                    this.checkboxNpm.checked = false;
-                                    this.checkboxComposer.checked = false;
+                                    Sio.readMessage("t_exec_o_project", () => {
+                                        if (this.selectModify.selectedIndex > 0 && this.selectModify.options[this.selectModify.selectedIndex].value !== null) {
+                                            this.inputName.value = "";
+                                            this.textareaDescription.value = "";
+                                            this.folderName.value = "";
+                                            this.checkboxGit.checked = false;
+                                            this.checkboxSsh.checked = false;
+                                            this.checkboxTerser.checked = false;
+                                            this.checkboxSass.checked = false;
+                                            this.checkboxNpm.checked = false;
+                                            this.checkboxComposer.checked = false;
 
-                                    this.selectModify.options[this.selectModify.selectedIndex].remove();
-                                }
+                                            this.selectModify.options[this.selectModify.selectedIndex].remove();
+                                        }
 
-                                Sio.stopRead("t_exec_o_project");
-                            });
+                                        Sio.stopRead("t_exec_o_project");
+                                    });
+                                });
+                            }
                         }
                     }
                 }
@@ -159,7 +182,7 @@
                         let name = this.selectModify.options[this.selectModify.selectedIndex].value;
                         let buffer = "";
 
-                        Sio.sendMessage("t_exec_stream_i", {'tag': "project", 'cmd': "read", 'path': `${this.path}/${name}.set`});
+                        Sio.sendMessage("t_exec_stream_i", {'tag': "project", 'cmd': "read", 'path': `${this.pathSetting}/${name}.set`});
 
                         Sio.readMessage("t_exec_stream_o_project", (data) => {
                             if (data.chunk !== "end")
@@ -169,6 +192,7 @@
 
                                 this.inputName.value = result.name;
                                 this.textareaDescription.value = result.description;
+                                this.folderName.value = result.folderName;
                                 this.checkboxGit.checked = result.git;
                                 this.checkboxSsh.checked = result.ssh;
                                 this.checkboxTerser.checked = result.terser;
@@ -180,6 +204,17 @@
                             }
                         });
                     }
+                    else {
+                        this.inputName.value = "";
+                        this.textareaDescription.value = "";
+                        this.folderName.value = "";
+                        this.checkboxGit.checked = false;
+                        this.checkboxSsh.checked = false;
+                        this.checkboxTerser.checked = false;
+                        this.checkboxSass.checked = false;
+                        this.checkboxNpm.checked = false;
+                        this.checkboxComposer.checked = false;
+                    }
                 }
             }
         },
@@ -188,6 +223,7 @@
                 windowComponent: null,
                 inputName: null,
                 textareaDescription: null,
+                folderName: null,
                 checkboxGit: null,
                 checkboxSsh: null,
                 checkboxTerser: null,
@@ -196,7 +232,8 @@
                 checkboxComposer: null,
                 selectModify: null,
                 buttonSave: null,
-                path: ""
+                pathSetting: "",
+                pathFolder: ""
             };
         },
         created() {
@@ -230,6 +267,9 @@
         width: 90%;
         resize: none;
     }
+    .project_component .left .section .button_cmd_window.delete {
+        margin-top: 10px;
+    }
     .project_component .right .sub_left, .project_component .right .sub_right {
         vertical-align: top;
         display: inline-block;
@@ -249,11 +289,8 @@
         width: 100%;
         text-align: right;
     }
-    .project_component .bottom .button_cmd_window  {
+    .project_component .bottom .button_cmd_window {
         display: inline-block;
         margin-right: 25px;
-    }
-    .project_component .button_cmd_window.delete {
-        margin-top: 10px;
     }
 </style>

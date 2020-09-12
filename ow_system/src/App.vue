@@ -121,6 +121,7 @@
 
     .button_cmd_window {
         cursor: pointer;
+        color: #ffffff;
         width: 150px;
         height: 34px;
         line-height: 34px;

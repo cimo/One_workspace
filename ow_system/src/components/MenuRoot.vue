@@ -56,6 +56,7 @@
         methods: {
             _setting: Config.setting,
             _findParent: Helper.findParent,
+            _promptLogic: Helper.promptLogic,
             clickLogic(event) {
                 let menuRootComponent = this._findParent(event.target, ["menuRoot_component"]);
 
@@ -84,8 +85,12 @@
                             let tab = window.open(`http://localhost:${this._setting().vuejs.ui_port}`, "_blank");
                             tab.focus();
                         }
-                        else
+                        else {
+                            if (this._promptLogic() === true)
+                                return false;
+
                             this.$root.$refs.windowComponent.init(windowOpener);
+                        }
 
                         this.menuRootContainer.style.display = "none";
                     }

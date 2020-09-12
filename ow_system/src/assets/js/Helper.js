@@ -10,6 +10,38 @@ let dragOffsetY = 0;
 let dragStartX = 0;
 let dragStartY = 0;
 
+const _dragStart = (event) => {
+    for (const value of dragTagList) {
+        dragTarget = findParent(event.target, value);
+
+        if (dragTarget !== null && event.target.classList.contains("drag") === true) {
+            dragOffsetX = dragTarget.offsetLeft;
+            dragOffsetY = dragTarget.offsetTop;
+
+            dragStartX = event.type === "touchstart" ? event.touches[0].clientX : event.clientX;
+            dragStartY = event.type === "touchstart" ? event.touches[0].clientY : event.clientY;
+
+            dragActive = true;
+
+            break;
+        }
+    }
+};
+
+const _dragMove = (event) => {
+    if (dragActive === true) {
+        let dragCurrentX = dragOffsetX + (event.type === "touchstart" ? event.touches[0].clientX : event.clientX) - dragStartX;
+        let dragCurrentY = dragOffsetY + (event.type === "touchstart" ? event.touches[0].clientY : event.clientY) - dragStartY;
+
+        dragTarget.style.left = `${dragCurrentX}px`;
+        dragTarget.style.top = `${dragCurrentY}px`;
+    }
+};
+
+const _dragEnd = () => {
+    dragActive = false;
+};
+
 const findParent = (element, tags) => {
     if (element !== null) {
         if (tags.every(tags => element.classList.contains(tags)) === true)
@@ -140,37 +172,14 @@ const dragInit = (parent, tagList) => {
     }
 };
 
-const _dragStart = (event) => {
-    for (const value of dragTagList) {
-        dragTarget = findParent(event.target, value);
+const promptLogic = () => {
+    let promptComponent = document.querySelector(".prompt_component");
 
-        if (dragTarget !== null && event.target.classList.contains("drag") === true) {
-            dragOffsetX = dragTarget.offsetLeft;
-            dragOffsetY = dragTarget.offsetTop;
+    if (promptComponent !== null && promptComponent.style.display !== "" && promptComponent.style.display !== "none")
+        return true;
 
-            dragStartX = event.type === "touchstart" ? event.touches[0].clientX : event.clientX;
-            dragStartY = event.type === "touchstart" ? event.touches[0].clientY : event.clientY;
-
-            dragActive = true;
-
-            break;
-        }
-    }
-};
-
-const _dragMove = (event) => {
-    if (dragActive === true) {
-        let dragCurrentX = dragOffsetX + (event.type === "touchstart" ? event.touches[0].clientX : event.clientX) - dragStartX;
-        let dragCurrentY = dragOffsetY + (event.type === "touchstart" ? event.touches[0].clientY : event.clientY) - dragStartY;
-
-        dragTarget.style.left = `${dragCurrentX}px`;
-        dragTarget.style.top = `${dragCurrentY}px`;
-    }
-};
-
-const _dragEnd = () => {
-    dragActive = false;
-};
+    return false;
+}
 
 exports.findParent = findParent;
 exports.currentWindowElement = currentWindowElement;
@@ -179,3 +188,4 @@ exports.focusNextWindow = focusNextWindow;
 exports.focusCurrentMainbarElement = focusCurrentMainbarElement;
 exports.unMinimizeElement = unMinimizeElement;
 exports.dragInit = dragInit;
+exports.promptLogic = promptLogic;

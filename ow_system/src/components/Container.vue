@@ -53,13 +53,15 @@
                             windowComponent.querySelector(".container_component .data_component").style.display = "none";
 
                             this.$root.$refs.containerCommandComponent.init(windowComponent);
-                        } else if (index === 1) {
+                        }
+                        else if (index === 1) {
                             windowComponent.querySelector(".container_component .command_component").style.display = "none";
                             windowComponent.querySelector(".container_component .terminal_component").style.display = "block";
                             windowComponent.querySelector(".container_component .data_component").style.display = "none";
 
                             this.$root.$refs.containerTerminalComponent.init(windowComponent);
-                        } else if (index === 2) {
+                        }
+                        else if (index === 2) {
                             windowComponent.querySelector(".container_component .command_component").style.display = "none";
                             windowComponent.querySelector(".container_component .terminal_component").style.display = "none";
                             windowComponent.querySelector(".container_component .data_component").style.display = "block";

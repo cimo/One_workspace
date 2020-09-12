@@ -1,7 +1,6 @@
 <template>
     <div class="window_component empty">
         <div class="header">
-            <div class="overlay drag"></div>
             <div class="left_column">
                 <img src="@/assets/images/empty.png" alt="empty.png"/>
                 <p></p>
@@ -11,12 +10,14 @@
                 <img src="@/assets/images/window_maximize.svg" class="button_maximize button" alt="window_maximize.svg"/>
                 <img src="@/assets/images/window_close.svg" class="button_close button" alt="window_close.svg"/>
             </div>
+            <div class="overlay drag"></div>
         </div>
         <div class="body">
             <ProjectComponent/>
             <ToolComponent/>
             <PackageComponent/>
             <ContainerComponent/>
+            <div class="overlay"></div>
         </div>
         <div class="footer"></div>
     </div>
@@ -46,6 +47,7 @@
             _focusCurrentMainbarElement: Helper.focusCurrentMainbarElement,
             _unMinimizeElement: Helper.unMinimizeElement,
             _dragInit: Helper.dragInit,
+            _promptLogic: Helper.promptLogic,
             _changeStatus(event) {
                 let overlayElement = event !== undefined ? this._findParent(event.target, ["overlay"]) : false;
 
@@ -167,6 +169,9 @@
                 this._focusCurrentMainbarElement();
             },
             clickLogic(event) {
+                if (this._promptLogic() === true)
+                    return false;
+
                 let windowComponent = this._findParent(event.target, ["window_component"]);
 
                 if (windowComponent !== null) {
@@ -208,6 +213,12 @@
                     }
                 }
                 else {
+                    if (this.$root.$refs.promptComponent.clicked === true) {
+                        this.$root.$refs.promptComponent.clicked = false;
+
+                        return false;
+                    }
+
                     let windowOpener = this._findParent(event.target, ["window_opener"]);
                     let mainbarElement = this._findParent(event.target, ["mainbar_element", "program"]);
 
@@ -219,6 +230,9 @@
                 }
             },
             doubleClickLogic(event) {
+                if (this._promptLogic() === true)
+                    return false;
+
                 this._changeStatus(event);
             },
             resizeLogic() {
@@ -326,10 +340,24 @@
         height: calc(100% - 28px);
         color: #ffffff;
     }
+    .window_component .body .overlay {
+        display: block;
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+    }
 
     .window_component.focused .header .overlay {
         opacity: 0;
         right: 132px;
+    }
+    .window_component.focused .header .drag {
         cursor: move;
+    }
+
+    .window_component.focused .body .overlay {
+        display: none;
     }
 </style>
