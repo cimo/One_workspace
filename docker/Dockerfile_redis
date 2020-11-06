@@ -1,4 +1,6 @@
-FROM mysql:5.7
+ARG REDIS_VERSION
+
+FROM redis:${REDIS_VERSION}
 
 ARG WWW_USER_NAME
 ARG WWW_USER_PASSWORD
@@ -6,15 +8,11 @@ ARG WEB_USER_GROUP
 ARG WEB_PATH
 ARG PATH_ROOT
 ARG TIMEZONE
-ARG MYSQL_ROOT_PASSWORD
-ARG MYSQL_USER
-ARG MYSQL_PASSWORD
-ARG MYSQL57_PORT
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV DEBCONF_NOWARNINGS=yes
 
-COPY ${PATH_ROOT}/mysql_override.cnf /etc/mysql/conf.d/override.cnf
+COPY ${PATH_ROOT}/redis.conf /usr/local/etc/redis/redis.conf
 
 # System
 RUN cd ~ \
@@ -39,4 +37,4 @@ wget \
 && apt-get autoclean -y \
 && apt-get autoremove -y
 
-EXPOSE ${MYSQL_PORT}
+EXPOSE ${REDIS_PORT}

@@ -129,6 +129,20 @@ const setting = function() {
                     containerName: "PostgreSql_10.13",
                     imagePath: require("@/assets/images/postgresql.svg"),
                     imageName: "postgresql.svg"
+                },
+		{
+                    category: "container",
+                    name: "Redis",
+                    containerName: "Redis_6.0.9",
+                    imagePath: require("@/assets/images/redis.svg"),
+                    imageName: "redis.svg"
+                },
+		{
+                    category: "container",
+                    name: "MongoDb",
+                    containerName: "MongoDb_4.0.20",
+                    imagePath: require("@/assets/images/mongodb.svg"),
+                    imageName: "mongodb.svg"
                 }
             ]
         }
