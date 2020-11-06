@@ -16,11 +16,11 @@ Is a docker service container for have, in one space, a large and complete devel
 
 | Tool: |
 |:---|
-| Docker |
 | Git |
 | Ssh |
 | Terser |
 | Sass |
+| VueJs |
 
 | Package: |
 |:---|
@@ -36,6 +36,8 @@ Is a docker service container for have, in one space, a large and complete devel
 | MySql 5.7 |
 | PostgreSql 10.13 |
 | NodeJs 12.18.1 |
+| Redis 6.0.9 |
+| MongoDb 4.4.1 |
 
 ## Instructions:
 1) Copy file in your folder (for example /home/cimo/One_workspace).
