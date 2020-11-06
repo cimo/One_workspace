@@ -70,6 +70,8 @@ project/*
 virtual_host/custom/*
 !virtual_host/custom/.gitkeep
 !virtual_host/custom/example.conf
+data/*
+!data/.gitkeep
 .env
 error.log
 debug.log
