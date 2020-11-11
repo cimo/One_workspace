@@ -19,8 +19,6 @@
             _currentWindowElement: Helper.currentWindowElement,
             _createXterm() {
                 if (this.windowComponent !== null && this.name !== null && this.containerName !== null) {
-                    Sio.sendMessage("t_pty_start", {'tag': this.containerName});
-
                     let terminalComponent = this.windowComponent.querySelector(".terminal_component");
                     let terminal = terminalComponent.querySelector(".terminal.xterm");
 
@@ -34,28 +32,39 @@
                     this.xtermList[this.containerName].loadAddon(this.fitAddonList[this.containerName]);
                     this.xtermList[this.containerName].open(terminalComponent);
                     this.xtermList[this.containerName].focus();
+
+                    let clientRect = terminalComponent.getBoundingClientRect();
+                    terminal = terminalComponent.querySelector(".terminal.xterm");
+                    terminal.style.height = `${clientRect.height}px`;
+
                     this.fitAddonList[this.containerName].fit();
+                    let size = this.fitAddonList[this.containerName].proposeDimensions();
+
+                    Sio.sendMessage("t_pty_start", {'tag': this.containerName, 'size': [size.cols, size.rows]});
 
                     if (this.name === "NodeJs")
                         Sio.sendMessage("t_pty_i", {'tag': this.containerName, 'cmd': `history -c && history -w && clear\r`});
                     else {
                         Sio.sendMessage("t_pty_i", {'tag': this.containerName, 'cmd': `docker exec -it ${this.containerName} /bin/bash\r`});
+
                         Sio.sendMessage("t_pty_i", {'tag': this.containerName, 'cmd': `history -c && history -w && clear\r`});
                     }
 
-                    this.xtermList[this.containerName].onData((event) => {
-                        Sio.sendMessage("t_pty_i", {'tag': this.containerName, 'cmd': event});
+                    this.xtermList[this.containerName].onData((data) => {
+                        Sio.sendMessage("t_pty_i", {'tag': this.containerName, 'cmd': data});
                     });
 
                     Sio.readMessage(`t_pty_o_${this.containerName}`, (data) => {
                         if (terminalComponent !== null) {
-                            if ((this.name !== "NodeJs" && data.trim() === "exit") || data === "xterm_reset") {
+                            if ((this.name !== "NodeJs" && data.cmd.trim() === "exit") || data.cmd === "xterm_reset") {
                                 Sio.stopRead(`t_pty_o_${this.containerName}`);
 
                                 this._createXterm();
                             }
-                            else
-                                this.xtermList[this.containerName].write(data);
+                            else {
+                                if (this.xtermList[data.tag] !== undefined && data.tag !== undefined && data.cmd !== undefined)
+                                    this.xtermList[data.tag].write(data.cmd);
+                            }
                         }
                     });
                 }
@@ -103,6 +112,9 @@
                             terminal.style.height = `${clientRect.height}px`;
 
                             this.fitAddonList[this.containerName].fit();
+
+                            let size = this.fitAddonList[this.containerName].proposeDimensions();
+                            Sio.sendMessage("t_pty_resize", {'tag': this.containerName, 'size': [size.cols, size.rows]});
                         }
                     }
                 }

@@ -2,9 +2,9 @@
 
 /* global */
 
-const io = require("socket.io-client");
-
 const config = require("@/assets/js/Config.js");
+
+const io = require("socket.io-client");
 
 const socketIo = io(config.setting().websocket.url);
 

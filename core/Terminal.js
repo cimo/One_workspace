@@ -19,56 +19,57 @@ const socketEvent = async(helper, socket, type) => {
 };
 
 const _pty = (helper, socket) => {
-    let tag = "";
     let ptySpawnList = [];
 
-    socket.on("t_pty_start", (data) => {
-        helper.writeLog("Terminal start");
-
-        tag = data.tag;
+    socket.on("t_pty_start", (dataStart) => {
+        helper.writeLog(`Terminal ${dataStart.tag} start`);
 
         let shell = os.platform() === "win32" ? "powershell.exe" : "bash";
 
-        ptySpawnList[tag] = pty.spawn(shell, [], {
+        ptySpawnList[dataStart.tag] = pty.spawn(shell, [], {
             name: "xterm-color",
-            cols: 80,
-            rows: 24,
+            cols: dataStart.size[0],
+            rows: dataStart.size[1],
             cwd: process.env.HOME,
             env: process.env
         });
 
-        ptySpawnList[tag].on("data", (data) => {
-            helper.writeLog(`Terminal t_pty_o_${tag} => ${data}`);
+        ptySpawnList[dataStart.tag].on("data", (data) => {
+            helper.writeLog(`Terminal t_pty_o_${dataStart.tag} => ${data}`);
 
-            socket.emit(`t_pty_o_${tag}`, data);
+            socket.emit(`t_pty_o_${dataStart.tag}`, {'tag': dataStart.tag, 'cmd': data});
         });
 
-        ptySpawnList[tag].on("exit", () => {
-            if (ptySpawnList[tag] !== undefined) {
-                helper.writeLog(`Terminal t_pty_o_${tag} => xterm_reset`);
+        ptySpawnList[dataStart.tag].on("exit", () => {
+            if (ptySpawnList[dataStart.tag] !== undefined) {
+                helper.writeLog(`Terminal t_pty_o_${dataStart.tag} => xterm_reset`);
 
-                socket.emit(`t_pty_o_${tag}`, "xterm_reset");
+                socket.emit(`t_pty_o_${dataStart.tag}`, {'tag': dataStart.tag, 'cmd': "xterm_reset"});
 
-                ptySpawnList[tag].destroy();
+                ptySpawnList[dataStart.tag].destroy();
             }
         });
     });
 
     socket.on("t_pty_i", (data) => {
-        if (data.tag !== undefined && data.cmd !== undefined && ptySpawnList[data.tag] !== undefined) {
+        if (ptySpawnList[data.tag] !== undefined && data.tag !== undefined && data.cmd !== undefined) {
             helper.writeLog(`Terminal t_pty_i => ${data.tag} - ${data.cmd}`);
 
-            tag = data.tag;
+            ptySpawnList[data.tag].write(data.cmd);
+        }
+    });
 
-            ptySpawnList[tag].write(data.cmd);
+    socket.on("t_pty_resize", (data) => {
+        if (ptySpawnList[data.tag] !== undefined && data.tag !== undefined && data.size !== undefined) {
+            helper.writeLog(`Terminal t_pty_resize => ${data.tag}`);
+
+            ptySpawnList[data.tag].resize(data.size[0], data.size[1]);
         }
     });
 
     socket.on("t_pty_close", (data) => {
-        if (data.tag !== undefined && ptySpawnList[data.tag] !== undefined) {
+        if (ptySpawnList[data.tag] !== undefined && data.tag !== undefined) {
             helper.writeLog(`Terminal t_pty_close => ${data.tag}`);
-
-            tag = "";
 
             ptySpawnList[data.tag].destroy();
 
@@ -122,7 +123,7 @@ const _exec = (helper, socket) => {
                     let stream;
                     stream = fs.createReadStream(data.path, {'flags': "r", 'encoding': encoding});
 
-                    stream.on("data", function (chunkData) {
+                    stream.on("data", (chunkData) => {
                         let chunk = chunkData.toString();
 
                         helper.writeLog(`Read t_exec_stream_o_${data.tag} => ${chunk}`);
