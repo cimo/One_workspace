@@ -106,8 +106,7 @@ const _exec = (helper, socket) => {
 
             if (fs.existsSync(directory) === true) {
                 if (data.cmd === "write" && data.content !== undefined) {
-                    let stream;
-                    stream = fs.createWriteStream(data.path, {'flags': "w", 'encoding': encoding, 'mode': "0664"});
+                    let stream = fs.createWriteStream(data.path, {'flags': "w", 'encoding': encoding, 'mode': "0664"});
 
                     stream.write(data.content);
 
@@ -120,22 +119,23 @@ const _exec = (helper, socket) => {
                     });
                 }
                 else if (data.cmd === "read") {
-                    let stream;
-                    stream = fs.createReadStream(data.path, {'flags': "r", 'encoding': encoding});
+                    if (fs.existsSync(data.path) === true) {
+                        let stream = fs.createReadStream(data.path, {'flags': "r", 'encoding': encoding});
 
-                    stream.on("data", (chunkData) => {
-                        let chunk = chunkData.toString();
+                        stream.on("data", (chunkData) => {
+                            let chunk = chunkData.toString();
 
-                        helper.writeLog(`Read t_exec_stream_o_${data.tag} => ${chunk}`);
+                            helper.writeLog(`Read t_exec_stream_o_${data.tag} => ${chunk}`);
 
-                        socket.emit(`t_exec_stream_o_${data.tag}`, {'chunk': chunk});
-                    });
+                            socket.emit(`t_exec_stream_o_${data.tag}`, {'chunk': chunk});
+                        });
 
-                    stream.on("close", () => {
-                        helper.writeLog(`Read t_exec_stream_o_${data.tag} => close`);
+                        stream.on("close", () => {
+                            helper.writeLog(`Read t_exec_stream_o_${data.tag} => close`);
 
-                        socket.emit(`t_exec_stream_o_${data.tag}`, {'chunk': "end"});
-                    });
+                            socket.emit(`t_exec_stream_o_${data.tag}`, {'chunk': "end"});
+                        });
+                    }
                 }
             }
         }

@@ -22,11 +22,6 @@ Is a docker service container for have, in one space, a large and complete devel
 | Sass |
 | VueJs |
 
-| Package: |
-|:---|
-| Npm |
-| Composer |
-
 | Conatiner: |
 |:---|
 | Php 5.6-fpm |

@@ -2,12 +2,12 @@
     <div class="command_component">
         <div class="section">
             <div class="left">
-                <p class="text">Status: <span class="status"></span></p>
+                <p>Status: <span class="status"></span></p>
             </div>
         </div>
         <div class="section">
             <div class="left">
-                <p class="text">Start a container</p>
+                <p>Start a container</p>
             </div>
             <div class="right">
                 <div class="button_cmd_window cmd">Start</div>
@@ -15,7 +15,7 @@
         </div>
         <div class="section">
             <div class="left">
-                <p class="text">Restart a container</p>
+                <p>Restart a container</p>
             </div>
             <div class="right">
                 <div class="button_cmd_window cmd">Restart</div>
@@ -23,7 +23,7 @@
         </div>
         <div class="section">
             <div class="left">
-                <p class="text">Stop a container</p>
+                <p>Stop a container</p>
             </div>
             <div class="right">
                 <div class="button_cmd_window cmd">Stop</div>
@@ -46,7 +46,10 @@
             _checkStatus(containerName) {
                 if (Object.keys(this.windowComponentList).length > 0) {
                     this.statusIntervalList[containerName] = setInterval(() => {
-                        Sio.sendMessage("t_exec_i", {'tag': `${containerName}_command`, 'cmd': `docker ps --filter "name=${containerName}" --format "{{.Status}}"`});
+                        Sio.sendMessage("t_exec_i", {
+                            'tag': `${containerName}_command`,
+                            'cmd': `docker ps --filter "name=${containerName}" --format "{{.Status}}"`
+                        });
                     }, 1000);
 
                     Sio.readMessage(`t_exec_o_${containerName}_command`, (data) => {
@@ -83,7 +86,7 @@
                 }
             },
             clickLogic(event) {
-                let windowComponent = this._findParent(event.target, ["window_component"]);
+                let windowComponent = this._findParent(event.target, ["command_component"], ["window_component"]);
                 let currentWindowElement = this._currentWindowElement(windowComponent);
 
                 if (currentWindowElement !== null) {
@@ -96,21 +99,28 @@
                         if (index === 0 && this.statusList[containerName] === -1) {
                             this.statusElementList[containerName].innerHTML = "Starting...";
 
-                            Sio.sendMessage("t_exec_i", {'tag': `${containerName}_command`, 'cmd': `docker start ${containerName}`});
+                            Sio.sendMessage("t_exec_i", {
+                                'tag': `${containerName}_command`,
+                                'cmd': `docker start ${containerName}`
+                            });
 
                             this.statusOldList[containerName] = 0;
-                        }
-                        else if (index === 1 && this.statusList[containerName] !== -1) {
+                        } else if (index === 1 && this.statusList[containerName] !== -1) {
                             this.statusElementList[containerName].innerHTML = "Restarting...";
 
-                            Sio.sendMessage("t_exec_i", {'tag': `${containerName}_command`, 'cmd': `docker restart ${containerName}`});
+                            Sio.sendMessage("t_exec_i", {
+                                'tag': `${containerName}_command`,
+                                'cmd': `docker restart ${containerName}`
+                            });
 
                             this.statusOldList[containerName] = -1;
-                        }
-                        else if (index === 2 && this.statusList[containerName] !== -1) {
+                        } else if (index === 2 && this.statusList[containerName] !== -1) {
                             this.statusElementList[containerName].innerHTML = "Stopping...";
 
-                            Sio.sendMessage("t_exec_i", {'tag': `${containerName}_command`, 'cmd': `docker stop ${containerName}`});
+                            Sio.sendMessage("t_exec_i", {
+                                'tag': `${containerName}_command`,
+                                'cmd': `docker stop ${containerName}`
+                            });
 
                             this.statusOldList[containerName] = -1;
                         }
@@ -145,7 +155,7 @@
                 statusOldList: [],
                 statusElementList: [],
                 buttonCommandList: []
-            }
+            };
         },
         created() {
             this.$root.$refs.containerCommandComponent = this;

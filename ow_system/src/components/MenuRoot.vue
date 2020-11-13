@@ -27,13 +27,6 @@
                         <p class="text">{{value.name}}</p>
                     </div>
                 </div>
-                <p class="label">Package</p>
-                <div v-for="(value, key) in menuRoot.packageItems" v-bind:key="`${key}-${value.name}`" class="window_opener" v-bind:data-category="value.category" v-bind:data-name="value.name">
-                    <div class="program">
-                        <img class="icon" v-bind:src="value.imagePath" v-bind:alt="value.imageName"/>
-                        <p class="text">{{value.name}}</p>
-                    </div>
-                </div>
                 <p class="label">Container</p>
                 <div v-for="(value, key) in menuRoot.containerItems" v-bind:key="`${key}-${value.name}`" class="window_opener" v-bind:data-category="value.category" v-bind:data-name="value.name" v-bind:data-container_name="value.containerName">
                     <div class="program">

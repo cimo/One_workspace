@@ -85,7 +85,8 @@
 <style scoped>
     .container_component .menu {
         height: 28px;
-        background-color: #000000;
+        background-color: #2b2b2b;
+        border-bottom: 1px solid #a0a0a0;
         cursor: pointer;
     }
     .container_component .menu .button {

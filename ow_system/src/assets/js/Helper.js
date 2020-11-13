@@ -42,12 +42,16 @@ const _dragEnd = () => {
     dragActive = false;
 };
 
-const findParent = (element, tags) => {
+const findParent = (element, child, parent) => {
     if (element !== null) {
-        if (tags.every(tags => element.classList.contains(tags)) === true)
-            return element;
+        if (child.every(child => element.classList.contains(child)) === true) {
+            if (parent !== undefined)
+                return findParent(element.parentElement, parent);
+            else
+                return element;
+        }
         else
-            return findParent(element.parentElement, tags);
+            return findParent(element.parentElement, child, parent);
     }
 
     return null;

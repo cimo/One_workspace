@@ -2,15 +2,15 @@
     <div class="project_component">
         <div class="left">
             <div class="section">
-                <p class="text">Name:</p>
+                <p>Name:</p>
                 <input type="text" name="name" value=""/>
             </div>
             <div class="section">
-                <div class="text">Description:</div>
+                <p>Description:</p>
                 <textarea name="description" rows="4"></textarea>
             </div>
             <div class="section">
-                <p class="text">Folder name:</p>
+                <p>Folder name:</p>
                 <input type="text" name="folder_name" value=""/>
             </div>
             <div class="section">
@@ -27,16 +27,12 @@
                 <div class="text">Ssh</div>
                 <div class="text">Terser</div>
                 <div class="text">Sass</div>
-                <div class="text">Npm</div>
-                <div class="text">Composer</div>
             </div>
             <div class="sub_right">
                 <input type="checkbox" name="git" value=""/>
                 <input type="checkbox" name="ssh" value=""/>
                 <input type="checkbox" name="terser" value=""/>
                 <input type="checkbox" name="sass" value=""/>
-                <input type="checkbox" name="npm" value=""/>
-                <input type="checkbox" name="composer" value=""/>
             </div>
         </div>
         <div class="bottom">
@@ -46,6 +42,7 @@
 </template>
 
 <script>
+    import Config from "@/assets/js/Config.js";
     import Helper from "@/assets/js/Helper.js";
     import Sio from "@/assets/js/Sio.js";
 
@@ -54,6 +51,7 @@
         //components: {},
         computed: {},
         methods: {
+            _setting: Config.setting,
             _findParent: Helper.findParent,
             _currentWindowElement: Helper.currentWindowElement,
             init(windowComponent) {
@@ -69,151 +67,165 @@
                     this.checkboxSsh = this.windowComponent.querySelector("input[name='ssh']");
                     this.checkboxTerser = this.windowComponent.querySelector("input[name='terser']");
                     this.checkboxSass = this.windowComponent.querySelector("input[name='sass']");
-                    this.checkboxNpm = this.windowComponent.querySelector("input[name='npm']");
-                    this.checkboxComposer = this.windowComponent.querySelector("input[name='composer']");
-                    this.selectModify = this.windowComponent.querySelector("select[name='edit']");
+                    this.selectEdit = this.windowComponent.querySelector("select[name='edit']");
+                    this.buttonDelete = this.windowComponent.querySelector(".button_cmd_window.delete");
                     this.buttonSave = this.windowComponent.querySelector(".button_cmd_window.save");
 
-                    if (this.selectModify !== null) {
-                        Sio.sendMessage("t_exec_i", {'tag': "project", 'cmd': `ls /home/user_1/root/ow_system/setting`});
+                    if (this.selectEdit !== null) {
+                        Sio.sendMessage("t_exec_i", {
+                            'tag': "projectInit",
+                            'cmd': `ls ${this._setting().systemData.pathSetting}/*${this._setting().systemData.extensionProject} | sed 's#.*/##'`
+                        });
 
-                        Sio.readMessage("t_exec_o_project", (data) => {
+                        Sio.readMessage("t_exec_o_projectInit", (data) => {
                             if (data.out !== undefined) {
                                 let outSplit = data.out.split("\n");
 
                                 for (const value of outSplit) {
                                     if (value !== "") {
                                         let option = document.createElement("option");
-                                        option.value = value.replace(".set", "");
-                                        option.text = value.replace(".set", "");
-                                        this.selectModify.appendChild(option);
+                                        option.value = value.replace(this._setting().systemData.extensionProject, "");
+                                        option.text = value.replace(this._setting().systemData.extensionProject, "");
+                                        this.selectEdit.appendChild(option);
                                     }
                                 }
                             }
 
-                            Sio.stopRead("t_exec_o_project");
+                            Sio.stopRead("t_exec_o_projectInit");
                         });
                     }
                 }
             },
             clickLogic(event) {
-                let windowComponent = this._findParent(event.target, ["window_component"]);
+                let windowComponent = this._findParent(event.target, ["project_component"], ["window_component"]);
+                let currentWindowElement = this._currentWindowElement(windowComponent);
 
-                if (windowComponent !== null) {
-                    let currentWindowElement = this._currentWindowElement(windowComponent);
+                if (currentWindowElement !== null) {
+                    this.windowComponent = windowComponent;
 
-                    if (currentWindowElement !== null) {
-                        this.windowComponent = windowComponent;
+                    if (event.target.classList.contains("save") === true) {
+                        if (this.inputName.value !== "") {
+                            let content = {
+                                'name': this.inputName.value,
+                                'description': this.textareaDescription.value,
+                                'folderName': this.folderName.value,
+                                'git': this.checkboxGit.checked === true ? true : false,
+                                'ssh': this.checkboxSsh.checked === true ? true : false,
+                                'terser': this.checkboxTerser.checked === true ? true : false,
+                                'sass': this.checkboxSass.checked === true ? true : false
+                            };
 
-                        this.pathSetting = "/home/user_1/root/ow_system/setting";
-                        this.pathFolder = "/home/user_1/root/project";
+                            // Create setting file
+                            Sio.sendMessage("t_exec_stream_i", {
+                                'tag': "projectClickLogicSetting",
+                                'cmd': "write",
+                                'path': `${this._setting().systemData.pathSetting}/${this.inputName.value}${this._setting().systemData.extensionProject}`,
+                                'content': JSON.stringify(content)
+                            });
 
-                        if (event.target.classList.contains("save") === true) {
-                            if (this.inputName.value !== "") {
-                                let content = {
-                                    'name': this.inputName.value,
-                                    'description': this.textareaDescription.value,
-                                    'folderName': this.folderName.value,
-                                    'git': this.checkboxGit.checked === true ? true : false,
-                                    'ssh': this.checkboxSsh.checked === true ? true : false,
-                                    'terser': this.checkboxTerser.checked === true ? true : false,
-                                    'sass': this.checkboxSass.checked === true ? true : false,
-                                    'npm': this.checkboxNpm.checked === true ? true : false,
-                                    'composer': this.checkboxComposer.checked === true ? true : false
-                                };
+                            Sio.readMessage("t_exec_stream_o_projectClickLogicSetting", (data) => {
+                                if (data.chunk === "end") {
+                                    if (this.selectEdit.querySelector(`option[value='${this.inputName.value}'`) === null) {
+                                        let option = document.createElement("option");
+                                        option.value = this.inputName.value;
+                                        option.text = this.inputName.value;
+                                        this.selectEdit.appendChild(option);
 
-                                // Create setting file
-                                Sio.sendMessage("t_exec_stream_i", {'tag': "project", 'cmd': "write", 'path': `${this.pathSetting}/${this.inputName.value}.set`, 'content': JSON.stringify(content)});
-
-                                Sio.readMessage("t_exec_stream_o_project", (data) => {
-                                    if (data.chunk === "end") {
-                                        if (this.selectModify.querySelector(`option[value='${this.inputName.value}'`) === null) {
-                                            let option = document.createElement("option");
-                                            option.value = this.inputName.value;
-                                            option.text = this.inputName.value;
-                                            this.selectModify.appendChild(option);
-
-                                            this.selectModify.querySelector(`option[value='${this.inputName.value}'`).selected = true;
-                                        }
-
-                                        Sio.stopRead("t_exec_stream_o_project");
+                                        this.selectEdit.querySelector(`option[value='${this.inputName.value}'`).selected = true;
                                     }
-                                });
 
-                                // Create folder root
-                                Sio.sendMessage("t_exec_i", {'tag': "project", 'cmd': `mkdir -p ${this.pathFolder}/${this.folderName.value}/root`});
+                                    Sio.stopRead("t_exec_stream_o_projectClickLogicSetting");
+                                }
+                            });
 
-                                Sio.readMessage("t_exec_o_project", () => {
-                                    Sio.stopRead("t_exec_o_project");
-                                });
-                            }
+                            // Create folder root
+                            Sio.sendMessage("t_exec_i", {
+                                'tag': "projectClickLogicFolder",
+                                'cmd': `mkdir -p ${this._setting().systemData.pathProject}/${this.folderName.value}/root`
+                            });
+
+                            Sio.readMessage("t_exec_o_projectClickLogicFolder", () => {
+                                Sio.stopRead("t_exec_o_projectClickLogicFolder");
+                            });
                         }
-                        else if (event.target.classList.contains("delete") === true) {
-                            if (this.selectModify.selectedIndex > 0) {
-                                this.$root.$refs.promptComponent.show(this.windowComponent, "You really want to delete this project?<br>(The root folder will be preserved).", () => {
-                                    Sio.sendMessage("t_exec_i", {'tag': "project", 'cmd': `rm ${this.pathSetting}/${this.inputName.value}.set`});
-
-                                    Sio.readMessage("t_exec_o_project", () => {
-                                        if (this.selectModify.selectedIndex > 0 && this.selectModify.options[this.selectModify.selectedIndex].value !== null) {
-                                            this.inputName.value = "";
-                                            this.textareaDescription.value = "";
-                                            this.folderName.value = "";
-                                            this.checkboxGit.checked = false;
-                                            this.checkboxSsh.checked = false;
-                                            this.checkboxTerser.checked = false;
-                                            this.checkboxSass.checked = false;
-                                            this.checkboxNpm.checked = false;
-                                            this.checkboxComposer.checked = false;
-
-                                            this.selectModify.options[this.selectModify.selectedIndex].remove();
-                                        }
-
-                                        Sio.stopRead("t_exec_o_project");
-                                    });
+                    }
+                    else if (event.target.classList.contains("delete") === true) {
+                        if (this.selectEdit.selectedIndex > 0) {
+                            this.$root.$refs.promptComponent.show(this.windowComponent, "You really want to delete this project?<br>(The root folder will be preserved).", () => {
+                                Sio.sendMessage("t_exec_i", {
+                                    'tag': "projectClickLogicDelete",
+                                    'cmd': `rm ${this._setting().systemData.pathSetting}/${this.inputName.value}${this._setting().systemData.extensionProject}`
                                 });
-                            }
+
+                                Sio.readMessage("t_exec_o_projectClickLogicDelete", () => {
+                                    if (this.selectEdit.selectedIndex > 0 && this.selectEdit.options[this.selectEdit.selectedIndex].value !== null) {
+                                        this.inputName.value = "";
+                                        this.textareaDescription.value = "";
+                                        this.folderName.value = "";
+                                        this.checkboxGit.checked = false;
+                                        this.checkboxSsh.checked = false;
+                                        this.checkboxTerser.checked = false;
+                                        this.checkboxSass.checked = false;
+
+                                        this.selectEdit.options[this.selectEdit.selectedIndex].remove();
+                                    }
+
+                                    Sio.stopRead("t_exec_o_projectClickLogicDelete");
+                                });
+                            });
                         }
                     }
                 }
             },
             changeLogic(event) {
-                if (event.target.classList.contains("edit") === true) {
-                    if (this.selectModify.selectedIndex > 0) {
-                        let name = this.selectModify.options[this.selectModify.selectedIndex].value;
-                        let buffer = "";
+                let windowComponent = this._findParent(event.target, ["project_component"], ["window_component"]);
+                let currentWindowElement = this._currentWindowElement(windowComponent);
 
-                        Sio.sendMessage("t_exec_stream_i", {'tag': "project", 'cmd': "read", 'path': `${this.pathSetting}/${name}.set`});
+                if (currentWindowElement !== null) {
+                    this.windowComponent = windowComponent;
 
-                        Sio.readMessage("t_exec_stream_o_project", (data) => {
-                            if (data.chunk !== "end")
-                                buffer += data.chunk;
-                            else {
-                                let result = JSON.parse(buffer);
+                    if (event.target.classList.contains("edit") === true) {
+                        if (this.selectEdit.selectedIndex > 0) {
+                            let name = this.selectEdit.options[this.selectEdit.selectedIndex].value;
+                            let buffer = "";
 
-                                this.inputName.value = result.name;
-                                this.textareaDescription.value = result.description;
-                                this.folderName.value = result.folderName;
-                                this.checkboxGit.checked = result.git;
-                                this.checkboxSsh.checked = result.ssh;
-                                this.checkboxTerser.checked = result.terser;
-                                this.checkboxSass.checked = result.sass;
-                                this.checkboxNpm.checked = result.npm;
-                                this.checkboxComposer.checked = result.composer;
+                            Sio.sendMessage("t_exec_stream_i", {
+                                'tag': "projectChangeLogicEdit",
+                                'cmd': "read",
+                                'path': `${this._setting().systemData.pathSetting}/${name}${this._setting().systemData.extensionProject}`
+                            });
 
-                                Sio.stopRead("t_exec_stream_o_project");
-                            }
-                        });
-                    }
-                    else {
-                        this.inputName.value = "";
-                        this.textareaDescription.value = "";
-                        this.folderName.value = "";
-                        this.checkboxGit.checked = false;
-                        this.checkboxSsh.checked = false;
-                        this.checkboxTerser.checked = false;
-                        this.checkboxSass.checked = false;
-                        this.checkboxNpm.checked = false;
-                        this.checkboxComposer.checked = false;
+                            Sio.readMessage("t_exec_stream_o_projectChangeLogicEdit", (data) => {
+                                if (data.chunk !== "end")
+                                    buffer += data.chunk;
+                                else {
+                                    let result = JSON.parse(buffer);
+
+                                    this.inputName.value = result.name;
+                                    this.textareaDescription.value = result.description;
+                                    this.folderName.value = result.folderName;
+                                    this.checkboxGit.checked = result.git;
+                                    this.checkboxSsh.checked = result.ssh;
+                                    this.checkboxTerser.checked = result.terser;
+                                    this.checkboxSass.checked = result.sass;
+
+                                    Sio.stopRead("t_exec_stream_o_projectChangeLogicEdit");
+
+                                    this.buttonDelete.style.display = "block";
+                                }
+                            });
+                        }
+                        else {
+                            this.inputName.value = "";
+                            this.textareaDescription.value = "";
+                            this.folderName.value = "";
+                            this.checkboxGit.checked = false;
+                            this.checkboxSsh.checked = false;
+                            this.checkboxTerser.checked = false;
+                            this.checkboxSass.checked = false;
+
+                            this.buttonDelete.style.display = "none";
+                        }
                     }
                 }
             }
@@ -228,12 +240,9 @@
                 checkboxSsh: null,
                 checkboxTerser: null,
                 checkboxSass: null,
-                checkboxNpm: null,
-                checkboxComposer: null,
-                selectModify: null,
+                selectEdit: null,
                 buttonSave: null,
-                pathSetting: "",
-                pathFolder: ""
+                buttonDelete: null
             };
         },
         created() {
@@ -268,7 +277,9 @@
         resize: none;
     }
     .project_component .left .section .button_cmd_window.delete {
+        display: none;
         margin-top: 10px;
+        background-color: #ff0000;
     }
     .project_component .right .sub_left, .project_component .right .sub_right {
         vertical-align: top;

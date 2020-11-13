@@ -15,7 +15,6 @@
         <div class="body">
             <ProjectComponent/>
             <ToolComponent/>
-            <PackageComponent/>
             <ContainerComponent/>
             <div class="overlay"></div>
         </div>
@@ -27,7 +26,6 @@
     import Helper from "@/assets/js/Helper.js";
     import ProjectComponent from "@/components/Project.vue";
     import ToolComponent from "@/components/Tool.vue";
-    import PackageComponent from "@/components/Package.vue";
     import ContainerComponent from "@/components/Container.vue";
 
     export default {
@@ -35,7 +33,6 @@
         components: {
             ProjectComponent,
             ToolComponent,
-            PackageComponent,
             ContainerComponent
         },
         computed: {},
@@ -108,36 +105,25 @@
 
                     if (category === "project") {
                         newWindowComponent.querySelector(".tool_component").remove();
-                        newWindowComponent.querySelector(".package_component").remove();
                         newWindowComponent.querySelector(".container_component").remove();
 
                         this.$root.$refs.projectComponent.init(newWindowComponent);
                     }
                     else if (category === "tool") {
                         newWindowComponent.querySelector(".project_component").remove();
-                        newWindowComponent.querySelector(".package_component").remove();
                         newWindowComponent.querySelector(".container_component").remove();
 
                         this.$root.$refs.toolComponent.init(newWindowComponent);
                     }
-                    else if (category === "package") {
-                        newWindowComponent.querySelector(".project_component").remove();
-                        newWindowComponent.querySelector(".tool_component").remove();
-                        newWindowComponent.querySelector(".container_component").remove();
-
-                        this.$root.$refs.packageComponent.init(newWindowComponent);
-                    }
                     else if (category === "container") {
                         newWindowComponent.querySelector(".project_component").remove();
                         newWindowComponent.querySelector(".tool_component").remove();
-                        newWindowComponent.querySelector(".package_component").remove();
 
                         this.$root.$refs.containerComponent.init(newWindowComponent);
                     }
                     else {
                         newWindowComponent.querySelector(".project_component").remove();
                         newWindowComponent.querySelector(".tool_component").remove();
-                        newWindowComponent.querySelector(".package_component").remove();
                         newWindowComponent.querySelector(".container_component").remove();
                     }
 
@@ -177,39 +163,41 @@
                 if (windowComponent !== null) {
                     let currentWindowElement = this._currentWindowElement(windowComponent);
 
-                    this.windowName = currentWindowElement[0];
-                    this.windowComponent = windowComponent;
+                    if (currentWindowElement !== null) {
+                        this.windowName = currentWindowElement[0];
+                        this.windowComponent = windowComponent;
 
-                    this._focusCurrentWindow(this.windowComponent);
-
-                    this._focusCurrentMainbarElement();
-
-                    if (event.target.classList.contains("button_minimize") === true) {
-                        this.windowComponent.classList.add("minimized");
-                        this.windowComponent.style.display = "none";
-
-                        this._focusNextWindow();
-
-                        this.$root.$refs.footerComponent.minimize(this.windowComponent);
-
-                        this._focusCurrentMainbarElement();
-                    }
-                    else if (event.target.classList.contains("button_maximize") === true)
-                        this._changeStatus();
-                    else if (event.target.classList.contains("button_close") === true) {
-                        this.$root.$refs.containerCommandComponent.close(this.windowComponent);
-                        this.$root.$refs.containerTerminalComponent.close(this.windowComponent);
-                        this.$root.$refs.containerDataComponent.close(this.windowComponent);
-
-                        this.windowComponent.parentNode.removeChild(this.windowComponent);
-
-                        this._focusNextWindow();
-
-                        this.$root.$refs.footerComponent.remove(this.windowComponent);
+                        this._focusCurrentWindow(this.windowComponent);
 
                         this._focusCurrentMainbarElement();
 
-                        this._close();
+                        if (event.target.classList.contains("button_minimize") === true) {
+                            this.windowComponent.classList.add("minimized");
+                            this.windowComponent.style.display = "none";
+
+                            this._focusNextWindow();
+
+                            this.$root.$refs.footerComponent.minimize(this.windowComponent);
+
+                            this._focusCurrentMainbarElement();
+                        }
+                        else if (event.target.classList.contains("button_maximize") === true)
+                            this._changeStatus();
+                        else if (event.target.classList.contains("button_close") === true) {
+                            this.$root.$refs.containerCommandComponent.close(this.windowComponent);
+                            this.$root.$refs.containerTerminalComponent.close(this.windowComponent);
+                            this.$root.$refs.containerDataComponent.close(this.windowComponent);
+
+                            this.windowComponent.parentNode.removeChild(this.windowComponent);
+
+                            this._focusNextWindow();
+
+                            this.$root.$refs.footerComponent.remove(this.windowComponent);
+
+                            this._focusCurrentMainbarElement();
+
+                            this._close();
+                        }
                     }
                 }
                 else {
@@ -251,10 +239,10 @@
         },
         data() {
             return {
+                windowName: "",
                 windowComponent: null,
                 windowPosition: [],
-                windowSize: [],
-                windowName: ""
+                windowSize: []
             };
         },
         created() {

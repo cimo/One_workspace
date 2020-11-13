@@ -32,7 +32,10 @@
             _checkStatus(containerName) {
                 if (Object.keys(this.windowComponentList).length > 0) {
                     this.statusIntervalList[containerName] = setInterval(() => {
-                        Sio.sendMessage("t_exec_i", {'tag': `${containerName}_data`, 'cmd': `docker stats ${containerName} --no-stream --format "{{.CPUPerc}}[-]{{.MemUsage}}[-]{{.BlockIO}}[-]{{.NetIO}}"`});
+                        Sio.sendMessage("t_exec_i", {
+                            'tag': `${containerName}_data`,
+                            'cmd': `docker stats ${containerName} --no-stream --format "{{.CPUPerc}}[-]{{.MemUsage}}[-]{{.BlockIO}}[-]{{.NetIO}}"`
+                        });
                     }, 1000);
 
                     Sio.readMessage(`t_exec_o_${containerName}_data`, (data) => {
@@ -81,7 +84,7 @@
             return {
                 windowComponentList: [],
                 statusIntervalList: []
-            }
+            };
         },
         created() {
             this.$root.$refs.containerDataComponent = this;

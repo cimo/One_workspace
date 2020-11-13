@@ -30,16 +30,17 @@
                 this.$root.$refs.footerComponent.clickLogic(event);
                 this.$root.$refs.windowComponent.clickLogic(event);
                 this.$root.$refs.projectComponent.clickLogic(event);
+                this.$root.$refs.toolGitComponent.clickLogic(event);
                 this.$root.$refs.containerComponent.clickLogic(event);
                 this.$root.$refs.containerCommandComponent.clickLogic(event);
                 this.$root.$refs.containerTerminalComponent.clickLogic(event);
-                this.$root.$refs.packageComponent.clickLogic(event);
             },
             _doubleClickEvent(event) {
                 this.$root.$refs.windowComponent.doubleClickLogic(event);
             },
             _changeEvent(event) {
                 this.$root.$refs.projectComponent.changeLogic(event);
+                this.$root.$refs.toolGitComponent.changeLogic(event);
             },
             _resizeEvent() {
                 this.$root.$refs.windowComponent.resizeLogic();

@@ -18,7 +18,7 @@
             _findParent: Helper.findParent,
             _currentWindowElement: Helper.currentWindowElement,
             _createXterm() {
-                if (this.windowComponent !== null && this.name !== null && this.containerName !== null) {
+                if (this.windowName !== null && this.containerName !== null && this.windowComponent !== null) {
                     let terminalComponent = this.windowComponent.querySelector(".terminal_component");
                     let terminal = terminalComponent.querySelector(".terminal.xterm");
 
@@ -40,23 +40,39 @@
                     this.fitAddonList[this.containerName].fit();
                     let size = this.fitAddonList[this.containerName].proposeDimensions();
 
-                    Sio.sendMessage("t_pty_start", {'tag': this.containerName, 'size': [size.cols, size.rows]});
+                    Sio.sendMessage("t_pty_start", {
+                        'tag': this.containerName,
+                        'size': [size.cols, size.rows]
+                    });
 
-                    if (this.name === "NodeJs")
-                        Sio.sendMessage("t_pty_i", {'tag': this.containerName, 'cmd': `history -c && history -w && clear\r`});
+                    if (this.windowName === "NodeJs") {
+                        Sio.sendMessage("t_pty_i", {
+                            'tag': this.containerName,
+                            'cmd': `history -c && history -w && clear\r`
+                        });
+                    }
                     else {
-                        Sio.sendMessage("t_pty_i", {'tag': this.containerName, 'cmd': `docker exec -it ${this.containerName} /bin/bash\r`});
+                        Sio.sendMessage("t_pty_i", {
+                            'tag': this.containerName,
+                            'cmd': `docker exec -it ${this.containerName} /bin/bash\r`
+                        });
 
-                        Sio.sendMessage("t_pty_i", {'tag': this.containerName, 'cmd': `history -c && history -w && clear\r`});
+                        Sio.sendMessage("t_pty_i", {
+                            'tag': this.containerName,
+                            'cmd': `history -c && history -w && clear\r`
+                        });
                     }
 
                     this.xtermList[this.containerName].onData((data) => {
-                        Sio.sendMessage("t_pty_i", {'tag': this.containerName, 'cmd': data});
+                        Sio.sendMessage("t_pty_i", {
+                            'tag': this.containerName,
+                            'cmd': data
+                        });
                     });
 
                     Sio.readMessage(`t_pty_o_${this.containerName}`, (data) => {
                         if (terminalComponent !== null) {
-                            if ((this.name !== "NodeJs" && data.cmd.trim() === "exit") || data.cmd === "xterm_reset") {
+                            if ((this.windowName !== "NodeJs" && data.cmd.trim() === "exit") || data.cmd === "xterm_reset") {
                                 Sio.stopRead(`t_pty_o_${this.containerName}`);
 
                                 this._createXterm();
@@ -73,7 +89,7 @@
                 let currentWindowElement = this._currentWindowElement(windowComponent);
 
                 if (currentWindowElement !== null) {
-                    this.name = currentWindowElement[0];
+                    this.windowName = currentWindowElement[0];
                     this.containerName = currentWindowElement[3];
                     this.windowComponent = windowComponent;
 
@@ -84,21 +100,24 @@
                 }
             },
             clickLogic(event) {
-                let windowComponent = this._findParent(event.target, ["window_component"]);
-                let currentWindowElement = this._currentWindowElement(windowComponent);
+                let windowComponent = this._findParent(event.target, ['terminal_component'], ["window_component"]);
 
-                if (currentWindowElement !== null) {
-                    this.name = currentWindowElement[0];
-                    this.containerName = currentWindowElement[3];
-                    this.windowComponent = windowComponent;
+                if (windowComponent !== null) {
+                    let currentWindowElement = this._currentWindowElement(windowComponent);
 
-                    if (this.xtermList[this.containerName] !== undefined)
-                        this.xtermList[this.containerName].focus();
+                    if (currentWindowElement !== null) {
+                        this.windowName = currentWindowElement[0];
+                        this.containerName = currentWindowElement[3];
+                        this.windowComponent = windowComponent;
+
+                        if (this.xtermList[this.containerName] !== undefined)
+                            this.xtermList[this.containerName].focus();
+                    }
                 }
             },
             resizeLogic(windowComponent, currentWindowElement) {
                 if (currentWindowElement !== null) {
-                    this.name = currentWindowElement[0];
+                    this.windowName = currentWindowElement[0];
                     this.containerName = currentWindowElement[3];
                     this.windowComponent = windowComponent;
 
@@ -114,7 +133,10 @@
                             this.fitAddonList[this.containerName].fit();
 
                             let size = this.fitAddonList[this.containerName].proposeDimensions();
-                            Sio.sendMessage("t_pty_resize", {'tag': this.containerName, 'size': [size.cols, size.rows]});
+                            Sio.sendMessage("t_pty_resize", {
+                                'tag': this.containerName,
+                                'size': [size.cols, size.rows]
+                            });
                         }
                     }
                 }
@@ -123,7 +145,7 @@
                 let currentWindowElement = this._currentWindowElement(windowComponent);
 
                 if (currentWindowElement !== null) {
-                    this.name = currentWindowElement[0];
+                    this.windowName = currentWindowElement[0];
                     this.containerName = currentWindowElement[3];
                     this.windowComponent = windowComponent;
 
@@ -133,17 +155,17 @@
                     delete this.xtermList[this.containerName];
                     delete this.fitAddonList[this.containerName];
 
-                    this.windowComponent = null;
-                    this.name = null;
+                    this.windowName = null;
                     this.containerName = null;
+                    this.windowComponent = null;
                 }
             }
         },
         data() {
             return {
-                windowComponent: null,
-                name: null,
+                windowName: null,
                 containerName: null,
+                windowComponent: null,
                 xtermList: [],
                 fitAddonList: []
             };
@@ -159,7 +181,7 @@
     .terminal_component {
         display: none;
         position: absolute;
-        top: 28px;
+        top: 29px;
         bottom: 0;
         left: 0;
         right: 0;

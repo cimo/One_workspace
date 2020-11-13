@@ -8,16 +8,22 @@ const websocketProtocol = window.location.protocol === "http:" ? "ws:" : "wss:";
 
 const setting = function() {
     return {
-        'nodejs': {
-            'url': `${window.location.protocol}//${domain}:${nodeJsPort}`
+        nodejs: {
+            url: `${window.location.protocol}//${domain}:${nodeJsPort}`
         },
-        'websocket': {
-            'url': `${websocketProtocol}//${domain}:${nodeJsPort}`
+        websocket: {
+            url: `${websocketProtocol}//${domain}:${nodeJsPort}`
         },
-        'vuejs': {
-            'ui_port': 8000
+        vuejs: {
+            ui_port: 8000
         },
-        'menu_root': {
+        systemData: {
+            pathSetting: "/home/user_1/root/ow_system/setting",
+            pathProject: "/home/user_1/root/project",
+            extensionProject: ".prj",
+            extensionGit: ".pgit"
+        },
+        menu_root: {
             sideItems: [
                 {
                     category: "side",
@@ -64,20 +70,6 @@ const setting = function() {
                     name: "VueJs",
                     imagePath: require("@/assets/images/vuejs.svg"),
                     imageName: "vuejs.svg"
-                }
-            ],
-            packageItems: [
-                {
-                    category: "package",
-                    name: "Npm",
-                    imagePath: require("@/assets/images/npm.svg"),
-                    imageName: "npm.svg"
-                },
-                {
-                    category: "package",
-                    name: "Composer",
-                    imagePath: require("@/assets/images/composer.svg"),
-                    imageName: "composer.svg"
                 }
             ],
             containerItems: [
@@ -130,14 +122,14 @@ const setting = function() {
                     imagePath: require("@/assets/images/postgresql.svg"),
                     imageName: "postgresql.svg"
                 },
-		{
+                {
                     category: "container",
                     name: "Redis",
                     containerName: "Redis_6.0.9",
                     imagePath: require("@/assets/images/redis.svg"),
                     imageName: "redis.svg"
                 },
-		{
+                {
                     category: "container",
                     name: "MongoDb",
                     containerName: "MongoDb_4.0.20",
