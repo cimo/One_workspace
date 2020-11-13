@@ -54,6 +54,12 @@
             _setting: Config.setting,
             _findParent: Helper.findParent,
             _currentWindowElement: Helper.currentWindowElement,
+            _deleteToolFileSetting(extension) {
+                Sio.sendMessage("t_exec_i", {
+                    tag: "projectDeleteToolFileSetting",
+                    cmd: `rm ${this._setting().systemData.pathSetting}/${this.inputName.value}${extension}`
+                });
+            },
             init(windowComponent) {
                 let currentWindowElement = this._currentWindowElement(windowComponent);
 
@@ -73,8 +79,8 @@
 
                     if (this.selectEdit !== null) {
                         Sio.sendMessage("t_exec_i", {
-                            'tag': "projectInit",
-                            'cmd': `ls ${this._setting().systemData.pathSetting}/*${this._setting().systemData.extensionProject} | sed 's#.*/##'`
+                            tag: "projectInit",
+                            cmd: `ls ${this._setting().systemData.pathSetting}/*${this._setting().systemData.extensionProject} | sed 's#.*/##'`
                         });
 
                         Sio.readMessage("t_exec_o_projectInit", (data) => {
@@ -106,21 +112,21 @@
                     if (event.target.classList.contains("save") === true) {
                         if (this.inputName.value !== "") {
                             let content = {
-                                'name': this.inputName.value,
-                                'description': this.textareaDescription.value,
-                                'folderName': this.folderName.value,
-                                'git': this.checkboxGit.checked === true ? true : false,
-                                'ssh': this.checkboxSsh.checked === true ? true : false,
-                                'terser': this.checkboxTerser.checked === true ? true : false,
-                                'sass': this.checkboxSass.checked === true ? true : false
+                                name: this.inputName.value,
+                                description: this.textareaDescription.value,
+                                folderName: this.folderName.value,
+                                git: this.checkboxGit.checked === true ? true : false,
+                                ssh: this.checkboxSsh.checked === true ? true : false,
+                                terser: this.checkboxTerser.checked === true ? true : false,
+                                sass: this.checkboxSass.checked === true ? true : false
                             };
 
                             // Create setting file
                             Sio.sendMessage("t_exec_stream_i", {
-                                'tag': "projectClickLogicSetting",
-                                'cmd': "write",
-                                'path': `${this._setting().systemData.pathSetting}/${this.inputName.value}${this._setting().systemData.extensionProject}`,
-                                'content': JSON.stringify(content)
+                                tag: "projectClickLogicSetting",
+                                cmd: "write",
+                                path: `${this._setting().systemData.pathSetting}/${this.inputName.value}${this._setting().systemData.extensionProject}`,
+                                content: JSON.stringify(content)
                             });
 
                             Sio.readMessage("t_exec_stream_o_projectClickLogicSetting", (data) => {
@@ -140,21 +146,31 @@
 
                             // Create folder root
                             Sio.sendMessage("t_exec_i", {
-                                'tag': "projectClickLogicFolder",
-                                'cmd': `mkdir -p ${this._setting().systemData.pathProject}/${this.folderName.value}/root`
+                                tag: "projectClickLogicFolder",
+                                cmd: `mkdir -p ${this._setting().systemData.pathProject}/${this.folderName.value}/root`
                             });
 
                             Sio.readMessage("t_exec_o_projectClickLogicFolder", () => {
                                 Sio.stopRead("t_exec_o_projectClickLogicFolder");
                             });
+
+                            // Create git setting file
+                            if (this.checkboxGit.checked === true) {
+                                let name = this.inputName.value;
+                                let path = `${this._setting().systemData.pathProject}/${this.folderName.value}/root`;
+
+                                this.$root.$refs.toolGitComponent.createFile(name, path);
+                            }
+                            else
+                                this._deleteToolFileSetting(this._setting().systemData.extensionGit);
                         }
                     }
                     else if (event.target.classList.contains("delete") === true) {
                         if (this.selectEdit.selectedIndex > 0) {
                             this.$root.$refs.promptComponent.show(this.windowComponent, "You really want to delete this project?<br>(The root folder will be preserved).", () => {
                                 Sio.sendMessage("t_exec_i", {
-                                    'tag': "projectClickLogicDelete",
-                                    'cmd': `rm ${this._setting().systemData.pathSetting}/${this.inputName.value}${this._setting().systemData.extensionProject}`
+                                    tag: "projectClickLogicDelete",
+                                    cmd: `rm ${this._setting().systemData.pathSetting}/${this.inputName.value}${this._setting().systemData.extensionProject}`
                                 });
 
                                 Sio.readMessage("t_exec_o_projectClickLogicDelete", () => {
@@ -171,6 +187,8 @@
                                     }
 
                                     Sio.stopRead("t_exec_o_projectClickLogicDelete");
+
+                                    this._deleteToolFileSetting(this._setting().systemData.extensionGit);
                                 });
                             });
                         }
@@ -190,9 +208,9 @@
                             let buffer = "";
 
                             Sio.sendMessage("t_exec_stream_i", {
-                                'tag': "projectChangeLogicEdit",
-                                'cmd': "read",
-                                'path': `${this._setting().systemData.pathSetting}/${name}${this._setting().systemData.extensionProject}`
+                                tag: "projectChangeLogicEdit",
+                                cmd: "read",
+                                path: `${this._setting().systemData.pathSetting}/${name}${this._setting().systemData.extensionProject}`
                             });
 
                             Sio.readMessage("t_exec_stream_o_projectChangeLogicEdit", (data) => {

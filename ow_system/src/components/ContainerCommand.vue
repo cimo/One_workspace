@@ -47,8 +47,8 @@
                 if (Object.keys(this.windowComponentList).length > 0) {
                     this.statusIntervalList[containerName] = setInterval(() => {
                         Sio.sendMessage("t_exec_i", {
-                            'tag': `${containerName}_command`,
-                            'cmd': `docker ps --filter "name=${containerName}" --format "{{.Status}}"`
+                            tag: `${containerName}_command`,
+                            cmd: `docker ps --filter "name=${containerName}" --format "{{.Status}}"`
                         });
                     }, 1000);
 
@@ -100,8 +100,8 @@
                             this.statusElementList[containerName].innerHTML = "Starting...";
 
                             Sio.sendMessage("t_exec_i", {
-                                'tag': `${containerName}_command`,
-                                'cmd': `docker start ${containerName}`
+                                tag: `${containerName}_command`,
+                                cmd: `docker start ${containerName}`
                             });
 
                             this.statusOldList[containerName] = 0;
@@ -109,8 +109,8 @@
                             this.statusElementList[containerName].innerHTML = "Restarting...";
 
                             Sio.sendMessage("t_exec_i", {
-                                'tag': `${containerName}_command`,
-                                'cmd': `docker restart ${containerName}`
+                                tag: `${containerName}_command`,
+                                cmd: `docker restart ${containerName}`
                             });
 
                             this.statusOldList[containerName] = -1;
@@ -118,8 +118,8 @@
                             this.statusElementList[containerName].innerHTML = "Stopping...";
 
                             Sio.sendMessage("t_exec_i", {
-                                'tag': `${containerName}_command`,
-                                'cmd': `docker stop ${containerName}`
+                                tag: `${containerName}_command`,
+                                cmd: `docker stop ${containerName}`
                             });
 
                             this.statusOldList[containerName] = -1;

@@ -33,8 +33,8 @@
                 if (Object.keys(this.windowComponentList).length > 0) {
                     this.statusIntervalList[containerName] = setInterval(() => {
                         Sio.sendMessage("t_exec_i", {
-                            'tag': `${containerName}_data`,
-                            'cmd': `docker stats ${containerName} --no-stream --format "{{.CPUPerc}}[-]{{.MemUsage}}[-]{{.BlockIO}}[-]{{.NetIO}}"`
+                            tag: `${containerName}_data`,
+                            cmd: `docker stats ${containerName} --no-stream --format "{{.CPUPerc}}[-]{{.MemUsage}}[-]{{.BlockIO}}[-]{{.NetIO}}"`
                         });
                     }, 1000);
 

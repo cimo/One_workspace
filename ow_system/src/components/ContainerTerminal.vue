@@ -41,32 +41,32 @@
                     let size = this.fitAddonList[this.containerName].proposeDimensions();
 
                     Sio.sendMessage("t_pty_start", {
-                        'tag': this.containerName,
-                        'size': [size.cols, size.rows]
+                        tag: this.containerName,
+                        size: [size.cols, size.rows]
                     });
 
                     if (this.windowName === "NodeJs") {
                         Sio.sendMessage("t_pty_i", {
-                            'tag': this.containerName,
-                            'cmd': `history -c && history -w && clear\r`
+                            tag: this.containerName,
+                            cmd: `history -c && history -w && clear\r`
                         });
                     }
                     else {
                         Sio.sendMessage("t_pty_i", {
-                            'tag': this.containerName,
-                            'cmd': `docker exec -it ${this.containerName} /bin/bash\r`
+                            tag: this.containerName,
+                            cmd: `docker exec -it ${this.containerName} /bin/bash\r`
                         });
 
                         Sio.sendMessage("t_pty_i", {
-                            'tag': this.containerName,
-                            'cmd': `history -c && history -w && clear\r`
+                            tag: this.containerName,
+                            cmd: `history -c && history -w && clear\r`
                         });
                     }
 
                     this.xtermList[this.containerName].onData((data) => {
                         Sio.sendMessage("t_pty_i", {
-                            'tag': this.containerName,
-                            'cmd': data
+                            tag: this.containerName,
+                            cmd: data
                         });
                     });
 
@@ -134,8 +134,8 @@
 
                             let size = this.fitAddonList[this.containerName].proposeDimensions();
                             Sio.sendMessage("t_pty_resize", {
-                                'tag': this.containerName,
-                                'size': [size.cols, size.rows]
+                                tag: this.containerName,
+                                size: [size.cols, size.rows]
                             });
                         }
                     }

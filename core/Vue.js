@@ -4,8 +4,10 @@
 
 const childProcess = require("child_process");
 
+const config = require("./Config");
+
 const startup = async(helper) => {
-    childProcess.exec(`vue ui --headless --host 0.0.0.0 --port ${process.env.NODEJS_PORT_VUE}`, (error, stdout, stderr) => {
+    childProcess.exec(`vue ui --headless --host ${config.setting.ip} --port ${process.env.NODEJS_PORT_VUE}`, (error, stdout, stderr) => {
         if (error !== null)
             helper.writeLog(`Vue error => ${error}`);
         else

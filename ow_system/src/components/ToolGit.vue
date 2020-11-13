@@ -19,8 +19,10 @@
             <input type="password" name="password" value=""/>
         </div>
         <div class="section">
-            <p>Path:</p>
-            <input type="text" name="path" value=""/>
+            <div class="button_cmd_window git_command clone">Clone</div>
+            <div class="button_cmd_window git_command pull">Pull</div>
+            <div class="button_cmd_window git_command fetch">Fetch</div>
+            <div class="button_cmd_window git_command reset">Reset</div>
         </div>
         <div class="bottom">
             <div class="button_cmd_window save">Save</div>
@@ -47,19 +49,16 @@
                 if (currentWindowElement !== null) {
                     this.windowComponent = windowComponent;
 
-                    this.projectName = "";
-
                     this.selectEdit = this.windowComponent.querySelector("select[name='edit']");
                     this.inputUrl = this.windowComponent.querySelector("input[name='url']");
                     this.inputUsername = this.windowComponent.querySelector("input[name='username']");
                     this.inputPassword = this.windowComponent.querySelector("input[name='password']");
-                    this.inputPath = this.windowComponent.querySelector("input[name='path']");
                     this.buttonSave = this.windowComponent.querySelector(".button_cmd_window.save");
 
                     if (this.selectEdit !== null) {
                         Sio.sendMessage("t_exec_i", {
-                            'tag': "gitInit",
-                            'cmd': `ls ${this._setting().systemData.pathSetting}/*${this._setting().systemData.extensionProject} | sed 's#.*/##'`
+                            tag: "gitInit",
+                            cmd: `ls ${this._setting().systemData.pathSetting}/*${this._setting().systemData.extensionGit} | sed 's#.*/##'`
                         });
 
                         Sio.readMessage("t_exec_o_gitInit", (data) => {
@@ -69,8 +68,8 @@
                                 for (const value of outSplit) {
                                     if (value !== "") {
                                         let option = document.createElement("option");
-                                        option.value = value.replace(this._setting().systemData.extensionProject, "");
-                                        option.text = value.replace(this._setting().systemData.extensionProject, "");
+                                        option.value = value.replace(this._setting().systemData.extensionGit, "");
+                                        option.text = value.replace(this._setting().systemData.extensionGit, "");
                                         this.selectEdit.appendChild(option);
                                     }
                                 }
@@ -89,37 +88,8 @@
                     this.windowComponent = windowComponent;
 
                     if (event.target.classList.contains("save") === true) {
-                        if (this.projectName !== "" && this.inputUrl.value !== "") {
-                            let content = {
-                                'url': this.inputUrl.value,
-                                'username': this.inputUsername.value,
-                                'password': this.inputPassword.value,
-                                'path': this.inputPath.value
-                            };
-
-                            // Create git setting file
-                            Sio.sendMessage("t_exec_stream_i", {
-                                'tag': "gitClickLogicSetting",
-                                'cmd': "write",
-                                'path': `${this._setting().systemData.pathSetting}/${this.projectName}${this._setting().systemData.extensionGit}`,
-                                'content': JSON.stringify(content)
-                            });
-
-                            Sio.readMessage("t_exec_stream_o_gitClickLogicSetting", (data) => {
-                                if (data.chunk === "end") {
-                                    if (this.selectEdit.querySelector(`option[value='${this.projectName}'`) === null) {
-                                        let option = document.createElement("option");
-                                        option.value = this.projectName;
-                                        option.text = this.projectName;
-                                        this.selectEdit.appendChild(option);
-
-                                        this.selectEdit.querySelector(`option[value='${this.projectName}'`).selected = true;
-                                    }
-
-                                    Sio.stopRead("t_exec_stream_o_gitClickLogicSetting");
-                                }
-                            });
-                        }
+                        if (this.projectName !== "" && this.inputUrl.value !== "")
+                            this.createFile();
                     }
                 }
             },
@@ -138,9 +108,9 @@
                             this.projectName = name;
 
                             Sio.sendMessage("t_exec_stream_i", {
-                                'tag': "gitChangeLogicEdit",
-                                'cmd': "read",
-                                'path': `${this._setting().systemData.pathSetting}/${name}${this._setting().systemData.extensionGit}`
+                                tag: "gitChangeLogicEdit",
+                                cmd: "read",
+                                path: `${this._setting().systemData.pathSetting}/${name}${this._setting().systemData.extensionGit}`
                             });
 
                             Sio.readMessage("t_exec_stream_o_gitChangeLogicEdit", (data) => {
@@ -152,7 +122,7 @@
                                     this.inputUrl.value = result.url;
                                     this.inputUsername.value = result.username;
                                     this.inputPassword.value = result.password;
-                                    this.inputPath.checked = result.path;
+                                    this.projectPath = result.path;
 
                                     Sio.stopRead("t_exec_stream_o_gitChangeLogicEdit");
                                 }
@@ -164,9 +134,47 @@
                             this.inputUrl.value = "";
                             this.inputUsername.value = "";
                             this.inputPassword.value = "";
-                            this.inputPath.checked = "";
+                            this.projectPath = "";
                         }
                     }
+                }
+            },
+            createFile(name, path) {
+                if (name !== undefined)
+                    this.projectName = name;
+
+                if (path !== undefined)
+                    this.projectPath = path;
+
+                let content = {
+                    url: this.inputUrl !== null ? this.inputUrl.value : "",
+                    username: this.inputUsername !== null ? this.inputUsername.value : "",
+                    password: this.inputPassword !== null ? this.inputPassword.value : "",
+                    path: this.projectPath
+                };
+
+                Sio.sendMessage("t_exec_stream_i", {
+                    tag: "gitClickLogicSetting",
+                    cmd: "write",
+                    path: `${this._setting().systemData.pathSetting}/${this.projectName}${this._setting().systemData.extensionGit}`,
+                    content: JSON.stringify(content)
+                });
+
+                if (this.inputUrl !== null) {
+                    Sio.readMessage("t_exec_stream_o_gitClickLogicSetting", (data) => {
+                        if (data.chunk === "end") {
+                            if (this.selectEdit.querySelector(`option[value='${this.projectName}'`) === null) {
+                                let option = document.createElement("option");
+                                option.value = this.projectName;
+                                option.text = this.projectName;
+                                this.selectEdit.appendChild(option);
+
+                                this.selectEdit.querySelector(`option[value='${this.projectName}'`).selected = true;
+                            }
+
+                            Sio.stopRead("t_exec_stream_o_gitClickLogicSetting");
+                        }
+                    });
                 }
             }
         },
@@ -174,11 +182,11 @@
             return {
                 windowComponent: null,
                 projectName: "",
+                projectPath: "",
                 selectEdit: null,
                 inputUrl: null,
                 inputUsername: null,
                 inputPassword: null,
-                inputPath: null,
                 buttonSave: null
             };
         },
@@ -204,6 +212,11 @@
     }
     .git_component .section input {
         width: 50%;
+    }
+    .git_component .section .button_cmd_window.git_command
+    {
+        display: inline-block;
+        margin: 5px;
     }
     .git_component .bottom {
         position: absolute;

@@ -23,8 +23,8 @@ const vue = require("./Vue");
 const urlRoot = `${path.dirname(__dirname)}/public`;
 
 const certificate = {
-    'key': fs.readFileSync(config.setting.certificate.key),
-    'cert': fs.readFileSync(config.setting.certificate.cert)
+    key: fs.readFileSync(config.setting.certificate.key),
+    cert: fs.readFileSync(config.setting.certificate.cert)
 };
 
 const digest = httpAuth.digest({
