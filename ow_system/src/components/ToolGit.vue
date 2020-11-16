@@ -19,6 +19,10 @@
             <input type="password" name="password" value=""/>
         </div>
         <div class="section">
+            <p>Branch name:</p>
+            <input type="text" name="branchName" value=""/>
+        </div>
+        <div class="section">
             <div class="button_cmd_window git_command clone">Clone</div>
             <div class="button_cmd_window git_command pull">Pull</div>
             <div class="button_cmd_window git_command fetch">Fetch</div>
@@ -53,6 +57,7 @@
                     this.inputUrl = this.windowComponent.querySelector("input[name='url']");
                     this.inputUsername = this.windowComponent.querySelector("input[name='username']");
                     this.inputPassword = this.windowComponent.querySelector("input[name='password']");
+                    this.branchName = this.windowComponent.querySelector("input[name='branchName']");
                     this.buttonSave = this.windowComponent.querySelector(".button_cmd_window.save");
 
                     if (this.selectEdit !== null) {
@@ -91,6 +96,40 @@
                         if (this.projectName !== "" && this.inputUrl.value !== "")
                             this.createFile();
                     }
+
+                    let command = "";
+                    let url = `https://${this.inputUsername.value}:${this.inputPassword.value}@${this.inputUrl.value}`;
+                    let branchNameMatch = /^[A-Za-z ]+$/.test(this.branchName.value);
+
+                    if (this.projectName === "")
+                        return false;
+
+                    if (event.target.classList.contains("clone") === true)
+                        command = `cd ${this.projectPath} && rm -f .DS_Store && git clone ${url} .`;
+                    else if (event.target.classList.contains("pull") === true && branchNameMatch === true)
+                        command = `cd ${this.projectPath} && rm -f .DS_Store && git pull ${url} ${this.branchName.value}`;
+                    else if (event.target.classList.contains("fetch") === true)
+                        command = `cd ${this.projectPath} && rm -f .DS_Store && git fetch --all`;
+                    else if (event.target.classList.contains("reset") === true && branchNameMatch === true)
+                        command = `cd ${this.projectPath} && rm -f .DS_Store && git reset --hard ${this.branchName.value}`;
+
+                    if (command === "")
+                        return false;
+
+                    Sio.sendMessage("t_exec_i", {
+                        tag: "gitCommand",
+                        cmd: command,
+                    });
+
+                    Sio.readMessage("t_exec_o_gitCommand", (data) => {
+                        console.log(data);
+
+                        if (data.out !== undefined) {
+                            //...
+                        }
+
+                        Sio.stopRead("t_exec_o_gitCommand");
+                    });
                 }
             },
             changeLogic(event) {
@@ -134,6 +173,7 @@
                             this.inputUrl.value = "";
                             this.inputUsername.value = "";
                             this.inputPassword.value = "";
+                            this.branchName.value = "";
                             this.projectPath = "";
                         }
                     }
@@ -187,6 +227,7 @@
                 inputUrl: null,
                 inputUsername: null,
                 inputPassword: null,
+                branchName: null,
                 buttonSave: null
             };
         },
@@ -212,6 +253,9 @@
     }
     .git_component .section input {
         width: 50%;
+    }
+    .git_component .section input[name='branch'] {
+        width: 25%;
     }
     .git_component .section .button_cmd_window.git_command
     {
