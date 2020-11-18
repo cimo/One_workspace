@@ -2,11 +2,6 @@
     <div class="command_component">
         <div class="section">
             <div class="left">
-                <p>Status: <span class="status"></span></p>
-            </div>
-        </div>
-        <div class="section">
-            <div class="left">
                 <p>Start a container</p>
             </div>
             <div class="right">
@@ -29,6 +24,10 @@
                 <div class="button_cmd_window cmd">Stop</div>
             </div>
         </div>
+        <div class="section">
+            <p>Status:</p>
+            <pre class="status"></pre>
+        </div>
     </div>
 </template>
 
@@ -47,26 +46,17 @@
                 if (Object.keys(this.windowComponentList).length > 0) {
                     this.statusIntervalList[containerName] = setInterval(() => {
                         Sio.sendMessage("t_exec_i", {
-                            tag: `${containerName}_command`,
+                            tag: `${containerName}_status`,
                             cmd: `docker ps --filter "name=${containerName}" --format "{{.Status}}"`
                         });
                     }, 1000);
 
-                    Sio.readMessage(`t_exec_o_${containerName}_command`, (data) => {
-                        if (containerName !== null) {
+                    Sio.readMessage(`t_exec_o_${containerName}_status`, (data) => {
+                        if (containerName !== null && this.statusCommandList[containerName] < 0) {
                             let result = data.out !== undefined ? data.out : data.err;
 
-                            this.statusList[containerName] = result.indexOf("Up ");
-
-                            if ((this.statusList[containerName] === this.statusOldList[containerName]) || this.statusOldList[containerName] === null) {
-                                if (this.statusList[containerName] !== -1)
-                                    this.statusElementList[containerName].innerHTML = "Running...";
-                                else {
-                                    this.statusElementList[containerName].innerHTML = "Stopped.";
-
-                                    this.statusOldList[containerName] = 0;
-                                }
-                            }
+                            if (result !== undefined && result.indexOf("Up ") !== -1)
+                                this.statusElementList[containerName].innerHTML = "Running...";
                         }
                     });
                 }
@@ -78,9 +68,9 @@
                     let containerName = currentWindowElement[3];
                     this.windowComponentList[containerName] = windowComponent;
 
-                    this.statusOldList[containerName] = null;
-                    this.statusElementList[containerName] = this.windowComponentList[containerName].querySelector(".command_component .left .status");
                     this.buttonCommandList[containerName] = this.windowComponentList[containerName].querySelectorAll(".command_component .right .cmd");
+                    this.statusElementList[containerName] = this.windowComponentList[containerName].querySelector(".command_component .status");
+                    this.statusCommandList[containerName] = -1;
 
                     this._checkStatus(containerName);
                 }
@@ -96,34 +86,47 @@
                     if (event.target.classList.contains("cmd") === true) {
                         let index = Array.from(this.buttonCommandList[containerName]).indexOf(event.target);
 
-                        if (index === 0 && this.statusList[containerName] === -1) {
-                            this.statusElementList[containerName].innerHTML = "Starting...";
-
+                        if (index === 0) {
                             Sio.sendMessage("t_exec_i", {
+                                closeEnabled: true,
                                 tag: `${containerName}_command`,
                                 cmd: `docker start ${containerName}`
                             });
 
-                            this.statusOldList[containerName] = 0;
-                        } else if (index === 1 && this.statusList[containerName] !== -1) {
-                            this.statusElementList[containerName].innerHTML = "Restarting...";
-
+                            this.statusElementList[containerName].innerHTML = "Starting...";
+                            this.statusCommandList[containerName] = index;
+                        }
+                        else if (index === 1) {
                             Sio.sendMessage("t_exec_i", {
+                                closeEnabled: true,
                                 tag: `${containerName}_command`,
                                 cmd: `docker restart ${containerName}`
                             });
 
-                            this.statusOldList[containerName] = -1;
-                        } else if (index === 2 && this.statusList[containerName] !== -1) {
-                            this.statusElementList[containerName].innerHTML = "Stopping...";
-
+                            this.statusElementList[containerName].innerHTML = "Restarting...";
+                            this.statusCommandList[containerName] = index;
+                        }
+                        else if (index === 2) {
                             Sio.sendMessage("t_exec_i", {
+                                closeEnabled: true,
                                 tag: `${containerName}_command`,
                                 cmd: `docker stop ${containerName}`
                             });
 
-                            this.statusOldList[containerName] = -1;
+                            this.statusElementList[containerName].innerHTML = "Stopping...";
+                            this.statusCommandList[containerName] = index;
                         }
+
+                        Sio.readMessage(`t_exec_o_${containerName}_command`, (data) => {
+                            if (data.close !== undefined) {
+                                Sio.stopRead(`t_exec_o_${containerName}_command`);
+
+                                if (this.statusCommandList[containerName] === 2)
+                                    this.statusElementList[containerName].innerHTML = "Stopped.";
+
+                                this.statusCommandList[containerName] = -1;
+                            }
+                        });
                     }
                 }
             },
@@ -134,27 +137,26 @@
                     let containerName = currentWindowElement[3];
                     this.windowComponentList[containerName] = windowComponent;
 
+                    Sio.stopRead(`t_exec_o_${containerName}_status`);
+
                     clearInterval(this.statusIntervalList[containerName]);
 
-                    Sio.stopRead(`t_exec_o_${containerName}_command`);
-
                     delete this.windowComponentList[containerName];
-                    delete this.statusIntervalList[containerName];
-                    delete this.statusList[containerName];
-                    delete this.statusOldList[containerName];
-                    delete this.statusElementList[containerName];
                     delete this.buttonCommandList[containerName];
+                    delete this.statusIntervalList[containerName];
+                    delete this.statusElementList[containerName];
+                    delete this.statusCommandList[containerName];
+
                 }
             }
         },
         data() {
             return {
                 windowComponentList: [],
+                buttonCommandList: [],
                 statusIntervalList: [],
-                statusList: [],
-                statusOldList: [],
                 statusElementList: [],
-                buttonCommandList: []
+                statusCommandList: []
             };
         },
         created() {

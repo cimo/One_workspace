@@ -35,10 +35,10 @@ const digest = httpAuth.digest({
 const app = express();
 
 app.use(express.static(urlRoot));
-app.use(bodyParser.urlencoded({'extended': false}));
+app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 app.use(cookieParser());
-app.use(csrf({'cookie': true}));
+app.use(csrf({cookie: true}));
 //app.use(cors());
 
 const httpServer = http.createServer(app);

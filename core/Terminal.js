@@ -37,16 +37,18 @@ const _pty = (helper, socket) => {
         ptySpawnList[dataStart.tag].on("data", (data) => {
             helper.writeLog(`Terminal t_pty_o_${dataStart.tag} => ${data}`);
 
-            socket.emit(`t_pty_o_${dataStart.tag}`, {'tag': dataStart.tag, 'cmd': data});
+            socket.emit(`t_pty_o_${dataStart.tag}`, {tag: dataStart.tag, cmd: data});
         });
 
         ptySpawnList[dataStart.tag].on("exit", () => {
             if (ptySpawnList[dataStart.tag] !== undefined) {
                 helper.writeLog(`Terminal t_pty_o_${dataStart.tag} => xterm_reset`);
 
-                socket.emit(`t_pty_o_${dataStart.tag}`, {'tag': dataStart.tag, 'cmd': "xterm_reset"});
+                socket.emit(`t_pty_o_${dataStart.tag}`, {tag: dataStart.tag, cmd: "xterm_reset"});
 
                 ptySpawnList[dataStart.tag].destroy();
+
+                delete ptySpawnList[dataStart.tag];
             }
         });
     });
@@ -79,61 +81,70 @@ const _pty = (helper, socket) => {
 };
 
 const _exec = (helper, socket) => {
-    socket.on("t_exec_i", (data) => {
-        if (data.tag !== undefined && data.cmd !== undefined) {
-            helper.writeLog(`Terminal t_exec_i => ${data.tag} - ${data.cmd}`);
+    socket.on("t_exec_i", (dataStart) => {
+        if (dataStart.tag !== undefined && dataStart.cmd !== undefined) {
+            helper.writeLog(`Terminal t_exec_i => ${dataStart.tag} - ${dataStart.cmd}`);
 
-            childProcess.exec(data.cmd, (error, stdout, stderr) => {
-                if (error !== null) {
-                    helper.writeLog(`t_exec_o_${data.tag} => ${error}`);
+            let execResult = childProcess.exec(dataStart.cmd);
+            
+            execResult.stdout.on("data", (data) => {
+                helper.writeLog(`t_exec_o_${dataStart.tag} => stdout: ${data}`);
 
-                    socket.emit(`t_exec_o_${data.tag}`, {'err': error});
-                }
-                else {
-                    helper.writeLog(`t_exec_o_${data.tag} => ${stdout} - ${stderr}`);
-
-                    socket.emit(`t_exec_o_${data.tag}`, {'out': stdout, 'err': stderr});
-                }
+                socket.emit(`t_exec_o_${dataStart.tag}`, {out: data});
             });
+
+            execResult.stderr.on("data", (data) => {
+                helper.writeLog(`t_exec_o_${dataStart.tag} => stderr: ${data}`);
+
+                socket.emit(`t_exec_o_${dataStart.tag}`, {err: data});
+            });
+
+            if (dataStart.closeEnabled === true) {
+                execResult.on("close", (data) => {
+                    helper.writeLog(`t_exec_o_${dataStart.tag} => close: ${data}`);
+
+                    socket.emit(`t_exec_o_${dataStart.tag}`, {close: data});
+                });
+            }
         }
     });
 
-    socket.on("t_exec_stream_i", (data) => {
-        if (data.tag !== undefined && data.cmd !== undefined && data.path !== undefined) {
-            helper.writeLog(`Terminal t_exec_stream_i => ${data.tag} - ${data.cmd} - ${data.path} - ${data.content}`);
+    socket.on("t_exec_stream_i", (dataStart) => {
+        if (dataStart.tag !== undefined && dataStart.cmd !== undefined && dataStart.path !== undefined) {
+            helper.writeLog(`Terminal t_exec_stream_i => ${dataStart.tag} - ${dataStart.cmd} - ${dataStart.path} - ${dataStart.content}`);
 
-            let directory = path.dirname(data.path);
+            let directory = path.dirname(dataStart.path);
 
             if (fs.existsSync(directory) === true) {
-                if (data.cmd === "write" && data.content !== undefined) {
-                    let stream = fs.createWriteStream(data.path, {'flags': "w", 'encoding': encoding, 'mode': "0664"});
+                if (dataStart.cmd === "write" && dataStart.content !== undefined) {
+                    let stream = fs.createWriteStream(dataStart.path, {flags: "w", encoding: encoding, mode: "0664"});
 
-                    stream.write(data.content);
+                    stream.write(dataStart.content);
 
                     stream.end();
 
                     stream.on("finish", () => {
-                        helper.writeLog(`Write t_exec_stream_o_${data.tag} => end`);
+                        helper.writeLog(`Write t_exec_stream_o_${dataStart.tag} => finish`);
 
-                        socket.emit(`t_exec_stream_o_${data.tag}`, {'chunk': "end"});
+                        socket.emit(`t_exec_stream_o_${dataStart.tag}`, {chunk: "end"});
                     });
                 }
-                else if (data.cmd === "read") {
-                    if (fs.existsSync(data.path) === true) {
-                        let stream = fs.createReadStream(data.path, {'flags': "r", 'encoding': encoding});
+                else if (dataStart.cmd === "read") {
+                    if (fs.existsSync(dataStart.path) === true) {
+                        let stream = fs.createReadStream(dataStart.path, {flags: "r", encoding: encoding});
 
-                        stream.on("data", (chunkData) => {
-                            let chunk = chunkData.toString();
+                        stream.on("data", (data) => {
+                            let chunk = data.toString();
 
-                            helper.writeLog(`Read t_exec_stream_o_${data.tag} => ${chunk}`);
+                            helper.writeLog(`Read t_exec_stream_o_${dataStart.tag} => ${chunk}`);
 
-                            socket.emit(`t_exec_stream_o_${data.tag}`, {'chunk': chunk});
+                            socket.emit(`t_exec_stream_o_${dataStart.tag}`, {chunk: chunk});
                         });
 
                         stream.on("close", () => {
-                            helper.writeLog(`Read t_exec_stream_o_${data.tag} => close`);
+                            helper.writeLog(`Read t_exec_stream_o_${dataStart.tag} => close`);
 
-                            socket.emit(`t_exec_stream_o_${data.tag}`, {'chunk': "end"});
+                            socket.emit(`t_exec_stream_o_${dataStart.tag}`, {chunk: "end"});
                         });
                     }
                 }

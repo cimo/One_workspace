@@ -39,16 +39,18 @@
                     }, 1000);
 
                     Sio.readMessage(`t_exec_o_${containerName}_data`, (data) => {
-                        if (containerName !== null) {
+                        if (containerName !== null && this.windowComponentList[containerName] !== undefined) {
                             let result = data.out !== undefined ? data.out : data.err;
 
-                            result = result.split("[-]");
+                            if (result !== undefined) {
+                                result = result.split("[-]");
 
-                            if (result.length > 1) {
-                                this.windowComponentList[containerName].querySelector(".data_component .square_1 .value").innerHTML = result[0];
-                                this.windowComponentList[containerName].querySelector(".data_component .square_2 .value").innerHTML = result[1];
-                                this.windowComponentList[containerName].querySelector(".data_component .square_3 .value").innerHTML = result[2];
-                                this.windowComponentList[containerName].querySelector(".data_component .square_4 .value").innerHTML = result[3];
+                                if (result.length > 1) {
+                                    this.windowComponentList[containerName].querySelector(".data_component .square_1 .value").innerHTML = result[0];
+                                    this.windowComponentList[containerName].querySelector(".data_component .square_2 .value").innerHTML = result[1];
+                                    this.windowComponentList[containerName].querySelector(".data_component .square_3 .value").innerHTML = result[2];
+                                    this.windowComponentList[containerName].querySelector(".data_component .square_4 .value").innerHTML = result[3];
+                                }
                             }
                         }
                     });
@@ -71,9 +73,9 @@
                     let containerName = currentWindowElement[3];
                     this.windowComponentList[containerName] = windowComponent;
 
-                    clearInterval(this.statusIntervalList[containerName]);
-
                     Sio.stopRead(`t_exec_o_${containerName}_data`);
+
+                    clearInterval(this.statusIntervalList[containerName]);
 
                     delete this.windowComponentList[containerName];
                     delete this.statusIntervalList[containerName];

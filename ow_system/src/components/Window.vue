@@ -136,8 +136,8 @@
                     title.innerHTML = this.windowName;
 
                     let style = window.getComputedStyle(newWindowComponent);
-                    this.windowPosition[this.windowName] = {'x': 0, 'y': 0};
-                    this.windowSize[this.windowName] = {'width': style.width, 'height': style.height};
+                    this.windowPosition[this.windowName] = {x: 0, y: 0};
+                    this.windowSize[this.windowName] = {width: style.width, height: style.height};
 
                     document.querySelector(".body_component").appendChild(newWindowComponent);
 

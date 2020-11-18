@@ -45,23 +45,17 @@
                         size: [size.cols, size.rows]
                     });
 
-                    if (this.windowName === "NodeJs") {
-                        Sio.sendMessage("t_pty_i", {
-                            tag: this.containerName,
-                            cmd: `history -c && history -w && clear\r`
-                        });
-                    }
-                    else {
+                    if (this.windowName !== "NodeJs") {
                         Sio.sendMessage("t_pty_i", {
                             tag: this.containerName,
                             cmd: `docker exec -it ${this.containerName} /bin/bash\r`
                         });
-
-                        Sio.sendMessage("t_pty_i", {
-                            tag: this.containerName,
-                            cmd: `history -c && history -w && clear\r`
-                        });
                     }
+
+                    Sio.sendMessage("t_pty_i", {
+                        tag: this.containerName,
+                        cmd: `history -c && history -w && clear\r`
+                    });
 
                     this.xtermList[this.containerName].onData((data) => {
                         Sio.sendMessage("t_pty_i", {
@@ -72,6 +66,19 @@
 
                     Sio.readMessage(`t_pty_o_${this.containerName}`, (data) => {
                         if (terminalComponent !== null) {
+                            if (data.cmd.indexOf(" is not running") !== -1) {
+                                Sio.stopRead(`t_pty_o_${this.containerName}`);
+
+                                Sio.sendMessage("t_pty_close", {tag: this.containerName});
+
+                                delete this.xtermList[this.containerName];
+                                delete this.fitAddonList[this.containerName];
+
+                                terminal.remove();
+
+                                return;
+                            }
+
                             if ((this.windowName !== "NodeJs" && data.cmd.trim() === "exit") || data.cmd === "xterm_reset") {
                                 Sio.stopRead(`t_pty_o_${this.containerName}`);
 
@@ -149,8 +156,9 @@
                     this.containerName = currentWindowElement[3];
                     this.windowComponent = windowComponent;
 
-                    Sio.sendMessage("t_pty_close", {'tag': this.containerName});
                     Sio.stopRead(`t_pty_o_${this.containerName}`);
+
+                    Sio.sendMessage("t_pty_close", {tag: this.containerName});
 
                     delete this.xtermList[this.containerName];
                     delete this.fitAddonList[this.containerName];

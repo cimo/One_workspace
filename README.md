@@ -8,7 +8,7 @@ Is a docker service container for have, in one space, a large and complete devel
 | Info: |
 |:---|
 | Secure and fast ui tools for increase your productivity |
-| Cross platform (Windows docker, Linux docker, Mac docker) |
+| Cross platform (Windows, Linux, Mac) |
 
 | Project: |
 |:---|
@@ -45,7 +45,7 @@ Is a docker service container for have, in one space, a large and complete devel
 
 3) Modify file with your configuration, save and close the file.
 
-4) Add your path in the shared folder docker dashboard and write on terminal:
+   Add your path in the shared folder docker dashboard and write on terminal:
 
         sudo docker-compose up -d --build
 
@@ -55,7 +55,7 @@ Is a docker service container for have, in one space, a large and complete devel
         127.0.0.1 localhost-php5
         127.0.0.1 localhost-php7
 
-6) Write on your browser "https://localhost".
+6) Write on your browser "http://localhost".
 
 <b>By CIMO - https://reinventsoftware.org</b>
 
