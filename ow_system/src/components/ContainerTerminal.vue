@@ -18,7 +18,7 @@
             _findParent: Helper.findParent,
             _currentWindowElement: Helper.currentWindowElement,
             _createXterm() {
-                if (this.windowName !== null && this.containerName !== null && this.windowComponent !== null) {
+                if (this.windowName !== "" && this.containerName !== "" && this.windowComponent !== null) {
                     let terminalComponent = this.windowComponent.querySelector(".terminal_component");
                     let terminal = terminalComponent.querySelector(".terminal.xterm");
 
@@ -163,16 +163,16 @@
                     delete this.xtermList[this.containerName];
                     delete this.fitAddonList[this.containerName];
 
-                    this.windowName = null;
-                    this.containerName = null;
+                    this.windowName = "";
+                    this.containerName = "";
                     this.windowComponent = null;
                 }
             }
         },
         data() {
             return {
-                windowName: null,
-                containerName: null,
+                windowName: "",
+                containerName: "",
                 windowComponent: null,
                 xtermList: [],
                 fitAddonList: []

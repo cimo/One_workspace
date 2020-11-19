@@ -51,8 +51,8 @@
                 if (overlayElement !== null && this.windowComponent !== null) {
                     if (this.windowComponent.classList.contains("maximized") === false) {
                         let clientRect = this.windowComponent.getBoundingClientRect();
-                        this.windowPosition[this.windowName].x = clientRect.x;
-                        this.windowPosition[this.windowName].y = clientRect.y;
+                        this.windowPositionList[this.windowName].x = clientRect.x;
+                        this.windowPositionList[this.windowName].y = clientRect.y;
 
                         this.windowComponent.style.left = "0";
                         this.windowComponent.style.top = "0";
@@ -63,11 +63,11 @@
                         this.windowComponent.querySelector(".overlay").classList.remove("drag");
                     }
                     else {
-                        this.windowComponent.style.left = `${this.windowPosition[this.windowName].x}px`;
-                        this.windowComponent.style.top = `${this.windowPosition[this.windowName].y}px`;
+                        this.windowComponent.style.left = `${this.windowPositionList[this.windowName].x}px`;
+                        this.windowComponent.style.top = `${this.windowPositionList[this.windowName].y}px`;
 
-                        this.windowComponent.style.width = this.windowSize[this.windowName].width;
-                        this.windowComponent.style.height = this.windowSize[this.windowName].height;
+                        this.windowComponent.style.width = this.windowSizeList[this.windowName].width;
+                        this.windowComponent.style.height = this.windowSizeList[this.windowName].height;
 
                         this.windowComponent.querySelector(".overlay").classList.add("drag");
                     }
@@ -80,8 +80,8 @@
             _close() {
                 this.windowComponent = null;
 
-                delete this.windowPosition[this.windowName];
-                delete this.windowSize[this.windowName];
+                delete this.windowPositionList[this.windowName];
+                delete this.windowSizeList[this.windowName];
 
                 this.windowName = "";
             },
@@ -136,8 +136,8 @@
                     title.innerHTML = this.windowName;
 
                     let style = window.getComputedStyle(newWindowComponent);
-                    this.windowPosition[this.windowName] = {x: 0, y: 0};
-                    this.windowSize[this.windowName] = {width: style.width, height: style.height};
+                    this.windowPositionList[this.windowName] = {x: 0, y: 0};
+                    this.windowSizeList[this.windowName] = {width: style.width, height: style.height};
 
                     document.querySelector(".body_component").appendChild(newWindowComponent);
 
@@ -241,8 +241,8 @@
             return {
                 windowName: "",
                 windowComponent: null,
-                windowPosition: [],
-                windowSize: []
+                windowPositionList: [],
+                windowSizeList: []
             };
         },
         created() {

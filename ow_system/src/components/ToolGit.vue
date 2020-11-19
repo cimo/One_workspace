@@ -1,49 +1,74 @@
 <template>
     <div class="git_component">
-        <div class="left">
-            <div class="section">
-                <p>List:</p>
-                <select class="edit" name="edit">
-                    <option value="0">Edit git data</option>
-                </select>
+        <div class="menu_git">
+            <p class="button focused">Base</p>
+            <p class="button">Commit / Push</p>
+        </div>
+        <div class="part_1_container">
+            <div class="left">
+                <div class="section">
+                    <p>List:</p>
+                    <select class="edit" name="edit">
+                        <option value="0">Edit git data</option>
+                    </select>
+                </div>
+                <div class="section">
+                    <p>Url:</p>
+                    <input type="text" name="url" value=""/>
+                </div>
+                <div class="section">
+                    <p>Username:</p>
+                    <input type="text" name="username" value=""/>
+                </div>
+                <div class="section">
+                    <p>Password:</p>
+                    <input type="password" name="password" value=""/>
+                </div>
+                <div class="section">
+                    <p>Branch name:</p>
+                    <input type="text" name="branchName" value=""/>
+                </div>
+            </div>
+            <div class="right">
+                <div class="section">
+                    <div class="button_cmd_window git_command clone">Clone</div>
+                    <div class="button_cmd_window git_command pull">Pull</div>
+                    <div class="button_cmd_window git_command fetch">Fetch</div>
+                    <div class="button_cmd_window git_command reset">Reset</div>
+                </div>
             </div>
             <div class="section">
-                <p>Url:</p>
-                <input type="text" name="url" value=""/>
+                <p>Output:</p>
+                <pre class="output"></pre>
             </div>
-            <div class="section">
-                <p>Username:</p>
-                <input type="text" name="username" value=""/>
-            </div>
-            <div class="section">
-                <p>Password:</p>
-                <input type="password" name="password" value=""/>
-            </div>
-            <div class="section">
-                <p>Branch name:</p>
-                <input type="text" name="branchName" value=""/>
-            </div>
-            <div class="section">
-                <p>Commit description:</p>
-                <input type="text" name="commitDescription" value=""/>
+            <div class="bottom">
+                <div class="button_cmd_window save">Save</div>
             </div>
         </div>
-        <div class="right">
-            <div class="section">
-                <div class="button_cmd_window git_command clone">Clone</div>
-                <div class="button_cmd_window git_command pull">Pull</div>
-                <div class="button_cmd_window git_command fetch">Fetch</div>
-                <div class="button_cmd_window git_command reset">Reset</div>
-                <div class="button_cmd_window git_command commit">Commit</div>
-                <div class="button_cmd_window git_command push">Push</div>
+        <div class="part_2_container">
+            <div class="left">
+                <div class="section">
+                    <p>Project: <span class="project_label"></span></p>
+                </div>
+                <div class="section">
+                    <p>Branch name:</p>
+                    <input type="text" name="branchName" value=""/>
+                </div>
+                <div class="section">
+                    <p>Commit description:</p>
+                    <input type="text" name="commitDescription" value=""/>
+                </div>
             </div>
-        </div>
-        <div class="section">
-            <p>Output:</p>
-            <pre class="output"></pre>
-        </div>
-        <div class="bottom">
-            <div class="button_cmd_window save">Save</div>
+            <div class="right">
+                <div class="section">
+                    <div class="button_cmd_window git_command commit">Commit</div>
+                    <div class="button_cmd_window git_command push">Push</div>
+                </div>
+            </div>
+            <div class="section">
+                <p>Output:</p>
+                <pre class="output"></pre>
+            </div>
         </div>
     </div>
 </template>
@@ -60,6 +85,7 @@
         methods: {
             _setting: Config.setting,
             _findParent: Helper.findParent,
+            _capitalizeFirstLetter: Helper.capitalizeFirstLetter,
             _currentWindowElement: Helper.currentWindowElement,
             init(windowComponent) {
                 let currentWindowElement = this._currentWindowElement(windowComponent);
@@ -67,18 +93,22 @@
                 if (currentWindowElement !== null) {
                     this.windowComponent = windowComponent;
 
-                    this.selectEdit = this.windowComponent.querySelector("select[name='edit']");
-                    this.inputUrl = this.windowComponent.querySelector("input[name='url']");
-                    this.inputUsername = this.windowComponent.querySelector("input[name='username']");
-                    this.inputPassword = this.windowComponent.querySelector("input[name='password']");
-                    this.inputBranchName = this.windowComponent.querySelector("input[name='branchName']");
-                    this.inputCommitDescription = this.windowComponent.querySelector("input[name='commitDescription']");
-                    this.outputElement = this.windowComponent.querySelector(".output");
+                    this.elementPart1Container = this.windowComponent.querySelector(".part_1_container");
+                    this.elementPart2Container = this.windowComponent.querySelector(".part_2_container");
+                    this.selectEdit = this.windowComponent.querySelector(".part_1_container select[name='edit']");
+                    this.elementProjectlabel = this.windowComponent.querySelector(".part_2_container .project_label");
+                    this.inputUrl = this.windowComponent.querySelector(".part_1_container input[name='url']");
+                    this.inputUsername = this.windowComponent.querySelector(".part_1_container input[name='username']");
+                    this.inputPassword = this.windowComponent.querySelector(".part_1_container input[name='password']");
+                    this.inputBranchName1 = this.windowComponent.querySelector(".part_1_container input[name='branchName']");
+                    this.inputBranchName2 = this.windowComponent.querySelector(".part_2_container input[name='branchName']");
+                    this.inputCommitDescription = this.windowComponent.querySelector(".part_2_container input[name='commitDescription']");
+                    this.elementOutput1 = this.windowComponent.querySelector(".part_1_container .output");
+                    this.elementOutput2 = this.windowComponent.querySelector(".part_2_container .output");
                     this.buttonSave = this.windowComponent.querySelector(".button_cmd_window.save");
 
                     if (this.selectEdit !== null) {
                         Sio.sendMessage("t_exec_i", {
-                            closeEnabled: true,
                             tag: "gitInit",
                             cmd: `ls ${this._setting().systemData.pathSetting}/*${this._setting().systemData.extensionGit} | sed 's#.*/##'`
                         });
@@ -92,8 +122,10 @@
                                 for (const value of outSplit) {
                                     if (value !== "" && value.indexOf("ls: ") === -1) {
                                         let option = document.createElement("option");
-                                        option.value = value.replace(this._setting().systemData.extensionGit, "");
+                                        option.value = value;
                                         option.text = value.replace(this._setting().systemData.extensionGit, "");
+                                        option.text = option.text.replace("_", " ");
+                                        option.text = this._capitalizeFirstLetter(option.text);
                                         this.selectEdit.appendChild(option);
                                     }
                                 }
@@ -112,62 +144,105 @@
                 if (currentWindowElement !== null) {
                     this.windowComponent = windowComponent;
 
+                    let menuElement = this._findParent(event.target, ["menu_git"]);
+
+                    if (menuElement !== null) {
+                        let buttonList = menuElement.querySelectorAll(".button");
+
+                        let index = Array.from(buttonList).indexOf(event.target);
+
+                        if (index >= 0) {
+                            for (const value of buttonList) {
+                                value.classList.remove("focused");
+                            }
+
+                            buttonList[index].classList.add("focused");
+
+                            if (index === 0) {
+                                this.elementPart1Container.style.display = "block";
+                                this.elementPart2Container.style.display = "none";
+                            }
+                            else if (index === 1) {
+                                this.elementPart1Container.style.display = "none";
+                                this.elementPart2Container.style.display = "block";
+                            }
+                        }
+                    }
+
                     if (event.target.classList.contains("save") === true) {
-                        if (this.projectName !== "" && this.inputUrl.value !== "")
+                        if (this.projectName !== "" && this.inputUrl.value !== "" && this.inputPassword.value !== "")
                             this.createFile();
                     }
 
-                    let command = "";
-                    let url = `https://${this.inputUsername.value}:${this.inputPassword.value}@${this.inputUrl.value}`;
-                    let branchNameMatch = /^[A-Za-z-_/ ]+$/.test(this.inputBranchName.value);
+                    if (event.target.classList.contains("button_cmd_window") === true) {
+                        let command = "";
+                        let url = `https://${this.inputUsername.value}:${this.inputPassword.value}@${this.inputUrl.value}`;
+                        let branchNameMatch1 = /^[A-Za-z-_/ ]+$/.test(this.inputBranchName1.value);
+                        let branchNameMatch2 = /^[A-Za-z-_/ ]+$/.test(this.inputBranchName2.value);
 
-                    if (this.projectName === "")
-                        return false;
+                        if (this.projectName === "")
+                            return false;
 
-                    this.outputElement.innerHTML = "";
+                        this.elementOutput1.innerHTML = "";
+                        this.elementOutput2.innerHTML = "";
 
-                    if (event.target.classList.contains("clone") === true)
-                        command = `mkdir -p ${this.projectPath} && cd ${this.projectPath} && git clone ${url} .`;
-                    else if (event.target.classList.contains("pull") === true && branchNameMatch === true)
-                        command = `cd ${this.projectPath} && git pull ${url} ${this.inputBranchName.value}`;
-                    else if (event.target.classList.contains("fetch") === true)
-                        command = `cd ${this.projectPath} && git fetch --all`;
-                    else if (event.target.classList.contains("reset") === true && branchNameMatch === true)
-                        command = `cd ${this.projectPath} && git reset --hard ${this.inputBranchName.value}`;
-                    else if (event.target.classList.contains("commit") === true && this.inputCommitDescription.value !== "") {
-                        this.inputBranchName.value = "";
+                        if (event.target.classList.contains("clone") === true)
+                            command = `mkdir -p ${this.projectPath} && cd ${this.projectPath} && git clone ${url} .`;
+                        else if (event.target.classList.contains("pull") === true && branchNameMatch1 === true)
+                            command = `cd ${this.projectPath} && git pull ${url} ${this.inputBranchName1.value}`;
+                        else if (event.target.classList.contains("fetch") === true)
+                            command = `cd ${this.projectPath} && git fetch --all`;
+                        else if (event.target.classList.contains("reset") === true && branchNameMatch1 === true)
+                            command = `cd ${this.projectPath} && git reset --hard ${this.inputBranchName1.value}`;
+                        else if (event.target.classList.contains("commit") === true && this.inputCommitDescription.value !== "") {
+                            this.inputBranchName2.value = "";
 
-                        command = `cd ${this.projectPath} && git commit -m "${this.inputCommitDescription.value}"`;
-                    }
-                    else if (event.target.classList.contains("push") === true && branchNameMatch === true) {
-                        this.inputCommitDescription.value = "";
+                            command = `cd ${this.projectPath} && git commit -m "${this.inputCommitDescription.value}"`;
+                        } else if (event.target.classList.contains("push") === true && branchNameMatch2 === true) {
+                            this.inputCommitDescription.value = "";
 
-                        command = `cd ${this.projectPath} && git remote set-url origin ${url} && git push ${this.inputBranchName.value}`;
-                    }
-
-                    if (command === "")
-                        return false;
-
-                    Sio.sendMessage("t_exec_i", {
-                        closeEnabled: true,
-                        tag: "gitCommand",
-                        cmd: command,
-                    });
-
-                    let buffer = "";
-
-                    Sio.readMessage("t_exec_o_gitCommand", (data) => {
-                        let result = data.out !== undefined ? data.out : data.err;
-
-                        if (result !== undefined)
-                            buffer += result;
-
-                        if (data.close !== undefined) {
-                            Sio.stopRead("t_exec_o_gitCommand");
-
-                            this.outputElement.innerHTML = buffer;
+                            command = `cd ${this.projectPath} && git remote set-url origin ${url} && git push ${this.inputBranchName2.value}`;
                         }
-                    });
+
+                        if (command === "")
+                            return false;
+
+                        Sio.sendMessage("t_exec_i", {
+                            tag: "gitCommand",
+                            cmd: command,
+                        });
+
+                        let buffer = "";
+
+                        Sio.readMessage("t_exec_o_gitCommand", (data) => {
+                            let result = data.out !== undefined ? data.out : data.err;
+
+                            if (result !== undefined && event.target.classList.contains("clone") === true) {
+                                buffer = result;
+                                this.elementOutput1.innerHTML = buffer;
+                            }
+                            if (result !== undefined && event.target.classList.contains("fetch") === true) {
+                                buffer = result;
+                                this.elementOutput1.innerHTML = buffer;
+                            }
+                            else if (result !== undefined && event.target.classList.contains("clone") === false)
+                                buffer += result;
+
+                            if (data.close !== undefined) {
+                                Sio.stopRead("t_exec_o_gitCommand");
+
+                                if (getComputedStyle(this.elementPart1Container, null).display === "block")
+                                    this.elementOutput1.innerHTML = buffer;
+                                else
+                                    this.elementOutput2.innerHTML = buffer;
+
+                                if (event.target.classList.contains("clone") === true && data.close !== 128)
+                                    this.elementOutput1.innerHTML = "";
+                                else if (event.target.classList.contains("fetch") === true && data.close === 0)
+                                    this.elementOutput1.innerHTML = "";
+                            }
+                        });
+                    }
                 }
             },
             changeLogic(event) {
@@ -179,13 +254,13 @@
 
                     if (event.target.classList.contains("edit") === true) {
                         if (this.selectEdit.selectedIndex > 0) {
-                            let name = this.selectEdit.options[this.selectEdit.selectedIndex].value;
-                            this.projectName = name;
+                            let file = this.selectEdit.options[this.selectEdit.selectedIndex].value;
+                            this.projectName = this.selectEdit.options[this.selectEdit.selectedIndex].text;
 
                             Sio.sendMessage("t_exec_stream_i", {
                                 tag: "gitChangeLogicEdit",
                                 cmd: "read",
-                                path: `${this._setting().systemData.pathSetting}/${name}${this._setting().systemData.extensionGit}`
+                                path: `${this._setting().systemData.pathSetting}/${file}`
                             });
 
                             let buffer = "";
@@ -201,30 +276,42 @@
                                     this.inputUrl.value = result.url;
                                     this.inputUsername.value = result.username;
                                     this.inputPassword.value = result.password;
-                                    this.inputBranchName.value = "";
-                                    this.inputCommitDescription.value = "";
-                                    this.outputElement.innerHTML = "";
+                                    this.folderName = result.folderName;
                                     this.projectPath = result.path;
+
+                                    this.elementProjectlabel.innerHTML = name;
+                                    this.inputBranchName1.value = "";
+                                    this.inputBranchName2.value = "";
+                                    this.inputCommitDescription.value = "";
+                                    this.elementOutput1.innerHTML = "";
+                                    this.elementOutput2.innerHTML = "";
                                 }
                             });
                         }
                         else {
                             this.projectName = "";
+                            this.folderName = "";
+                            this.projectPath = "";
 
+                            this.elementProjectlabel.innerHTML = "";
                             this.inputUrl.value = "";
                             this.inputUsername.value = "";
                             this.inputPassword.value = "";
-                            this.inputBranchName.value = "";
+                            this.inputBranchName1.value = "";
+                            this.inputBranchName2.value = "";
                             this.inputCommitDescription.value = "";
-                            this.outputElement.innerHTML = "";
-                            this.projectPath = "";
+                            this.elementOutput1.innerHTML = "";
+                            this.elementOutput2.innerHTML = "";
                         }
                     }
                 }
             },
-            createFile(name, path) {
+            createFile(name, folderName, path) {
                 if (name !== undefined)
                     this.projectName = name;
+
+                if (folderName !== undefined)
+                    this.folderName = folderName;
 
                 if (path !== undefined)
                     this.projectPath = path;
@@ -233,50 +320,56 @@
                     url: this.inputUrl !== null ? this.inputUrl.value : "",
                     username: this.inputUsername !== null ? this.inputUsername.value : "",
                     password: this.inputPassword !== null ? this.inputPassword.value : "",
+                    folderName: this.folderName,
                     path: this.projectPath
                 };
 
                 Sio.sendMessage("t_exec_stream_i", {
                     tag: "gitClickLogicSetting",
                     cmd: "write",
-                    path: `${this._setting().systemData.pathSetting}/${this.projectName}${this._setting().systemData.extensionGit}`,
+                    path: `${this._setting().systemData.pathSetting}/${this.folderName}${this._setting().systemData.extensionGit}`,
                     content: JSON.stringify(content)
                 });
 
-                if (this.inputUrl !== null) {
+                if (this.selectEdit !== null) {
                     Sio.readMessage("t_exec_stream_o_gitClickLogicSetting", (data) => {
                         if (data.chunk === "end") {
                             Sio.stopRead("t_exec_stream_o_gitClickLogicSetting");
 
-                            if (this.selectEdit.querySelector(`option[value='${this.projectName}'`) === null) {
+                            let optionValue = `${this.folderName}${this._setting().systemData.extensionGit}`;
+
+                            if (this.selectEdit.querySelector(`option[value='${optionValue}'`) === null) {
                                 let option = document.createElement("option");
-                                option.value = this.projectName;
+                                option.value = optionValue;
                                 option.text = this.projectName;
                                 this.selectEdit.appendChild(option);
 
-                                this.selectEdit.querySelector(`option[value='${this.projectName}'`).selected = true;
+                                this.selectEdit.querySelector(`option[value='${optionValue}'`).selected = true;
                             }
                         }
                     });
                 }
             },
-            deleteOption(name) {
-                if (name !== "") {
+            deleteOption() {
+                if (this.selectEdit !== null) {
                     for (const option of this.selectEdit.options) {
-                        if (option.value === name) {
-                            this.projectName = "";
+                        if (option.value === `${this.folderName}${this._setting().systemData.extensionGit}`) {
+                            option.remove();
+                            this.selectEdit.selectedIndex = 0;
 
+                            this.projectName = "";
+                            this.folderName = "";
+                            this.projectPath = "";
+
+                            this.elementProjectlabel.innerHTML = "";
                             this.inputUrl.value = "";
                             this.inputUsername.value = "";
                             this.inputPassword.value = "";
-                            this.inputBranchName.value = "";
+                            this.inputBranchName1.value = "";
+                            this.inputBranchName2.value = "";
                             this.inputCommitDescription.value = "";
-                            this.outputElement.innerHTML = "";
-                            this.projectPath = "";
-
-                            option.remove();
-
-                            this.selectEdit.selectedIndex = 0;
+                            this.elementOutput1.innerHTML = "";
+                            this.elementOutput2.innerHTML = "";
 
                             break;
                         }
@@ -288,14 +381,20 @@
             return {
                 windowComponent: null,
                 projectName: "",
+                folderName: "",
                 projectPath: "",
+                elementPart1Container: null,
+                elementPart2Container: null,
                 selectEdit: null,
+                elementProjectlabel: null,
                 inputUrl: null,
                 inputUsername: null,
                 inputPassword: null,
-                inputBranchName: null,
+                inputBranchName1: null,
+                inputBranchName2: null,
                 inputCommitDescription: null,
-                outputElement: null,
+                elementOutput1: null,
+                elementOutput2: null,
                 buttonSave: null
             };
         },
@@ -307,14 +406,36 @@
 </script>
 
 <style scoped>
-    .git_component {
-        display: block;
+    .git_component .menu_git {
+        height: 28px;
+        background-color: #2b2b2b;
+        border-bottom: 1px solid #a0a0a0;
+        cursor: pointer;
+    }
+    .git_component .menu_git .button {
+        display: inline-block;
+        padding: 7px 8px;
+        font-size: 12px;
+    }
+    .git_component .menu_git .focused {
+        background-color: #0060ad;
+    }
+    .git_component .menu_git p:hover {
+        background-color: #808080;
+    }
+    .git_component .part_1_container, .git_component .part_2_container {
         position: absolute;
-        top: 0;
+        top: 28px;
         bottom: 0;
         left: 0;
         right: 0;
         padding: 10px;
+    }
+    .git_component .part_1_container {
+        display: block;
+    }
+    .git_component .part_2_container {
+        display: none;
     }
     .git_component .left, .git_component .right {
         vertical-align: top;

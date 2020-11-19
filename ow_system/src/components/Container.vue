@@ -1,6 +1,6 @@
 <template>
     <div class="container_component">
-        <div class="menu">
+        <div class="menu_container">
             <p class="button focused">Command</p>
             <p class="button">Terminal</p>
             <p class="button">Data</p>
@@ -31,7 +31,7 @@
                 this.$root.$refs.containerCommandComponent.init(windowComponent);
             },
             clickLogic(event) {
-                let menuElement = this._findParent(event.target, ["menu"]);
+                let menuElement = this._findParent(event.target, ["menu_container"]);
 
                 if (menuElement !== null) {
                     let windowComponent = this._findParent(menuElement, ["window_component"]);
@@ -83,21 +83,21 @@
 </script>
 
 <style scoped>
-    .container_component .menu {
+    .container_component .menu_container {
         height: 28px;
         background-color: #2b2b2b;
         border-bottom: 1px solid #a0a0a0;
         cursor: pointer;
     }
-    .container_component .menu .button {
+    .container_component .menu_container .button {
         display: inline-block;
         padding: 7px 8px;
         font-size: 12px;
     }
-    .container_component .menu .focused {
+    .container_component .menu_container .focused {
         background-color: #0060ad;
     }
-    .container_component .menu p:hover {
+    .container_component .menu_container p:hover {
         background-color: #808080;
     }
 </style>

@@ -99,7 +99,7 @@ const _exec = (helper, socket) => {
                 socket.emit(`t_exec_o_${dataStart.tag}`, {err: data});
             });
 
-            if (dataStart.closeEnabled === true) {
+            if (dataStart.closeEnabled === undefined && dataStart.closeEnabled !== false) {
                 execResult.on("close", (data) => {
                     helper.writeLog(`t_exec_o_${dataStart.tag} => close: ${data}`);
 

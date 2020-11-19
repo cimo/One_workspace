@@ -185,6 +185,10 @@ const promptLogic = () => {
     return false;
 }
 
+const capitalizeFirstLetter = (value) => {
+    return value.charAt(0).toUpperCase() + value.slice(1);
+}
+
 exports.findParent = findParent;
 exports.currentWindowElement = currentWindowElement;
 exports.focusCurrentWindow = focusCurrentWindow;
@@ -193,3 +197,4 @@ exports.focusCurrentMainbarElement = focusCurrentMainbarElement;
 exports.unMinimizeElement = unMinimizeElement;
 exports.dragInit = dragInit;
 exports.promptLogic = promptLogic;
+exports.capitalizeFirstLetter = capitalizeFirstLetter;

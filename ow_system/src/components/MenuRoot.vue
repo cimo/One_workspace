@@ -96,8 +96,8 @@
             let menuRoot = this._setting().menu_root;
 
             return {
-                menuRootContainer: null,
-                menuRoot
+                menuRoot,
+                menuRootContainer: null
             };
         },
         created() {

@@ -49,7 +49,7 @@
             },
             init() {
                 this.promptComponent = document.querySelector(".prompt_component");
-                this.bodyMessage = this.promptComponent.querySelector(".body .message");
+                this.elementBodyMessage = this.promptComponent.querySelector(".body .message");
                 this.buttonCancel = this.promptComponent.querySelector(".button_cmd_window.cancel");
                 this.buttonOk = this.promptComponent.querySelector(".button_cmd_window.ok");
 
@@ -67,7 +67,7 @@
                     this.executeWindowComponent = windowComponent;
 
                 if (message !== undefined)
-                    this.bodyMessage.innerHTML = message;
+                    this.elementBodyMessage.innerHTML = message;
 
                 if (callback !== undefined)
                     this.executeCallback = callback;
@@ -79,7 +79,7 @@
         data() {
             return {
                 promptComponent: null,
-                bodyMessage: null,
+                elementBodyMessage: null,
                 buttonCancel: null,
                 buttonOk: null,
                 clicked: false,

@@ -12,8 +12,8 @@
         computed: {},
         methods: {
             init() {
-                this.timeElement = document.querySelector(".timeDate_component .time");
-                this.dateElement = document.querySelector(".timeDate_component .date");
+                this.elementTime = document.querySelector(".timeDate_component .time");
+                this.elementDate = document.querySelector(".timeDate_component .date");
 
                 this._execute();
 
@@ -22,7 +22,7 @@
                 }, 1000);
             },
             _execute() {
-                if (this.timeElement !== null && this.dateElement !== null) {
+                if (this.elementTime !== null && this.elementDate !== null) {
                     let currentDate = new Date();
 
                     let month = currentDate.getMonth() + 1;
@@ -31,19 +31,19 @@
                     let day = currentDate.getDate();
                     day = day < 10 ? `0${day}` : `${day}`;
 
-                    this.dateElement.innerHTML = `${currentDate.getFullYear()}/${month}/${day}`;
+                    this.elementDate.innerHTML = `${currentDate.getFullYear()}/${month}/${day}`;
 
                     let minute = currentDate.getMinutes();
                     minute = minute < 10 ? `0${minute}` : `${minute}`;
 
-                    this.timeElement.innerHTML = `${currentDate.getHours()}:${minute}`;
+                    this.elementTime.innerHTML = `${currentDate.getHours()}:${minute}`;
                 }
             }
         },
         data() {
             return {
-                timeElement: null,
-                dateElement: null,
+                elementTime: null,
+                elementDate: null,
                 interval: null
             };
         },

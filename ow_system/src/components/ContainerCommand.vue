@@ -44,19 +44,20 @@
             _currentWindowElement: Helper.currentWindowElement,
             _checkStatus(containerName) {
                 if (Object.keys(this.windowComponentList).length > 0) {
-                    this.statusIntervalList[containerName] = setInterval(() => {
+                    this.intervalStatusList[containerName] = setInterval(() => {
                         Sio.sendMessage("t_exec_i", {
+                            closeEnabled: false,
                             tag: `${containerName}_status`,
                             cmd: `docker ps --filter "name=${containerName}" --format "{{.Status}}"`
                         });
                     }, 1000);
 
                     Sio.readMessage(`t_exec_o_${containerName}_status`, (data) => {
-                        if (containerName !== null && this.statusCommandList[containerName] < 0) {
+                        if (containerName !== null && this.commandStatusList[containerName] < 0) {
                             let result = data.out !== undefined ? data.out : data.err;
 
                             if (result !== undefined && result.indexOf("Up ") !== -1)
-                                this.statusElementList[containerName].innerHTML = "Running...";
+                                this.elementStatusList[containerName].innerHTML = "Running...";
                         }
                     });
                 }
@@ -69,8 +70,8 @@
                     this.windowComponentList[containerName] = windowComponent;
 
                     this.buttonCommandList[containerName] = this.windowComponentList[containerName].querySelectorAll(".command_component .right .cmd");
-                    this.statusElementList[containerName] = this.windowComponentList[containerName].querySelector(".command_component .status");
-                    this.statusCommandList[containerName] = -1;
+                    this.elementStatusList[containerName] = this.windowComponentList[containerName].querySelector(".command_component .status");
+                    this.commandStatusList[containerName] = -1;
 
                     this._checkStatus(containerName);
                 }
@@ -88,43 +89,40 @@
 
                         if (index === 0) {
                             Sio.sendMessage("t_exec_i", {
-                                closeEnabled: true,
                                 tag: `${containerName}_command`,
                                 cmd: `docker start ${containerName}`
                             });
 
-                            this.statusElementList[containerName].innerHTML = "Starting...";
-                            this.statusCommandList[containerName] = index;
+                            this.elementStatusList[containerName].innerHTML = "Starting...";
+                            this.commandStatusList[containerName] = index;
                         }
                         else if (index === 1) {
                             Sio.sendMessage("t_exec_i", {
-                                closeEnabled: true,
                                 tag: `${containerName}_command`,
                                 cmd: `docker restart ${containerName}`
                             });
 
-                            this.statusElementList[containerName].innerHTML = "Restarting...";
-                            this.statusCommandList[containerName] = index;
+                            this.elementStatusList[containerName].innerHTML = "Restarting...";
+                            this.commandStatusList[containerName] = index;
                         }
                         else if (index === 2) {
                             Sio.sendMessage("t_exec_i", {
-                                closeEnabled: true,
                                 tag: `${containerName}_command`,
                                 cmd: `docker stop ${containerName}`
                             });
 
-                            this.statusElementList[containerName].innerHTML = "Stopping...";
-                            this.statusCommandList[containerName] = index;
+                            this.elementStatusList[containerName].innerHTML = "Stopping...";
+                            this.commandStatusList[containerName] = index;
                         }
 
                         Sio.readMessage(`t_exec_o_${containerName}_command`, (data) => {
                             if (data.close !== undefined) {
                                 Sio.stopRead(`t_exec_o_${containerName}_command`);
 
-                                if (this.statusCommandList[containerName] === 2)
-                                    this.statusElementList[containerName].innerHTML = "Stopped.";
+                                if (this.commandStatusList[containerName] === 2)
+                                    this.elementStatusList[containerName].innerHTML = "Stopped.";
 
-                                this.statusCommandList[containerName] = -1;
+                                this.commandStatusList[containerName] = -1;
                             }
                         });
                     }
@@ -139,13 +137,13 @@
 
                     Sio.stopRead(`t_exec_o_${containerName}_status`);
 
-                    clearInterval(this.statusIntervalList[containerName]);
+                    clearInterval(this.intervalStatusList[containerName]);
 
                     delete this.windowComponentList[containerName];
                     delete this.buttonCommandList[containerName];
-                    delete this.statusIntervalList[containerName];
-                    delete this.statusElementList[containerName];
-                    delete this.statusCommandList[containerName];
+                    delete this.intervalStatusList[containerName];
+                    delete this.elementStatusList[containerName];
+                    delete this.commandStatusList[containerName];
 
                 }
             }
@@ -154,9 +152,9 @@
             return {
                 windowComponentList: [],
                 buttonCommandList: [],
-                statusIntervalList: [],
-                statusElementList: [],
-                statusCommandList: []
+                intervalStatusList: [],
+                elementStatusList: [],
+                commandStatusList: []
             };
         },
         created() {

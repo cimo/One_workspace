@@ -31,8 +31,9 @@
             _currentWindowElement: Helper.currentWindowElement,
             _checkStatus(containerName) {
                 if (Object.keys(this.windowComponentList).length > 0) {
-                    this.statusIntervalList[containerName] = setInterval(() => {
+                    this.intervalStatusList[containerName] = setInterval(() => {
                         Sio.sendMessage("t_exec_i", {
+                            closeEnabled: false,
                             tag: `${containerName}_data`,
                             cmd: `docker stats ${containerName} --no-stream --format "{{.CPUPerc}}[-]{{.MemUsage}}[-]{{.BlockIO}}[-]{{.NetIO}}"`
                         });
@@ -75,17 +76,17 @@
 
                     Sio.stopRead(`t_exec_o_${containerName}_data`);
 
-                    clearInterval(this.statusIntervalList[containerName]);
+                    clearInterval(this.intervalStatusList[containerName]);
 
                     delete this.windowComponentList[containerName];
-                    delete this.statusIntervalList[containerName];
+                    delete this.intervalStatusList[containerName];
                 }
             }
         },
         data() {
             return {
                 windowComponentList: [],
-                statusIntervalList: []
+                intervalStatusList: []
             };
         },
         created() {
