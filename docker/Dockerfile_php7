@@ -104,14 +104,7 @@ zlib1g-dev \
 && echo "\n" | pecl install memcached-3.1.5 \
 && docker-php-ext-configure gd --with-freetype=/usr/include --with-jpeg=/usr/include \
 && docker-php-ext-configure gmp \
-&& docker-php-ext-install gd \
-&& docker-php-ext-install intl \
-&& docker-php-ext-install opcache \
-&& docker-php-ext-install zip \
-&& docker-php-ext-install pdo_mysql \
-&& docker-php-ext-install pdo_pgsql \
-&& docker-php-ext-install bcmath \
-&& docker-php-ext-install gmp \
+&& docker-php-ext-install gd intl opcache zip pdo pdo_mysql pdo_pgsql bcmath gmp \
 # Composer
 && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
 # Clean
