@@ -144,6 +144,14 @@
                 if (currentWindowElement !== null) {
                     this.windowComponent = windowComponent;
 
+                    this.selectEdit.style.borderColor = "transparent";
+                    this.inputUrl.style.borderColor = "transparent";
+                    this.inputUsername.style.borderColor = "transparent";
+                    this.inputPassword.style.borderColor = "transparent";
+                    this.inputBranchName1.style.borderColor = "transparent";
+                    this.inputBranchName2.style.borderColor = "transparent";
+                    this.inputCommitDescription.style.borderColor = "transparent";
+
                     let menuElement = this._findParent(event.target, ["menu_git"]);
 
                     if (menuElement !== null) {
@@ -170,38 +178,75 @@
                     }
 
                     if (event.target.classList.contains("save") === true) {
-                        if (this.projectName !== "" && this.inputUrl.value !== "" && this.inputPassword.value !== "")
+                        if (this.projectName !== "" && this.inputUrl.value !== "" && this.inputUsername !== "" && this.inputPassword.value !== "")
                             this.createFile();
+                        else {
+                            if (this.inputUrl.value === "")
+                                this.inputUrl.style.borderColor = "#ff0000";
+                            if (this.inputUsername.value === "")
+                                this.inputUsername.style.borderColor = "#ff0000";
+                            if (this.inputPassword.value === "")
+                                this.inputPassword.style.borderColor = "#ff0000";
+                        }
                     }
 
                     if (event.target.classList.contains("button_cmd_window") === true) {
                         let command = "";
-                        let url = `https://${this.inputUsername.value}:${this.inputPassword.value}@${this.inputUrl.value}`;
+                        let url = "";
+
+                        if (this.inputUrl.value.indexOf("https://") !== -1) {
+                          let inputUrlValue = this.inputUrl.value.replace("https://", "");
+
+                          url = `https://${this.inputUsername.value}:${this.inputPassword.value}@${inputUrlValue}`;
+                        }
+                        else
+                          url = this.inputUrl.value;
+
                         let branchNameMatch1 = /^[A-Za-z-_/ ]+$/.test(this.inputBranchName1.value);
                         let branchNameMatch2 = /^[A-Za-z-_/ ]+$/.test(this.inputBranchName2.value);
 
-                        if (this.projectName === "")
+                        if (this.projectName === "") {
+                            this.selectEdit.style.borderColor = "#ff0000";
+
                             return false;
+                        }
 
                         this.elementOutput1.innerHTML = "";
                         this.elementOutput2.innerHTML = "";
 
                         if (event.target.classList.contains("clone") === true)
                             command = `mkdir -p ${this.projectPath} && cd ${this.projectPath} && git clone ${url} .`;
-                        else if (event.target.classList.contains("pull") === true && branchNameMatch1 === true)
-                            command = `cd ${this.projectPath} && git pull ${url} ${this.inputBranchName1.value}`;
+                        else if (event.target.classList.contains("pull") === true) {
+                            if (branchNameMatch1 === true)
+                                command = `cd ${this.projectPath} && git pull ${url} ${this.inputBranchName1.value}`;
+                            else
+                                this.inputBranchName1.style.borderColor = "#ff0000";
+                        }
                         else if (event.target.classList.contains("fetch") === true)
                             command = `cd ${this.projectPath} && git fetch --all`;
-                        else if (event.target.classList.contains("reset") === true && branchNameMatch1 === true)
-                            command = `cd ${this.projectPath} && git reset --hard ${this.inputBranchName1.value}`;
-                        else if (event.target.classList.contains("commit") === true && this.inputCommitDescription.value !== "") {
-                            this.inputBranchName2.value = "";
+                        else if (event.target.classList.contains("reset") === true) {
+                            if (branchNameMatch1 === true)
+                                command = `cd ${this.projectPath} && git reset --hard ${this.inputBranchName1.value}`;
+                            else
+                                this.inputBranchName1.style.borderColor = "#ff0000";
+                        }
+                        else if (event.target.classList.contains("commit") === true) {
+                            if (this.inputCommitDescription.value !== "") {
+                                this.inputBranchName2.value = "";
 
-                            command = `cd ${this.projectPath} && git commit -m "${this.inputCommitDescription.value}"`;
-                        } else if (event.target.classList.contains("push") === true && branchNameMatch2 === true) {
-                            this.inputCommitDescription.value = "";
+                                command = `cd ${this.projectPath} && git commit -m "${this.inputCommitDescription.value}"`;
+                            }
+                            else
+                                this.inputCommitDescription.style.borderColor = "#ff0000";
+                        }
+                        else if (event.target.classList.contains("push") === true) {
+                            if (branchNameMatch2 === true) {
+                                this.inputCommitDescription.value = "";
 
-                            command = `cd ${this.projectPath} && git remote set-url origin ${url} && git push ${this.inputBranchName2.value}`;
+                                command = `cd ${this.projectPath} && git remote set-url origin ${url} && git push ${this.inputBranchName2.value}`;
+                            }
+                            else
+                                this.inputBranchName2.style.borderColor = "#ff0000";
                         }
 
                         if (command === "")

@@ -13,12 +13,12 @@
                 <input type="text" name="name" value=""/>
             </div>
             <div class="section">
-                <p>Description:</p>
-                <textarea name="description" rows="4"></textarea>
-            </div>
-            <div class="section">
                 <p>Folder name:</p>
                 <input type="text" name="folder_name" value=""/>
+            </div>
+            <div class="section">
+                <p>Description:</p>
+                <textarea name="description" rows="4"></textarea>
             </div>
         </div>
         <div class="right">
@@ -69,8 +69,8 @@
                     this.windowComponent = windowComponent;
 
                     this.inputName = this.windowComponent.querySelector("input[name='name']");
-                    this.textareaDescription = this.windowComponent.querySelector("textarea[name='description']");
                     this.inputFolderName = this.windowComponent.querySelector("input[name='folder_name']");
+                    this.textareaDescription = this.windowComponent.querySelector("textarea[name='description']");
                     this.checkboxGit = this.windowComponent.querySelector("input[name='git']");
                     this.checkboxSsh = this.windowComponent.querySelector("input[name='ssh']");
                     this.checkboxTerser = this.windowComponent.querySelector("input[name='terser']");
@@ -116,12 +116,16 @@
                 if (currentWindowElement !== null) {
                     this.windowComponent = windowComponent;
 
+                    this.selectEdit.style.borderColor = "transparent";
+                    this.inputName.style.borderColor = "transparent";
+                    this.inputFolderName.style.borderColor = "transparent";
+
                     if (event.target.classList.contains("save") === true) {
                         if (this.inputName.value !== "" && this.inputFolderName.value !== "") {
                             let content = {
                                 name: this.inputName.value,
-                                description: this.textareaDescription.value,
                                 folderName: this.inputFolderName.value,
+                                description: this.textareaDescription.value,
                                 git: this.checkboxGit.checked === true ? true : false,
                                 ssh: this.checkboxSsh.checked === true ? true : false,
                                 terser: this.checkboxTerser.checked === true ? true : false,
@@ -187,6 +191,12 @@
                                 }
                             });
                         }
+                        else {
+                            if (this.inputName.value === "")
+                                this.inputName.style.borderColor = "#ff0000";
+                            if (this.inputFolderName.value === "")
+                                this.inputFolderName.style.borderColor = "#ff0000";
+                        }
                     }
                     else if (event.target.classList.contains("delete") === true) {
                         if (this.selectEdit.selectedIndex > 0) {
@@ -208,8 +218,8 @@
                                         this.selectEdit.selectedIndex = 0;
 
                                         this.inputName.value = "";
-                                        this.textareaDescription.value = "";
                                         this.inputFolderName.value = "";
+                                        this.textareaDescription.value = "";
                                         this.checkboxGit.checked = false;
                                         this.checkboxSsh.checked = false;
                                         this.checkboxTerser.checked = false;
@@ -251,8 +261,8 @@
                                     let result = JSON.parse(buffer);
 
                                     this.inputName.value = result.name;
-                                    this.textareaDescription.value = result.description;
                                     this.inputFolderName.value = result.folderName;
+                                    this.textareaDescription.value = result.description;
                                     this.checkboxGit.checked = result.git;
                                     this.checkboxSsh.checked = result.ssh;
                                     this.checkboxTerser.checked = result.terser;
@@ -264,8 +274,8 @@
                         }
                         else {
                             this.inputName.value = "";
-                            this.textareaDescription.value = "";
                             this.inputFolderName.value = "";
+                            this.textareaDescription.value = "";
                             this.checkboxGit.checked = false;
                             this.checkboxSsh.checked = false;
                             this.checkboxTerser.checked = false;
@@ -281,8 +291,8 @@
             return {
                 windowComponent: null,
                 inputName: null,
-                textareaDescription: null,
                 inputFolderName: null,
+                textareaDescription: null,
                 checkboxGit: null,
                 checkboxSsh: null,
                 checkboxTerser: null,
