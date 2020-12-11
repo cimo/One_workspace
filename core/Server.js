@@ -9,9 +9,9 @@ const http = require("http");
 const https = require("https");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
-const csrf = require("csurf");
 const httpAuth = require("http-auth");
-//const cors = require("cors");
+const cors = require("cors");
+const csrf = require("csurf");
 const socketIo = require("socket.io");
 
 const config = require("./Config");
@@ -27,10 +27,16 @@ const certificate = {
     cert: fs.readFileSync(config.setting.certificate.cert)
 };
 
-const digest = httpAuth.digest({
+const httpAuthOption = httpAuth.digest({
     realm: config.setting.digest.realm,
     file: `${config.setting.digest.path}.digest_htpasswd`
 });
+
+const corsOption = {
+	origin: [`http://${config.setting.socketIo.domain}`, `http://${config.setting.socketIo.domain}:${config.setting.port.vue_app}`],
+	methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"],
+	optionsSuccessStatus: 200
+};
 
 const app = express();
 
@@ -38,16 +44,36 @@ app.use(express.static(urlRoot));
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 app.use(cookieParser());
+app.use(cors(corsOption));
 app.use(csrf({cookie: true}));
-//app.use(cors());
 
 const httpServer = http.createServer(app);
 const httpsServer = https.createServer(certificate, app);
 
-const socketIoServer = socketIo(httpServer);
-const socketIosServer = socketIo(httpsServer);
+const socketIoHttpServer = socketIo(httpServer, {
+    cors: {
+		origin: [`http://${config.setting.socketIo.domain}`, `http://${config.setting.socketIo.domain}:${config.setting.port.vue_app}`],
+		methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"]
+	},
+	cookie: {
+        name: "one_workspace_socketIo",
+        httpOnly: true,
+        path: "/"
+    }
+});
+const socketIoHttpsServer = socketIo(httpsServer, {
+	cors: {
+		origin: [`https://${config.setting.socketIo.domain}`, `https://${config.setting.socketIo.domain}:${config.setting.port.vue_app}`],
+		methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"]
+	},
+    cookie: {
+        name: "one_workspace_socketIo",
+        httpOnly: true,
+        path: "/"
+    }
+});
 
-app.get("/", helper.digestCheck(digest, (request, result) => {
+app.get("/", helper.digestCheck(httpAuthOption, (request, result) => {
     result.send("");
 }));
 
@@ -60,13 +86,13 @@ httpsServer.listen(config.setting.port.https, config.setting.ip, () => {
     helper.writeLog(`Listen on https://${config.setting.ip}:${config.setting.port.https}`);
 });
 
-socketIoServer.on("connection", (socket) => {
-    sio.startup(helper, socketIoServer, socket, "http");
+socketIoHttpServer.on("connection", (socket) => {
+    sio.startup(helper, socketIoHttpServer, socket, "http");
 
     terminal.socketEvent(helper, socket, "http");
 });
-socketIosServer.on("connection", (socket) => {
-    sio.startup(helper, socketIosServer, socket, "https");
+socketIoHttpsServer.on("connection", (socket) => {
+    sio.startup(helper, socketIoHttpsServer, socket, "https");
 
     terminal.socketEvent(helper, socket, "https");
 });

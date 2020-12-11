@@ -5,9 +5,16 @@
 const setting = {
     debug: false,
     ip: "0.0.0.0",
+    cwd: process.env.HOME,
+    env: process.env,
+    socketIo: {
+        domain: "localhost"
+    },
     port: {
         http: process.env.NODEJS_PORT_HTTP,
-        https: process.env.NODEJS_PORT_HTTPS
+        https: process.env.NODEJS_PORT_HTTPS,
+        vue: process.env.NODEJS_PORT_VUE,
+        vue_app: process.env.NODEJS_PORT_VUE_APP
     },
     certificate: {
         key: `/home/${process.env.WWW_USER_NAME}/root/certificate/${process.env.CERTIFICATE_KEY}`,

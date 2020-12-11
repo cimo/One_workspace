@@ -12,10 +12,10 @@
         "express": "4.17.1",
         "body-parser": "1.19.0",
         "cookie-parser": "1.4.5",
-        "csurf": "1.11.0",
         "http-auth": "4.1.2",
         "cors": "2.8.5",
-        "socket.io": "2.3.0",
+        "csurf": "1.11.0",
+        "socket.io": "3.0.3",
         "node-pty": "0.9.0"
     },
     "peerDependencies": {}

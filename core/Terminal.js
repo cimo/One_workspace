@@ -1,12 +1,12 @@
 "use strict";
 
-/* global process */
-
 const os = require("os");
 const fs = require("fs");
 const path = require("path");
 const pty = require("node-pty");
 const childProcess = require("child_process");
+
+const config = require("./Config");
 
 const encoding = "utf-8";
 
@@ -30,8 +30,8 @@ const _pty = (helper, socket) => {
             name: "xterm-color",
             cols: dataStart.size[0],
             rows: dataStart.size[1],
-            cwd: process.env.HOME,
-            env: process.env
+            cwd: config.setting.cwd,
+            env: config.setting.env
         });
 
         ptySpawnList[dataStart.tag].on("data", (data) => {
