@@ -21,6 +21,7 @@ const setting = function() {
             pathSetting: "/home/user_1/root/ow_system/setting",
             pathProject: "/home/user_1/root/project",
             extensionProject: ".prj",
+            extensionSsh: ".ssh",
             extensionGit: ".pgit"
         },
         menu_root: {
@@ -38,6 +39,18 @@ const setting = function() {
                     name: "Explore",
                     imagePath: require("@/assets/images/explore.svg"),
                     imageName: "explore.svg"
+                },
+                {
+                    category: "project",
+                    name: "Ssh",
+                    imagePath: require("@/assets/images/ssh.svg"),
+                    imageName: "ssh.svg"
+                },
+                {
+                    category: "project",
+                    name: "VueJs",
+                    imagePath: require("@/assets/images/vuejs.svg"),
+                    imageName: "vuejs.svg"
                 }
             ],
             toolItems: [
@@ -46,12 +59,6 @@ const setting = function() {
                     name: "Git",
                     imagePath: require("@/assets/images/git.svg"),
                     imageName: "git.svg"
-                },
-                {
-                    category: "tool",
-                    name: "Ssh",
-                    imagePath: require("@/assets/images/ssh.svg"),
-                    imageName: "ssh.svg"
                 },
                 {
                     category: "tool",
@@ -64,12 +71,6 @@ const setting = function() {
                     name: "Sass",
                     imagePath: require("@/assets/images/sass.svg"),
                     imageName: "sass.svg"
-                },
-                {
-                    category: "tool",
-                    name: "VueJs",
-                    imagePath: require("@/assets/images/vuejs.svg"),
-                    imageName: "vuejs.svg"
                 }
             ],
             containerItems: [

@@ -1,7 +1,6 @@
 <template>
     <div class="tool_component">
         <ToolGitComponent/>
-        <ToolSshComponent/>
         <ToolTerserComponent/>
         <ToolSassComponent/>
     </div>
@@ -10,7 +9,6 @@
 <script>
     import Helper from "@/assets/js/Helper.js";
     import ToolGitComponent from "@/components/ToolGit.vue";
-    import ToolSshComponent from "@/components/ToolSsh.vue";
     import ToolTerserComponent from "@/components/ToolTerser.vue";
     import ToolSassComponent from "@/components/ToolSass.vue";
 
@@ -18,7 +16,6 @@
         name: "ToolComponent",
         components: {
             ToolGitComponent,
-            ToolSshComponent,
             ToolTerserComponent,
             ToolSassComponent
         },
@@ -28,11 +25,6 @@
             _currentWindowElement: Helper.currentWindowElement,
             _showComponent() {
                 if (this.windowName === "Git") {
-                    let sshComponent = this.windowComponent.querySelector(".ssh_component");
-
-                    if (sshComponent !== null)
-                        sshComponent.remove();
-
                     let terserComponent = this.windowComponent.querySelector(".terser_component");
 
                     if (terserComponent !== null)
@@ -45,32 +37,11 @@
 
                     this.$root.$refs.toolGitComponent.init(this.windowComponent);
                 }
-                else if (this.windowName === "Ssh") {
-                    let gitComponent = this.windowComponent.querySelector(".git_component");
-
-                    if (gitComponent !== null)
-                        gitComponent.remove();
-
-                    let terserComponent = this.windowComponent.querySelector(".terser_component");
-
-                    if (terserComponent !== null)
-                        terserComponent.remove();
-
-                    let sassComponent = this.windowComponent.querySelector(".sass_component");
-
-                    if (sassComponent !== null)
-                        sassComponent.remove();
-                }
                 else if (this.windowName === "Terser") {
                     let gitComponent = this.windowComponent.querySelector(".git_component");
 
                     if (gitComponent !== null)
                         gitComponent.remove();
-
-                    let sshComponent = this.windowComponent.querySelector(".ssh_component");
-
-                    if (sshComponent !== null)
-                        sshComponent.remove();
 
                     let sassComponent = this.windowComponent.querySelector(".sass_component");
 
@@ -82,11 +53,6 @@
 
                     if (gitComponent !== null)
                         gitComponent.remove();
-
-                    let sshComponent = this.windowComponent.querySelector(".ssh_component");
-
-                    if (sshComponent !== null)
-                        sshComponent.remove();
 
                     let terserComponent = this.windowComponent.querySelector(".terser_component");
 

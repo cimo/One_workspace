@@ -1,8 +1,8 @@
 <template>
     <div class="git_component">
         <div class="menu_git">
-            <p class="button focused">Base</p>
-            <p class="button">Commit / Push</p>
+            <p class="button focused">Receive</p>
+            <p class="button">Send</p>
         </div>
         <div class="part_1_container">
             <div class="left">
@@ -61,6 +61,7 @@
             </div>
             <div class="right">
                 <div class="section">
+                    <div class="button_cmd_window git_command status">Status</div>
                     <div class="button_cmd_window git_command commit">Commit</div>
                     <div class="button_cmd_window git_command push">Push</div>
                 </div>
@@ -191,8 +192,17 @@
                     }
 
                     if (event.target.classList.contains("button_cmd_window") === true) {
-                        let command = "";
+                        if (this.projectName === "") {
+                            this.selectEdit.style.borderColor = "#ff0000";
+
+                            return false;
+                        }
+
+                        this.elementOutput1.innerHTML = "";
+                        this.elementOutput2.innerHTML = "";
+
                         let url = "";
+                        let command = "";
 
                         if (this.inputUrl.value.indexOf("https://") !== -1) {
                           let inputUrlValue = this.inputUrl.value.replace("https://", "");
@@ -202,17 +212,8 @@
                         else
                           url = this.inputUrl.value;
 
-                        let branchNameMatch1 = /^[A-Za-z-_/ ]+$/.test(this.inputBranchName1.value);
-                        let branchNameMatch2 = /^[A-Za-z-_/ ]+$/.test(this.inputBranchName2.value);
-
-                        if (this.projectName === "") {
-                            this.selectEdit.style.borderColor = "#ff0000";
-
-                            return false;
-                        }
-
-                        this.elementOutput1.innerHTML = "";
-                        this.elementOutput2.innerHTML = "";
+                        let branchNameMatch1 = /^[A-Za-z0-9-_/ ]+$/.test(this.inputBranchName1.value);
+                        let branchNameMatch2 = /^[A-Za-z0-9-_/ ]+$/.test(this.inputBranchName2.value);
 
                         if (event.target.classList.contains("clone") === true)
                             command = `mkdir -p ${this.projectPath} && cd ${this.projectPath} && git clone ${url} .`;
@@ -229,6 +230,9 @@
                                 command = `cd ${this.projectPath} && git reset --hard ${this.inputBranchName1.value}`;
                             else
                                 this.inputBranchName1.style.borderColor = "#ff0000";
+                        }
+                        else if (event.target.classList.contains("status") === true) {
+                            command = `cd ${this.projectPath} && git status`;
                         }
                         else if (event.target.classList.contains("commit") === true) {
                             if (this.inputCommitDescription.value !== "") {
@@ -324,7 +328,7 @@
                                     this.folderName = result.folderName;
                                     this.projectPath = result.path;
 
-                                    this.elementProjectlabel.innerHTML = name;
+                                    this.elementProjectlabel.innerHTML = this.projectName;
                                     this.inputBranchName1.value = "";
                                     this.inputBranchName2.value = "";
                                     this.inputCommitDescription.value = "";
@@ -370,16 +374,16 @@
                 };
 
                 Sio.sendMessage("t_exec_stream_i", {
-                    tag: "gitClickLogicSetting",
+                    tag: "gitClickLogicSave",
                     cmd: "write",
                     path: `${this._setting().systemData.pathSetting}/${this.folderName}${this._setting().systemData.extensionGit}`,
                     content: JSON.stringify(content)
                 });
 
                 if (this.selectEdit !== null) {
-                    Sio.readMessage("t_exec_stream_o_gitClickLogicSetting", (data) => {
+                    Sio.readMessage("t_exec_stream_o_gitClickLogicSave", (data) => {
                         if (data.chunk === "end") {
-                            Sio.stopRead("t_exec_stream_o_gitClickLogicSetting");
+                            Sio.stopRead("t_exec_stream_o_gitClickLogicSave");
 
                             let optionValue = `${this.folderName}${this._setting().systemData.extensionGit}`;
 
@@ -479,8 +483,14 @@
     .git_component .part_1_container {
         display: block;
     }
+    .git_component .part_1_container .section .output {
+      height: 100px;
+    }
     .git_component .part_2_container {
         display: none;
+    }
+    .git_component .part_2_container .section .output {
+      height: 280px;
     }
     .git_component .left, .git_component .right {
         vertical-align: top;
@@ -504,7 +514,6 @@
         margin: 5px;
     }
     .git_component .section .output {
-        height: 175px;
         overflow-y: auto;
     }
     .git_component .bottom {

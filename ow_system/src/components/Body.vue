@@ -29,7 +29,8 @@
                 this.$root.$refs.menuRootComponent.clickLogic(event);
                 this.$root.$refs.footerComponent.clickLogic(event);
                 this.$root.$refs.windowComponent.clickLogic(event);
-                this.$root.$refs.projectComponent.clickLogic(event);
+                this.$root.$refs.projectExploreComponent.clickLogic(event);
+                this.$root.$refs.projectSshComponent.clickLogic(event);
                 this.$root.$refs.toolGitComponent.clickLogic(event);
                 this.$root.$refs.containerComponent.clickLogic(event);
                 this.$root.$refs.containerCommandComponent.clickLogic(event);
@@ -39,7 +40,7 @@
                 this.$root.$refs.windowComponent.doubleClickLogic(event);
             },
             _changeEvent(event) {
-                this.$root.$refs.projectComponent.changeLogic(event);
+                this.$root.$refs.projectExploreComponent.changeLogic(event);
                 this.$root.$refs.toolGitComponent.changeLogic(event);
             },
             _resizeEvent() {
