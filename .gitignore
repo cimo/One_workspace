@@ -47,16 +47,7 @@ Temporary Items
 .apdisk
 
 # cimo +
-_system/bash/custom/*
-!_system/bash/custom/.gitkeep
-_system/images/custom/*
-!_system/images/custom/.gitkeep
-_system/layout/custom/*
-!_system/layout/custom/.gitkeep
-_system/module/custom/*
-!_system/module/custom/.gitkeep
-_system/style/custom/*
-!_system/style/custom/.gitkeep
+_system/*
 core/node_modules
 ow_system/node_modules
 ow_system/setting/*
@@ -67,11 +58,6 @@ project/*
 !project/index.html
 !project/opcache.php
 !project/robots.txt
-virtual_host/custom/*
-!virtual_host/custom/.gitkeep
-!virtual_host/custom/example.conf
-data/*
-!data/.gitkeep
 .env
 error.log
 debug.log

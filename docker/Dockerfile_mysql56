@@ -25,7 +25,6 @@ nano \
 tzdata \
 curl \
 make \
-git \
 zip \
 unzip \
 cron \
@@ -39,4 +38,4 @@ wget \
 && apt-get autoclean -y \
 && apt-get autoremove -y
 
-EXPOSE ${MYSQL_PORT}
+EXPOSE ${MYSQL56_PORT}

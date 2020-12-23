@@ -8,7 +8,8 @@ Is a docker service container for have, in one space, a large and complete devel
 | Info: |
 |:---|
 | Secure and fast ui tools for increase your productivity |
-| Cross platform (Windows, Linux, Mac) |
+| Cross browser and responsive (Chrome, Firefox, Edge, Opera, Safari) |
+| Cross platform (Windows, Linux, Mac, Android, Ios) |
 
 | Project: |
 |:---|
@@ -35,11 +36,11 @@ Is a docker service container for have, in one space, a large and complete devel
 | MongoDb 4.4.1 |
 
 ## Instructions:
-1) Copy file in your folder (for example /home/cimo/One_workspace).
+1) Copy file in your folder (for example /home/cimo/One_workspace/root).
 
 2) Write on terminal:
 
-        cd /home/cimo/One_workspace
+        cd /home/cimo/One_workspace/root
         sudo cp .env.dist .env
         sudo nano .env
 
