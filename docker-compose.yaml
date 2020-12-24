@@ -146,8 +146,8 @@ services:
       NODEJS_PORT_HTTP: ${NODEJS_PORT_HTTP}
       NODEJS_PORT_HTTPS: ${NODEJS_PORT_HTTPS}
     ports:
-      - ${APACHE_PORT_HTTP}:80
-      - ${APACHE_PORT_HTTPS}:443
+      - 127.0.0.1:${APACHE_PORT_HTTP}:80
+      - 127.0.0.1:${APACHE_PORT_HTTPS}:443
     volumes:
       - ${PATH_ROOT}:/home/${WWW_USER_NAME}/root
       - ${PATH_ROOT}:${APACHE_PATH_ROOT}/htdocs
