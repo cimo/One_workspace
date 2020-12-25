@@ -133,7 +133,7 @@ const setting = function() {
                 {
                     category: "container",
                     name: "MongoDb",
-                    containerName: "MongoDb_4.0.20",
+                    containerName: "MongoDb_4.4.2",
                     imagePath: require("@/assets/images/mongodb.svg"),
                     imageName: "mongodb.svg"
                 }

@@ -33,7 +33,7 @@ Is a docker service container for have, in one space, a large and complete devel
 | PostgreSql 10.13 |
 | NodeJs 12.18.1 |
 | Redis 6.0.9 |
-| MongoDb 4.4.1 |
+| MongoDb 4.4.2 |
 
 ## Instructions:
 1) Copy file in your folder (for example /home/cimo/One_workspace/root).

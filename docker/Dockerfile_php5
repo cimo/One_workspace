@@ -20,7 +20,7 @@ ARG PHP5_PORT_XDEBUG
 ENV DEBIAN_FRONTEND=noninteractive
 ENV DEBCONF_NOWARNINGS=yes
 
-COPY ${PATH_ROOT}/zz-docker_php5.conf ${PHP5_PATH_ROOT}/php-fpm.d/zz-docker.conf
+COPY ${PATH_ROOT}/php5_zz-docker.conf ${PHP5_PATH_ROOT}/php-fpm.d/zz-docker.conf
 COPY ${PATH_ROOT}/php5_override.ini ${PHP5_PATH_ROOT}/php/conf.d/override.ini
 COPY ${PATH_ROOT}/entrypoint_php.sh /usr/local/bin/entrypoint.sh
 
