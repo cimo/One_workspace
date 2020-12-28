@@ -59,5 +59,6 @@ project/*
 !project/opcache.php
 !project/robots.txt
 .env
+.digest_htpasswd
 error.log
 debug.log
