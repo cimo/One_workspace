@@ -51,17 +51,17 @@
         methods: {
             _setting: Config.setting,
             _findParent: Helper.findParent,
-            _capitalizeFirstLetter: Helper.capitalizeFirstLetter,
             _currentWindowElement: Helper.currentWindowElement,
-            _deleteToolFileSetting(extension) {
+            _replaceName: Helper.replaceName,
+            _deleteFileSetting(extension) {
                 Sio.sendMessage("t_exec_i", {
                     closeEnabled: false,
                     tag: "exploreDeleteToolFileSetting",
-                    cmd: `rm ${this._setting().systemData.pathSetting}/${this.inputFolderName.value}${extension}`
+                    cmd: `rm ${this._setting().systemData.pathSetting}/${this.inputNameReplace}${extension}`
                 });
             },
             init(windowComponent) {
-                let currentWindowElement = this._currentWindowElement(windowComponent);
+                const currentWindowElement = this._currentWindowElement(windowComponent);
 
                 if (currentWindowElement !== null) {
                     this.windowComponent = windowComponent;
@@ -83,18 +83,16 @@
                         });
 
                         Sio.readMessage("t_exec_o_exploreInit", (data) => {
-                            let result = data.out !== undefined ? data.out : data.err;
+                            const result = data.out !== undefined ? data.out : data.err;
 
                             if (result !== undefined) {
-                                let outSplit = result.split("\n");
+                                const outSplit = result.split("\n");
 
                                 for (const value of outSplit) {
                                     if (value !== "" && value.indexOf("ls: ") === -1) {
-                                        let option = document.createElement("option");
+                                        const option = document.createElement("option");
                                         option.value = value;
                                         option.text = value.replace(this._setting().systemData.extensionProject, "");
-                                        option.text = option.text.replace("_", " ");
-                                        option.text = this._capitalizeFirstLetter(option.text);
                                         this.selectEdit.appendChild(option);
                                     }
                                 }
@@ -107,8 +105,8 @@
                 }
             },
             clickLogic(event) {
-                let windowComponent = this._findParent(event.target, ["explore_component"], ["window_component"]);
-                let currentWindowElement = this._currentWindowElement(windowComponent);
+                const windowComponent = this._findParent(event.target, ["explore_component"], ["window_component"]);
+                const currentWindowElement = this._currentWindowElement(windowComponent);
 
                 if (currentWindowElement !== null) {
                     this.windowComponent = windowComponent;
@@ -118,10 +116,13 @@
                     this.inputFolderName.style.borderColor = "transparent";
 
                     if (event.target.classList.contains("save") === true) {
-                        let folderNameCheck = /^[A-Za-z0-9-_/]+$/.test(this.inputFolderName.value);
+                        const inputNameCheck = /^[A-Za-z0-9-_ ]+$/.test(this.inputName.value);
+                        const folderNameCheck = /^[A-Za-z0-9-_]+$/.test(this.inputFolderName.value);
 
-                        if (folderNameCheck === true && this.inputName.value !== "" && this.inputFolderName.value !== "") {
-                            let content = {
+                        if (inputNameCheck === true && folderNameCheck === true && this.inputName.value !== "" && this.inputFolderName.value !== "") {
+                            this.inputNameReplace = this._replaceName(this.inputName.value, /\s/g, true);
+
+                            const content = {
                                 name: this.inputName.value,
                                 folderName: this.inputFolderName.value,
                                 description: this.textareaDescription.value,
@@ -134,7 +135,7 @@
                             Sio.sendMessage("t_exec_stream_i", {
                                 tag: "exploreClickLogicSave",
                                 cmd: "write",
-                                path: `${this._setting().systemData.pathSetting}/${this.inputFolderName.value}${this._setting().systemData.extensionProject}`,
+                                path: `${this._setting().systemData.pathSetting}/${this.inputNameReplace}${this._setting().systemData.extensionProject}`,
                                 content: JSON.stringify(content)
                             });
 
@@ -142,15 +143,17 @@
                                 if (data.chunk === "end") {
                                     Sio.stopRead("t_exec_stream_o_exploreClickLogicSave");
 
-                                    let optionValue = `${this.inputFolderName.value}${this._setting().systemData.extensionProject}`;
+                                    const optionValue = `${this.inputNameReplace}${this._setting().systemData.extensionProject}`;
 
                                     if (this.selectEdit.querySelector(`option[value='${optionValue}'`) === null) {
-                                        let option = document.createElement("option");
+                                        const option = document.createElement("option");
                                         option.value = optionValue;
-                                        option.text = this.inputName.value;
+                                        option.text = this.inputNameReplace;
                                         this.selectEdit.appendChild(option);
 
                                         this.selectEdit.querySelector(`option[value='${optionValue}'`).selected = true;
+
+                                        this.buttonDelete.style.display = "inline-block";
                                     }
 
                                     // Create folder root
@@ -159,30 +162,22 @@
                                         cmd: `mkdir -p ${this._setting().systemData.pathProject}/${this.inputFolderName.value}/root`
                                     });
 
-                                    Sio.readMessage("t_exec_o_exploreClickLogicFolder", (data) => {
-                                        if (data.close !== undefined) {
-                                            this.buttonDelete.style.display = "block";
-
-                                            Sio.stopRead("t_exec_o_exploreClickLogicFolder");
-                                        }
-                                    });
-
                                     // Create git setting file
                                     if (this.checkboxGit.checked === true) {
                                         Sio.sendMessage("t_exec_i", {
                                             tag: "exploreGitClickLogicSetting",
-                                            cmd: `test -f ${this._setting().systemData.pathSetting}/${this.inputFolderName.value}${this._setting().systemData.extensionGit}`
+                                            cmd: `test -f ${this._setting().systemData.pathSetting}/${this.inputNameReplace}${this._setting().systemData.extensionGit}`
                                         });
 
                                         Sio.readMessage("t_exec_o_exploreGitClickLogicSetting", (data) => {
                                             if (data.close === 1)
-                                                this.$root.$refs.toolGitComponent.createFile(this.inputName.value, this.inputFolderName.value, `${this._setting().systemData.pathProject}/${this.inputFolderName.value}/root`);
+                                                this.$root.$refs.toolGitComponent.createFile(this.inputNameReplace, `${this._setting().systemData.pathProject}/${this.inputFolderName.value}/root`);
                                             else
                                                 Sio.stopRead("t_exec_o_exploreGitClickLogicSetting");
                                         });
                                     }
                                     else {
-                                        this._deleteToolFileSetting(this._setting().systemData.extensionGit);
+                                        this._deleteFileSetting(this._setting().systemData.extensionGit);
 
                                         this.$root.$refs.toolGitComponent.deleteOption();
                                     }
@@ -190,7 +185,7 @@
                             });
                         }
                         else {
-                            if (this.inputName.value === "")
+                            if (this.inputName.value === "" || inputNameCheck === false)
                                 this.inputName.style.borderColor = "#ff0000";
                             if (this.inputFolderName.value === "" || folderNameCheck === false)
                                 this.inputFolderName.style.borderColor = "#ff0000";
@@ -201,14 +196,14 @@
                             this.$root.$refs.promptComponent.show(this.windowComponent, "You really want to delete this project?<br>(The root folder will be preserved).", () => {
                                 Sio.sendMessage("t_exec_i", {
                                     tag: "exploreClickLogicDelete",
-                                    cmd: `rm ${this._setting().systemData.pathSetting}/${this.inputFolderName.value}${this._setting().systemData.extensionProject}`
+                                    cmd: `rm ${this._setting().systemData.pathSetting}/${this.inputNameReplace}${this._setting().systemData.extensionProject}`
                                 });
 
                                 Sio.readMessage("t_exec_o_exploreClickLogicDelete", (data) => {
                                     if (data.close !== undefined && this.selectEdit.selectedIndex > 0 && this.selectEdit.options[this.selectEdit.selectedIndex].value !== null) {
                                         Sio.stopRead("t_exec_o_exploreClickLogicDelete");
 
-                                        this._deleteToolFileSetting(this._setting().systemData.extensionGit);
+                                        this._deleteFileSetting(this._setting().systemData.extensionGit);
 
                                         this.$root.$refs.toolGitComponent.deleteOption();
 
@@ -216,6 +211,7 @@
                                         this.selectEdit.selectedIndex = 0;
 
                                         this.inputName.value = "";
+                                        this.inputNameReplace = "";
                                         this.inputFolderName.value = "";
                                         this.textareaDescription.value = "";
                                         this.checkboxGit.checked = false;
@@ -231,20 +227,20 @@
                 }
             },
             changeLogic(event) {
-                let windowComponent = this._findParent(event.target, ["explore_component"], ["window_component"]);
-                let currentWindowElement = this._currentWindowElement(windowComponent);
+                const windowComponent = this._findParent(event.target, ["explore_component"], ["window_component"]);
+                const currentWindowElement = this._currentWindowElement(windowComponent);
 
                 if (currentWindowElement !== null) {
                     this.windowComponent = windowComponent;
 
                     if (event.target.classList.contains("edit") === true) {
                         if (this.selectEdit.selectedIndex > 0) {
-                            let file = this.selectEdit.options[this.selectEdit.selectedIndex].value;
+                            const optionValue = this.selectEdit.options[this.selectEdit.selectedIndex].value;
 
                             Sio.sendMessage("t_exec_stream_i", {
                                 tag: "exploreChangeLogicEdit",
                                 cmd: "read",
-                                path: `${this._setting().systemData.pathSetting}/${file}`
+                                path: `${this._setting().systemData.pathSetting}/${optionValue}`
                             });
 
                             let buffer = "";
@@ -255,21 +251,23 @@
                                 else {
                                     Sio.stopRead("t_exec_stream_o_exploreChangeLogicEdit");
 
-                                    let result = JSON.parse(buffer);
+                                    const result = JSON.parse(buffer);
 
                                     this.inputName.value = result.name;
+                                    this.inputNameReplace = this._replaceName(result.name, /\s/g, true);
                                     this.inputFolderName.value = result.folderName;
                                     this.textareaDescription.value = result.description;
                                     this.checkboxGit.checked = result.git;
                                     this.checkboxTerser.checked = result.terser;
                                     this.checkboxSass.checked = result.sass;
 
-                                    this.buttonDelete.style.display = "block";
+                                    this.buttonDelete.style.display = "inline-block";
                                 }
                             });
                         }
                         else {
                             this.inputName.value = "";
+                            this.inputNameReplace = "";
                             this.inputFolderName.value = "";
                             this.textareaDescription.value = "";
                             this.checkboxGit.checked = false;
@@ -286,6 +284,7 @@
             return {
                 windowComponent: null,
                 inputName: null,
+                inputNameReplace: "",
                 inputFolderName: null,
                 textareaDescription: null,
                 checkboxGit: null,
@@ -329,7 +328,7 @@
     }
     .explore_component .left .section .button_cmd_window.delete {
         display: none;
-        margin-top: 10px;
+        margin-left: 10px;
         background-color: #ff0000;
     }
     .explore_component .right .sub_left, .explore_component .right .sub_right {

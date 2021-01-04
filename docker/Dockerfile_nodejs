@@ -46,16 +46,10 @@ wget \
 && dpkg-reconfigure -f noninteractive tzdata \
 # Npm
 && npm install -g @vue/cli \
+&& npm install -g typescript \
+&& npm install -g eslint \
 && npm install -g terser \
 && npm install -g sass \
-# Selenium
-&& wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add \
-&& echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list \
-&& apt-get update \
-&& apt-get install -y google-chrome-stable firefox-esr \
-&& npm install -g selenium-side-runner --unsafe-perm=true --allow-root \
-&& npm install -g chromedriver --unsafe-perm=true --allow-root \
-&& npm install -g geckodriver --unsafe-perm=true --allow-root \
 # Clean
 && rm docker-19.03.9.tgz \
 && rm -rf /tmp/docker \

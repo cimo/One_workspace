@@ -189,6 +189,15 @@ const capitalizeFirstLetter = (value) => {
     return value.charAt(0).toUpperCase() + value.slice(1);
 }
 
+const replaceName = (name, rule, isLower) => {
+    const nameReplace = name.replace(rule, "_");
+
+    if (isLower === true)
+        return nameReplace.toLowerCase();
+
+    return nameReplace;
+}
+
 exports.findParent = findParent;
 exports.currentWindowElement = currentWindowElement;
 exports.focusCurrentWindow = focusCurrentWindow;
@@ -198,3 +207,4 @@ exports.unMinimizeElement = unMinimizeElement;
 exports.dragInit = dragInit;
 exports.promptLogic = promptLogic;
 exports.capitalizeFirstLetter = capitalizeFirstLetter;
+exports.replaceName = replaceName;

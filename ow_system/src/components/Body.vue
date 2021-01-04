@@ -41,6 +41,7 @@
             },
             _changeEvent(event) {
                 this.$root.$refs.projectExploreComponent.changeLogic(event);
+                this.$root.$refs.projectSshComponent.changeLogic(event);
                 this.$root.$refs.toolGitComponent.changeLogic(event);
             },
             _resizeEvent() {

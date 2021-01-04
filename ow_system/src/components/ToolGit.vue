@@ -89,7 +89,7 @@
             _capitalizeFirstLetter: Helper.capitalizeFirstLetter,
             _currentWindowElement: Helper.currentWindowElement,
             init(windowComponent) {
-                let currentWindowElement = this._currentWindowElement(windowComponent);
+                const currentWindowElement = this._currentWindowElement(windowComponent);
 
                 if (currentWindowElement !== null) {
                     this.windowComponent = windowComponent;
@@ -97,7 +97,7 @@
                     this.elementPart1Container = this.windowComponent.querySelector(".part_1_container");
                     this.elementPart2Container = this.windowComponent.querySelector(".part_2_container");
                     this.selectEdit = this.windowComponent.querySelector(".part_1_container select[name='edit']");
-                    this.elementProjectlabel = this.windowComponent.querySelector(".part_2_container .project_label");
+                    this.elementProjectLabel = this.windowComponent.querySelector(".part_2_container .project_label");
                     this.inputUrl = this.windowComponent.querySelector(".part_1_container input[name='url']");
                     this.inputUsername = this.windowComponent.querySelector(".part_1_container input[name='username']");
                     this.inputPassword = this.windowComponent.querySelector(".part_1_container input[name='password']");
@@ -115,18 +115,16 @@
                         });
 
                         Sio.readMessage("t_exec_o_gitInit", (data) => {
-                            let result = data.out !== undefined ? data.out : data.err;
+                            const result = data.out !== undefined ? data.out : data.err;
 
                             if (result !== undefined) {
-                                let outSplit = result.split("\n");
+                                const outSplit = result.split("\n");
 
                                 for (const value of outSplit) {
                                     if (value !== "" && value.indexOf("ls: ") === -1) {
-                                        let option = document.createElement("option");
+                                        const option = document.createElement("option");
                                         option.value = value;
                                         option.text = value.replace(this._setting().systemData.extensionGit, "");
-                                        option.text = option.text.replace("_", " ");
-                                        option.text = this._capitalizeFirstLetter(option.text);
                                         this.selectEdit.appendChild(option);
                                     }
                                 }
@@ -139,26 +137,18 @@
                 }
             },
             clickLogic(event) {
-                let windowComponent = this._findParent(event.target, ["git_component"], ["window_component"]);
-                let currentWindowElement = this._currentWindowElement(windowComponent);
+                const windowComponent = this._findParent(event.target, ["git_component"], ["window_component"]);
+                const currentWindowElement = this._currentWindowElement(windowComponent);
 
                 if (currentWindowElement !== null) {
                     this.windowComponent = windowComponent;
 
-                    this.selectEdit.style.borderColor = "transparent";
-                    this.inputUrl.style.borderColor = "transparent";
-                    this.inputUsername.style.borderColor = "transparent";
-                    this.inputPassword.style.borderColor = "transparent";
-                    this.inputBranchName1.style.borderColor = "transparent";
-                    this.inputBranchName2.style.borderColor = "transparent";
-                    this.inputCommitDescription.style.borderColor = "transparent";
-
-                    let menuElement = this._findParent(event.target, ["menu_git"]);
+                    const menuElement = this._findParent(event.target, ["menu_git"]);
 
                     if (menuElement !== null) {
-                        let buttonList = menuElement.querySelectorAll(".button");
+                        const buttonList = menuElement.querySelectorAll(".button");
 
-                        let index = Array.from(buttonList).indexOf(event.target);
+                        const index = Array.from(buttonList).indexOf(event.target);
 
                         if (index >= 0) {
                             for (const value of buttonList) {
@@ -177,6 +167,14 @@
                             }
                         }
                     }
+
+                    this.selectEdit.style.borderColor = "transparent";
+                    this.inputUrl.style.borderColor = "transparent";
+                    this.inputUsername.style.borderColor = "transparent";
+                    this.inputPassword.style.borderColor = "transparent";
+                    this.inputBranchName1.style.borderColor = "transparent";
+                    this.inputBranchName2.style.borderColor = "transparent";
+                    this.inputCommitDescription.style.borderColor = "transparent";
 
                     if (event.target.classList.contains("save") === true) {
                         if (this.projectName !== "" && this.inputUrl.value !== "" && this.inputUsername !== "" && this.inputPassword.value !== "")
@@ -205,15 +203,15 @@
                         let command = "";
 
                         if (this.inputUrl.value.indexOf("https://") !== -1) {
-                          let inputUrlValue = this.inputUrl.value.replace("https://", "");
+                            const inputUrlValue = this.inputUrl.value.replace("https://", "");
 
-                          url = `https://${this.inputUsername.value}:${this.inputPassword.value}@${inputUrlValue}`;
+                            url = `https://${this.inputUsername.value}:${this.inputPassword.value}@${inputUrlValue}`;
                         }
                         else
-                          url = this.inputUrl.value;
+                            url = this.inputUrl.value;
 
-                        let branchNameMatch1 = /^[A-Za-z0-9-_/ ]+$/.test(this.inputBranchName1.value);
-                        let branchNameMatch2 = /^[A-Za-z0-9-_/ ]+$/.test(this.inputBranchName2.value);
+                        const branchNameMatch1 = /^[A-Za-z0-9-_/ ]+$/.test(this.inputBranchName1.value);
+                        const branchNameMatch2 = /^[A-Za-z0-9-_/ ]+$/.test(this.inputBranchName2.value);
 
                         if (event.target.classList.contains("clone") === true)
                             command = `mkdir -p ${this.projectPath} && cd ${this.projectPath} && git clone ${url} .`;
@@ -264,7 +262,7 @@
                         let buffer = "";
 
                         Sio.readMessage("t_exec_o_gitCommand", (data) => {
-                            let result = data.out !== undefined ? data.out : data.err;
+                            const result = data.out !== undefined ? data.out : data.err;
 
                             if (result !== undefined && event.target.classList.contains("clone") === true) {
                                 buffer = result;
@@ -295,21 +293,20 @@
                 }
             },
             changeLogic(event) {
-                let windowComponent = this._findParent(event.target, ["git_component"], ["window_component"]);
-                let currentWindowElement = this._currentWindowElement(windowComponent);
+                const windowComponent = this._findParent(event.target, ["git_component"], ["window_component"]);
+                const currentWindowElement = this._currentWindowElement(windowComponent);
 
                 if (currentWindowElement !== null) {
                     this.windowComponent = windowComponent;
 
                     if (event.target.classList.contains("edit") === true) {
                         if (this.selectEdit.selectedIndex > 0) {
-                            let file = this.selectEdit.options[this.selectEdit.selectedIndex].value;
-                            this.projectName = this.selectEdit.options[this.selectEdit.selectedIndex].text;
+                            const optionValue = this.selectEdit.options[this.selectEdit.selectedIndex].value;
 
                             Sio.sendMessage("t_exec_stream_i", {
                                 tag: "gitChangeLogicEdit",
                                 cmd: "read",
-                                path: `${this._setting().systemData.pathSetting}/${file}`
+                                path: `${this._setting().systemData.pathSetting}/${optionValue}`
                             });
 
                             let buffer = "";
@@ -320,15 +317,15 @@
                                 else {
                                     Sio.stopRead("t_exec_stream_o_gitChangeLogicEdit");
 
-                                    let result = JSON.parse(buffer);
+                                    const result = JSON.parse(buffer);
 
                                     this.inputUrl.value = result.url;
                                     this.inputUsername.value = result.username;
                                     this.inputPassword.value = result.password;
-                                    this.folderName = result.folderName;
+                                    this.projectName = result.name;
                                     this.projectPath = result.path;
 
-                                    this.elementProjectlabel.innerHTML = this.projectName;
+                                    this.elementProjectLabel.innerHTML = result.name;
                                     this.inputBranchName1.value = "";
                                     this.inputBranchName2.value = "";
                                     this.inputCommitDescription.value = "";
@@ -339,10 +336,9 @@
                         }
                         else {
                             this.projectName = "";
-                            this.folderName = "";
                             this.projectPath = "";
 
-                            this.elementProjectlabel.innerHTML = "";
+                            this.elementProjectLabel.innerHTML = "";
                             this.inputUrl.value = "";
                             this.inputUsername.value = "";
                             this.inputPassword.value = "";
@@ -355,28 +351,25 @@
                     }
                 }
             },
-            createFile(name, folderName, path) {
+            createFile(name, path) {
                 if (name !== undefined)
                     this.projectName = name;
-
-                if (folderName !== undefined)
-                    this.folderName = folderName;
 
                 if (path !== undefined)
                     this.projectPath = path;
 
-                let content = {
+                const content = {
                     url: this.inputUrl !== null ? this.inputUrl.value : "",
                     username: this.inputUsername !== null ? this.inputUsername.value : "",
                     password: this.inputPassword !== null ? this.inputPassword.value : "",
-                    folderName: this.folderName,
+                    name: this.projectName,
                     path: this.projectPath
                 };
 
                 Sio.sendMessage("t_exec_stream_i", {
                     tag: "gitClickLogicSave",
                     cmd: "write",
-                    path: `${this._setting().systemData.pathSetting}/${this.folderName}${this._setting().systemData.extensionGit}`,
+                    path: `${this._setting().systemData.pathSetting}/${this.projectName}${this._setting().systemData.extensionGit}`,
                     content: JSON.stringify(content)
                 });
 
@@ -385,10 +378,10 @@
                         if (data.chunk === "end") {
                             Sio.stopRead("t_exec_stream_o_gitClickLogicSave");
 
-                            let optionValue = `${this.folderName}${this._setting().systemData.extensionGit}`;
+                            const optionValue = `${this.projectName}${this._setting().systemData.extensionGit}`;
 
                             if (this.selectEdit.querySelector(`option[value='${optionValue}'`) === null) {
-                                let option = document.createElement("option");
+                                const option = document.createElement("option");
                                 option.value = optionValue;
                                 option.text = this.projectName;
                                 this.selectEdit.appendChild(option);
@@ -402,15 +395,14 @@
             deleteOption() {
                 if (this.selectEdit !== null) {
                     for (const option of this.selectEdit.options) {
-                        if (option.value === `${this.folderName}${this._setting().systemData.extensionGit}`) {
+                        if (option.value === `${this.projectName}${this._setting().systemData.extensionGit}`) {
                             option.remove();
                             this.selectEdit.selectedIndex = 0;
 
                             this.projectName = "";
-                            this.folderName = "";
                             this.projectPath = "";
 
-                            this.elementProjectlabel.innerHTML = "";
+                            this.elementProjectLabel.innerHTML = "";
                             this.inputUrl.value = "";
                             this.inputUsername.value = "";
                             this.inputPassword.value = "";
@@ -430,12 +422,11 @@
             return {
                 windowComponent: null,
                 projectName: "",
-                folderName: "",
                 projectPath: "",
                 elementPart1Container: null,
                 elementPart2Container: null,
                 selectEdit: null,
-                elementProjectlabel: null,
+                elementProjectLabel: null,
                 inputUrl: null,
                 inputUsername: null,
                 inputPassword: null,

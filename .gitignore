@@ -49,6 +49,8 @@ Temporary Items
 # cimo +
 _system/*
 core/node_modules
+!key/.gitkeep
+key/*
 ow_system/node_modules
 ow_system/setting/*
 !ow_system/setting/.gitkeep
