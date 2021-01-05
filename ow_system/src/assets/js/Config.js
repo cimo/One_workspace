@@ -18,6 +18,7 @@ const setting = function() {
             ui_port: 8000
         },
         systemData: {
+            pathKey: "/home/user_1/root/key",
             pathSetting: "/home/user_1/root/ow_system/setting",
             pathProject: "/home/user_1/root/project",
             extensionProject: ".prj",

@@ -184,6 +184,8 @@
                         else if (event.target.classList.contains("button_maximize") === true)
                             this._changeStatus();
                         else if (event.target.classList.contains("button_close") === true) {
+                            this.$root.$refs.projectSshComponent.close(this.windowComponent);
+
                             this.$root.$refs.containerCommandComponent.close(this.windowComponent);
                             this.$root.$refs.containerTerminalComponent.close(this.windowComponent);
                             this.$root.$refs.containerDataComponent.close(this.windowComponent);
@@ -224,8 +226,6 @@
                 this._changeStatus(event);
             },
             resizeLogic() {
-                let currentWindowElement = this._currentWindowElement(this.windowComponent);
-
                 if (window.innerWidth < 840) {
                     let windowComponentList = document.querySelectorAll(".window_component:not(.empty)");
 
@@ -233,8 +233,6 @@
                         value.style.transform = "translate3d(0, 0, 0)";
                     }
                 }
-
-                this.$root.$refs.containerTerminalComponent.resizeLogic(this.windowComponent, currentWindowElement);
             }
         },
         data() {

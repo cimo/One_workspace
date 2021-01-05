@@ -30,8 +30,8 @@ const _dragStart = (event) => {
 
 const _dragMove = (event) => {
     if (dragActive === true) {
-        let dragCurrentX = dragOffsetX + (event.type === "touchstart" ? event.touches[0].clientX : event.clientX) - dragStartX;
-        let dragCurrentY = dragOffsetY + (event.type === "touchstart" ? event.touches[0].clientY : event.clientY) - dragStartY;
+        const dragCurrentX = dragOffsetX + (event.type === "touchstart" ? event.touches[0].clientX : event.clientX) - dragStartX;
+        const dragCurrentY = dragOffsetY + (event.type === "touchstart" ? event.touches[0].clientY : event.clientY) - dragStartY;
 
         dragTarget.style.left = `${dragCurrentX}px`;
         dragTarget.style.top = `${dragCurrentY}px`;
@@ -59,10 +59,10 @@ const findParent = (element, child, parent) => {
 
 const currentWindowElement = (element) => {
     if (element !== null && element.classList.contains("window_component") === true) {
-        let name = element.getAttribute("data-name");
-        let category = element.getAttribute("data-category");
-        let windowOpener = document.querySelector(`.window_opener[data-name='${name}']`);
-        let containerName = windowOpener.getAttribute("data-container_name");
+        const name = element.getAttribute("data-name");
+        const category = element.getAttribute("data-category");
+        const windowOpener = document.querySelector(`.window_opener[data-name='${name}']`);
+        const containerName = windowOpener.getAttribute("data-container_name");
 
         return [name, category, windowOpener, containerName];
     }
@@ -71,20 +71,20 @@ const currentWindowElement = (element) => {
 };
 
 const focusCurrentWindow = (windowComponent) => {
-    let focusedComponent = document.querySelector(".window_component.focused");
+    const focusedComponent = document.querySelector(".window_component.focused");
     let nameFocused = "";
 
     if (focusedComponent !== null)
         nameFocused = focusedComponent.getAttribute("data-name");
 
-    let windowComponentList = document.querySelectorAll(".window_component:not(.empty)");
+    const windowComponentList = document.querySelectorAll(".window_component:not(.empty)");
 
     for (const value of windowComponentList) {
         value.classList.remove("focused");
     }
 
     if (windowComponent !== null && windowComponent !== undefined) {
-        let name = windowComponent.getAttribute("data-name");
+        const name = windowComponent.getAttribute("data-name");
 
         windowComponent.style.display = "block";
         windowComponent.classList.add("focused");
@@ -95,16 +95,16 @@ const focusCurrentWindow = (windowComponent) => {
 };
 
 const focusNextWindow = () => {
-    let windowComponentList = document.querySelectorAll(".window_component:not(.empty)");
+    const windowComponentList = document.querySelectorAll(".window_component:not(.empty)");
 
     for (const value of windowComponentList) {
         value.classList.remove("focused");
     }
 
-    windowComponentList = document.querySelectorAll(".window_component:not(.empty):not(.minimized)");
+    const windowComponentMinimizedList = document.querySelectorAll(".window_component:not(.empty):not(.minimized)");
 
-    if (windowComponentList.length > 0) {
-        let windowComponent = windowComponentList[windowComponentList.length - 1];
+    if (windowComponentMinimizedList.length > 0) {
+        const windowComponent = windowComponentMinimizedList[windowComponentMinimizedList.length - 1];
 
         if (windowComponent !== null)
             windowComponent.classList.add("focused");
@@ -112,18 +112,18 @@ const focusNextWindow = () => {
 };
 
 const focusCurrentMainbarElement = () => {
-    let mainbarElementList = document.querySelectorAll(".footer_component .left_column .mainbar_element:not(.empty)");
+    const mainbarElementList = document.querySelectorAll(".footer_component .left_column .mainbar_element:not(.empty)");
 
     for (const value of mainbarElementList) {
         value.classList.remove("focused");
     }
 
-    let focusedComponent = document.querySelector(".window_component:not(.empty):not(.minimized).focused");
+    const focusedComponent = document.querySelector(".window_component:not(.empty):not(.minimized).focused");
 
     if (focusedComponent !== null) {
-        let name = focusedComponent.getAttribute("data-name");
+        const name = focusedComponent.getAttribute("data-name");
 
-        let mainbarElement = document.querySelector(`.footer_component .left_column .mainbar_element[data-name='${name}']`);
+        const mainbarElement = document.querySelector(`.footer_component .left_column .mainbar_element[data-name='${name}']`);
 
         if (mainbarElement !== null)
             mainbarElement.classList.add("focused");
@@ -132,13 +132,13 @@ const focusCurrentMainbarElement = () => {
 
 const unMinimizeElement = (name) => {
     if (name !== null && name !== undefined) {
-        let windowComponentList = document.querySelectorAll(".window_component:not(.empty)");
+        const windowComponentList = document.querySelectorAll(".window_component:not(.empty)");
 
         for (const value of windowComponentList) {
             value.classList.remove("focused");
         }
 
-        let windowComponent = document.querySelector(`.window_component[data-name='${name}']`);
+        const windowComponent = document.querySelector(`.window_component[data-name='${name}']`);
 
         if (windowComponent !== null) {
             windowComponent.classList.remove("minimized");
@@ -147,13 +147,13 @@ const unMinimizeElement = (name) => {
             windowComponent.parentNode.appendChild(windowComponent);
         }
 
-        let mainbarElementList = document.querySelectorAll(".footer_component .left_column .mainbar_element:not(.empty)");
+        const mainbarElementList = document.querySelectorAll(".footer_component .left_column .mainbar_element:not(.empty)");
 
         for (const value of mainbarElementList) {
             value.classList.remove("focused");
         }
 
-        let mainbarElement = document.querySelector(`.footer_component .left_column .mainbar_element[data-name='${name}']`);
+        const mainbarElement = document.querySelector(`.footer_component .left_column .mainbar_element[data-name='${name}']`);
 
         if (mainbarElement !== null) {
             mainbarElement.classList.remove("minimized");
@@ -177,7 +177,7 @@ const dragInit = (parent, tagList) => {
 };
 
 const promptLogic = () => {
-    let promptComponent = document.querySelector(".prompt_component");
+    const promptComponent = document.querySelector(".prompt_component");
 
     if (promptComponent !== null && promptComponent.style.display !== "" && promptComponent.style.display !== "none")
         return true;

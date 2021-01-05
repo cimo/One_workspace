@@ -10,7 +10,7 @@ const socketIo = io(config.setting().websocket.url);
 
 const sendMessage = (socketTag, command, time) => {
     if (time !== undefined && time > 0) {
-        let interval = setInterval(() => {
+        const interval = setInterval(() => {
             socketIo.emit(socketTag, command);
         }, time);
 

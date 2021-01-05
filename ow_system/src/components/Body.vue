@@ -46,6 +46,8 @@
             },
             _resizeEvent() {
                 this.$root.$refs.windowComponent.resizeLogic();
+                this.$root.$refs.projectSshComponent.resizeLogic();
+                this.$root.$refs.containerTerminalComponent.resizeLogic();
             }
         },
         data() {

@@ -19,11 +19,7 @@
             _currentWindowElement: Helper.currentWindowElement,
             _createXterm() {
                 if (this.windowName !== "" && this.containerName !== "" && this.windowComponent !== null) {
-                    let terminalComponent = this.windowComponent.querySelector(".terminal_component");
-                    let terminal = terminalComponent.querySelector(".terminal.xterm");
-
-                    if (terminal !== null)
-                        terminal.remove();
+                    const terminalComponent = this.windowComponent.querySelector(".terminal_component");
 
                     this.xtermList[this.containerName] = new Terminal({
                         cursorBlink: true
@@ -33,12 +29,12 @@
                     this.xtermList[this.containerName].open(terminalComponent);
                     this.xtermList[this.containerName].focus();
 
-                    let clientRect = terminalComponent.getBoundingClientRect();
-                    terminal = terminalComponent.querySelector(".terminal.xterm");
+                    const clientRect = terminalComponent.getBoundingClientRect();
+                    const terminal = terminalComponent.querySelector(".terminal.xterm");
                     terminal.style.height = `${clientRect.height}px`;
 
                     this.fitAddonList[this.containerName].fit();
-                    let size = this.fitAddonList[this.containerName].proposeDimensions();
+                    const size = this.fitAddonList[this.containerName].proposeDimensions();
 
                     Sio.sendMessage("t_pty_start", {
                         tag: this.containerName,
@@ -67,20 +63,15 @@
                     Sio.readMessage(`t_pty_o_${this.containerName}`, (data) => {
                         if (terminalComponent !== null) {
                             if (data.cmd.indexOf(" is not running") !== -1) {
-                                Sio.stopRead(`t_pty_o_${this.containerName}`);
-
-                                Sio.sendMessage("t_pty_close", {tag: this.containerName});
-
-                                delete this.xtermList[this.containerName];
-                                delete this.fitAddonList[this.containerName];
-
-                                terminal.remove();
+                                this._removeXterm();
 
                                 return;
                             }
 
                             if ((this.windowName !== "NodeJs" && data.cmd.trim() === "exit") || data.cmd === "xterm_reset") {
                                 Sio.stopRead(`t_pty_o_${this.containerName}`);
+
+                                this._removeXterm();
 
                                 this._createXterm();
                             }
@@ -92,25 +83,40 @@
                     });
                 }
             },
+            _removeXterm() {
+                const terminalComponent = this.windowComponent.querySelector(".terminal_component");
+                const terminal = terminalComponent.querySelector(".terminal.xterm");
+
+                if (terminal !== null) {
+                    Sio.stopRead(`t_pty_o_${this.containerName}`);
+
+                    Sio.sendMessage("t_pty_close", {tag: this.containerName});
+
+                    delete this.xtermList[this.containerName];
+                    delete this.fitAddonList[this.containerName];
+
+                    terminal.remove();
+                }
+            },
             init(windowComponent) {
-                let currentWindowElement = this._currentWindowElement(windowComponent);
+                const currentWindowElement = this._currentWindowElement(windowComponent);
 
                 if (currentWindowElement !== null) {
                     this.windowName = currentWindowElement[0];
                     this.containerName = currentWindowElement[3];
                     this.windowComponent = windowComponent;
 
-                    let terminal = this.windowComponent.querySelector(".terminal.xterm");
+                    const terminal = this.windowComponent.querySelector(".terminal.xterm");
 
                     if (terminal === null)
                         this._createXterm();
                 }
             },
             clickLogic(event) {
-                let windowComponent = this._findParent(event.target, ['terminal_component'], ["window_component"]);
+                const windowComponent = this._findParent(event.target, ['terminal_component'], ["window_component"]);
 
                 if (windowComponent !== null) {
-                    let currentWindowElement = this._currentWindowElement(windowComponent);
+                    const currentWindowElement = this._currentWindowElement(windowComponent);
 
                     if (currentWindowElement !== null) {
                         this.windowName = currentWindowElement[0];
@@ -122,24 +128,25 @@
                     }
                 }
             },
-            resizeLogic(windowComponent, currentWindowElement) {
+            resizeLogic() {
+                const currentWindowElement = this._currentWindowElement(this.windowComponent);
+
                 if (currentWindowElement !== null) {
                     this.windowName = currentWindowElement[0];
                     this.containerName = currentWindowElement[3];
-                    this.windowComponent = windowComponent;
 
-                    let terminalComponent = this.windowComponent.querySelector(".terminal_component");
+                    const terminalComponent = this.windowComponent.querySelector(".terminal_component");
 
                     if (terminalComponent !== null) {
-                        let terminal = terminalComponent.querySelector(".terminal.xterm");
+                        const terminal = terminalComponent.querySelector(".terminal.xterm");
 
                         if (terminal !== null && this.fitAddonList[this.containerName] !== undefined) {
-                            let clientRect = terminalComponent.getBoundingClientRect();
+                            const clientRect = terminalComponent.getBoundingClientRect();
                             terminal.style.height = `${clientRect.height}px`;
 
                             this.fitAddonList[this.containerName].fit();
 
-                            let size = this.fitAddonList[this.containerName].proposeDimensions();
+                            const size = this.fitAddonList[this.containerName].proposeDimensions();
                             Sio.sendMessage("t_pty_resize", {
                                 tag: this.containerName,
                                 size: [size.cols, size.rows]
@@ -149,7 +156,7 @@
                 }
             },
             close(windowComponent) {
-                let currentWindowElement = this._currentWindowElement(windowComponent);
+                const currentWindowElement = this._currentWindowElement(windowComponent);
 
                 if (currentWindowElement !== null) {
                     this.windowName = currentWindowElement[0];

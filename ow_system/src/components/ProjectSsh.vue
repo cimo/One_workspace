@@ -17,6 +17,10 @@
                 <input type="text" name="name" value=""/>
             </div>
             <div class="section">
+                <p>Server:</p>
+                <input type="text" name="server" value=""/>
+            </div>
+            <div class="section">
                 <p>Username:</p>
                 <input type="text" name="username" value=""/>
             </div>
@@ -63,10 +67,6 @@
             _createXterm() {
                 if (this.windowComponent !== null) {
                     const terminalComponent = this.windowComponent.querySelector(".terminal_component");
-                    const terminalOld = terminalComponent.querySelector(".terminal.xterm");
-
-                    if (terminalOld !== null)
-                        terminalOld.remove();
 
                     this.xterm = new Terminal({
                         cursorBlink: true
@@ -84,26 +84,40 @@
                     const size = this.fitAddon.proposeDimensions();
 
                     Sio.sendMessage("t_pty_start", {
-                        tag: "sshTerminal",
+                        tag: "ssh",
                         size: [size.cols, size.rows]
                     });
 
+                    const pathKey = `${this._setting().systemData.pathKey}/${this.inputKeyPublic.value}`;
+
                     Sio.sendMessage("t_pty_i", {
-                        tag: "sshTerminal",
-                        cmd: `history -c && history -w && clear\r`
+                        tag: "ssh",
+                        cmd: `history -c \
+                        && history -w \
+                        && clear \
+                        && chmod 400 ${pathKey} \
+                        && ssh -i ${pathKey} ${this.inputUsername.value}@${this.inputServer.value}\r`
                     });
 
                     this.xterm.onData((data) => {
                         Sio.sendMessage("t_pty_i", {
-                            tag: "sshTerminal",
+                            tag: "ssh",
                             cmd: data
                         });
                     });
 
-                    Sio.readMessage(`t_pty_o_sshTerminal`, (data) => {
+                    Sio.readMessage("t_pty_o_ssh", (data) => {
                         if (terminalComponent !== null) {
+                            if (data.cmd.indexOf(" closed by ") !== -1 || data.cmd.indexOf("logout") !== -1 || this.selectEdit.selectedIndex === 0) {
+                                this._removeXterm();
+
+                                return;
+                            }
+
                             if (data.cmd.trim() === "exit" || data.cmd === "xterm_reset") {
-                                Sio.stopRead(`t_pty_o_sshTerminal`);
+                                Sio.stopRead("t_pty_o_ssh");
+
+                                this._removeXterm();
 
                                 this._createXterm();
                             }
@@ -113,6 +127,21 @@
                             }
                         }
                     });
+                }
+            },
+            _removeXterm() {
+                const terminalComponent = this.windowComponent.querySelector(".terminal_component");
+                const terminal = terminalComponent.querySelector(".terminal.xterm");
+
+                if (terminal !== null) {
+                    Sio.stopRead("t_pty_o_ssh");
+
+                    Sio.sendMessage("t_pty_close", {tag: "ssh"});
+
+                    this.xterm = null;
+                    this.fitAddon = null;
+
+                    terminal.remove();
                 }
             },
             init(windowComponent) {
@@ -125,6 +154,7 @@
                     this.elementPart2Container = this.windowComponent.querySelector(".part_2_container");
                     this.selectEdit = this.windowComponent.querySelector(".part_1_container select[name='edit']");
                     this.inputName = this.windowComponent.querySelector(".part_1_container input[name='name']");
+                    this.inputServer = this.windowComponent.querySelector(".part_1_container input[name='server']");
                     this.inputUsername = this.windowComponent.querySelector(".part_1_container input[name='username']");
                     this.inputPassword = this.windowComponent.querySelector(".part_1_container input[name='password']");
                     this.inputKeyPublic = this.windowComponent.querySelector(".part_1_container input[name='key_public']");
@@ -191,25 +221,35 @@
 
                                 const terminal = this.windowComponent.querySelector(".terminal.xterm");
 
-                                if (terminal === null)
+                                if (terminal === null && this.selectEdit.selectedIndex > 0)
                                     this._createXterm();
+                                else {
+                                    if (this.selectEditIndexOld != this.selectEdit.selectedIndex) {
+                                        this._removeXterm();
+
+                                        this._createXterm();
+                                    }
+                                }
+
+                                this.selectEditIndexOld = this.selectEdit.selectedIndex;
                             }
                         }
                     }
 
                     this.selectEdit.style.borderColor = "transparent";
                     this.inputName.style.borderColor = "transparent";
+                    this.inputServer.style.borderColor = "transparent";
                     this.inputUsername.style.borderColor = "transparent";
-                    this.inputPassword.style.borderColor = "transparent";
 
                     if (event.target.classList.contains("save") === true) {
                         const inputNameCheck = /^[A-Za-z0-9-_ ]+$/.test(this.inputName.value);
 
-                        if (inputNameCheck === true && this.inputName.value !== "" && this.inputUsername.value !== "" && this.inputPassword.value !== "") {
+                        if (inputNameCheck === true && this.inputName.value !== "" && this.inputServer.value !== "" && this.inputUsername.value !== "") {
                             this.inputNameReplace = this._replaceName(this.inputName.value, /\s/g, true);
 
                             const content = {
                                 name: this.inputName.value,
+                                server: this.inputServer.value,
                                 username: this.inputUsername.value,
                                 password: this.inputPassword.value,
                                 key_public: this.inputKeyPublic.value,
@@ -246,10 +286,10 @@
                         else {
                             if (this.inputName.value === "" || inputNameCheck === false)
                                 this.inputName.style.borderColor = "#ff0000";
+                            if (this.inputServer.value === "")
+                                this.inputServer.style.borderColor = "#ff0000";
                             if (this.inputUsername.value === "")
                                 this.inputUsername.style.borderColor = "#ff0000";
-                            if (this.inputPassword.value === "")
-                                this.inputPassword.style.borderColor = "#ff0000";
                         }
                     }
                     else if (event.target.classList.contains("delete") === true) {
@@ -269,6 +309,7 @@
 
                                         this.inputName.value = "";
                                         this.inputNameReplace = "";
+                                        this.inputServer.value = "";
                                         this.inputUsername.value = "";
                                         this.inputPassword.value = "";
                                         this.inputKeyPublic.value = "";
@@ -311,6 +352,7 @@
 
                                     this.inputName.value = result.name;
                                     this.inputNameReplace = this._replaceName(result.name, /\s/g, true);
+                                    this.inputServer.value = result.server;
                                     this.inputUsername.value = result.username;
                                     this.inputPassword.value = result.password;
                                     this.inputKeyPublic.value = result.key_public;
@@ -323,6 +365,7 @@
                         else {
                             this.inputName.value = "";
                             this.inputNameReplace = "";
+                            this.inputServer.value = "";
                             this.inputUsername.value = "";
                             this.inputPassword.value = "";
                             this.inputKeyPublic.value = "";
@@ -332,6 +375,46 @@
                         }
                     }
                 }
+            },
+            resizeLogic() {
+                const currentWindowElement = this._currentWindowElement(this.windowComponent);
+
+                if (currentWindowElement !== null) {
+                    const terminalComponent = this.windowComponent.querySelector(".terminal_component");
+
+                    if (terminalComponent !== null) {
+                        const terminal = terminalComponent.querySelector(".terminal.xterm");
+
+                        if (terminal !== null && this.fitAddon !== undefined) {
+                            const clientRect = terminalComponent.getBoundingClientRect();
+                            terminal.style.height = `${clientRect.height}px`;
+
+                            this.fitAddon.fit();
+
+                            const size = this.fitAddon.proposeDimensions();
+                            Sio.sendMessage("t_pty_resize", {
+                                tag: "ssh",
+                                size: [size.cols, size.rows]
+                            });
+                        }
+                    }
+                }
+            },
+            close(windowComponent) {
+                const currentWindowElement = this._currentWindowElement(windowComponent);
+
+                if (currentWindowElement !== null) {
+                    this.windowComponent = windowComponent;
+
+                    Sio.stopRead("t_pty_o_ssh");
+
+                    Sio.sendMessage("t_pty_close", {tag: "ssh"});
+
+                    this.xterm = null;
+                    this.fitAddon = null;
+
+                    this.windowComponent = null;
+                }
             }
         },
         data() {
@@ -340,8 +423,10 @@
                 elementPart1Container: null,
                 elementPart2Container: null,
                 selectEdit: null,
+                selectEditIndexOld: 0,
                 inputName: null,
                 inputNameReplace: "",
+                inputServer: null,
                 inputUsername: null,
                 inputPassword: null,
                 inputKeyPublic: null,
@@ -412,7 +497,7 @@
         width: 40%;
     }
     .ssh_component .section textarea {
-        width: 90%;
+        width: 40%;
         resize: none;
     }
     .ssh_component .section .button_cmd_window.delete {
