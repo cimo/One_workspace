@@ -175,23 +175,20 @@
                                             else
                                                 Sio.stopRead("t_exec_o_exploreGitClickLogicSetting");
                                         });
-                                    }
-                                    else {
+                                    } else {
                                         this._deleteFileSetting(this._setting().systemData.extensionGit);
 
                                         this.$root.$refs.toolGitComponent.deleteOption();
                                     }
                                 }
                             });
-                        }
-                        else {
+                        } else {
                             if (this.inputName.value === "" || inputNameCheck === false)
                                 this.inputName.style.borderColor = "#ff0000";
                             if (this.inputFolderName.value === "" || folderNameCheck === false)
                                 this.inputFolderName.style.borderColor = "#ff0000";
                         }
-                    }
-                    else if (event.target.classList.contains("delete") === true) {
+                    } else if (event.target.classList.contains("delete") === true) {
                         if (this.selectEdit.selectedIndex > 0) {
                             this.$root.$refs.promptComponent.show(this.windowComponent, "You really want to delete this project?<br>(The root folder will be preserved).", () => {
                                 Sio.sendMessage("t_exec_i", {

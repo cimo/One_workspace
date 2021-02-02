@@ -23,7 +23,7 @@
             },
             _execute() {
                 if (this.elementTime !== null && this.elementDate !== null) {
-                    let currentDate = new Date();
+                    const currentDate = new Date();
 
                     let month = currentDate.getMonth() + 1;
                     month = month < 10 ? `0${month}` : `${month}`;

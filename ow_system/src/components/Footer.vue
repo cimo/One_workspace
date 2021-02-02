@@ -29,20 +29,20 @@
             _unMinimizeElement: Helper.unMinimizeElement,
             _promptLogic: Helper.promptLogic,
             init(windowOpener) {
-                let name = windowOpener.getAttribute("data-name");
-                let category = windowOpener.getAttribute("data-category");
+                const name = windowOpener.getAttribute("data-name");
+                const category = windowOpener.getAttribute("data-category");
 
-                let mainbarElementEmpty = document.querySelector(".footer_component .left_column .mainbar_element.empty");
+                const mainbarElementEmpty = document.querySelector(".footer_component .left_column .mainbar_element.empty");
 
-                let newMainbarElement = mainbarElementEmpty.cloneNode(true);
+                const newMainbarElement = mainbarElementEmpty.cloneNode(true);
                 newMainbarElement.classList.remove("empty");
                 newMainbarElement.classList.add("focused");
                 newMainbarElement.setAttribute("data-name", name);
                 newMainbarElement.setAttribute("data-category", category);
 
-                let src = windowOpener.querySelector("img").getAttribute("src");
+                const src = windowOpener.querySelector("img").getAttribute("src");
 
-                let icon = newMainbarElement.querySelector("img");
+                const icon = newMainbarElement.querySelector("img");
                 icon.setAttribute("src", src);
 
                 document.querySelector(".footer_component .left_column").appendChild(newMainbarElement);
@@ -51,11 +51,11 @@
                 if (this._promptLogic() === true)
                     return false;
 
-                let mainbarElement = this._findParent(event.target, ["mainbar_element"]);
+                const mainbarElement = this._findParent(event.target, ["mainbar_element"]);
 
                 if (mainbarElement !== null) {
-                    let name = mainbarElement.getAttribute("data-name");
-                    let windowComponent = document.querySelector(`.window_component[data-name='${name}']`);
+                    const name = mainbarElement.getAttribute("data-name");
+                    const windowComponent = document.querySelector(`.window_component[data-name='${name}']`);
 
                     if (mainbarElement.classList.contains("focused") === true)
                         this.minimize(windowComponent);
@@ -64,18 +64,20 @@
                 }
             },
             minimize(windowComponent) {
-                let name = windowComponent.getAttribute("data-name");
+                if (windowComponent !== null && windowComponent !== undefined) {
+                    const name = windowComponent.getAttribute("data-name");
 
-                let mainbarElement = document.querySelector(`.footer_component .left_column .mainbar_element[data-name='${name}']`);
+                    const mainbarElement = document.querySelector(`.footer_component .left_column .mainbar_element[data-name='${name}']`);
 
-                mainbarElement.classList.add("minimized");
+                    mainbarElement.classList.add("minimized");
 
-                windowComponent.querySelector(".button_minimize").click();
+                    windowComponent.querySelector(".button_minimize").click();
+                }
             },
             remove(windowComponent) {
-                let name = windowComponent.getAttribute("data-name");
+                const name = windowComponent.getAttribute("data-name");
 
-                let mainbarElement = document.querySelector(`.footer_component .left_column .mainbar_element[data-name='${name}']`);
+                const mainbarElement = document.querySelector(`.footer_component .left_column .mainbar_element[data-name='${name}']`);
 
                 mainbarElement.parentNode.removeChild(mainbarElement);
             }

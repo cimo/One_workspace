@@ -1,5 +1,5 @@
 <template>
-    <div class="terminal_component"></div>
+    <div class="terminal_container_component"></div>
 </template>
 
 <script>
@@ -19,7 +19,7 @@
             _currentWindowElement: Helper.currentWindowElement,
             _createXterm() {
                 if (this.windowName !== "" && this.containerName !== "" && this.windowComponent !== null) {
-                    const terminalComponent = this.windowComponent.querySelector(".terminal_component");
+                    const terminalComponent = this.windowComponent.querySelector(".terminal_container_component");
 
                     this.xtermList[this.containerName] = new Terminal({
                         cursorBlink: true
@@ -84,7 +84,7 @@
                 }
             },
             _removeXterm() {
-                const terminalComponent = this.windowComponent.querySelector(".terminal_component");
+                const terminalComponent = this.windowComponent.querySelector(".terminal_container_component");
                 const terminal = terminalComponent.querySelector(".terminal.xterm");
 
                 if (terminal !== null) {
@@ -102,8 +102,8 @@
                 const currentWindowElement = this._currentWindowElement(windowComponent);
 
                 if (currentWindowElement !== null) {
-                    this.windowName = currentWindowElement[0];
-                    this.containerName = currentWindowElement[3];
+                    this.windowName = currentWindowElement.name;
+                    this.containerName = currentWindowElement.containerName;
                     this.windowComponent = windowComponent;
 
                     const terminal = this.windowComponent.querySelector(".terminal.xterm");
@@ -113,29 +113,26 @@
                 }
             },
             clickLogic(event) {
-                const windowComponent = this._findParent(event.target, ['terminal_component'], ["window_component"]);
+                const windowComponent = this._findParent(event.target, ['terminal_container_component'], ["window_component"]);
+                const currentWindowElement = this._currentWindowElement(windowComponent);
 
-                if (windowComponent !== null) {
-                    const currentWindowElement = this._currentWindowElement(windowComponent);
+                if (currentWindowElement !== null) {
+                    this.windowName = currentWindowElement.name;
+                    this.containerName = currentWindowElement.containerName;
+                    this.windowComponent = windowComponent;
 
-                    if (currentWindowElement !== null) {
-                        this.windowName = currentWindowElement[0];
-                        this.containerName = currentWindowElement[3];
-                        this.windowComponent = windowComponent;
-
-                        if (this.xtermList[this.containerName] !== undefined)
-                            this.xtermList[this.containerName].focus();
-                    }
+                    if (this.xtermList[this.containerName] !== undefined)
+                        this.xtermList[this.containerName].focus();
                 }
             },
             resizeLogic() {
                 const currentWindowElement = this._currentWindowElement(this.windowComponent);
 
                 if (currentWindowElement !== null) {
-                    this.windowName = currentWindowElement[0];
-                    this.containerName = currentWindowElement[3];
+                    this.windowName = currentWindowElement.name;
+                    this.containerName = currentWindowElement.containerName;
 
-                    const terminalComponent = this.windowComponent.querySelector(".terminal_component");
+                    const terminalComponent = this.windowComponent.querySelector(".terminal_container_component");
 
                     if (terminalComponent !== null) {
                         const terminal = terminalComponent.querySelector(".terminal.xterm");
@@ -159,8 +156,8 @@
                 const currentWindowElement = this._currentWindowElement(windowComponent);
 
                 if (currentWindowElement !== null) {
-                    this.windowName = currentWindowElement[0];
-                    this.containerName = currentWindowElement[3];
+                    this.windowName = currentWindowElement.name;
+                    this.containerName = currentWindowElement.containerName;
                     this.windowComponent = windowComponent;
 
                     Sio.stopRead(`t_pty_o_${this.containerName}`);
@@ -193,7 +190,7 @@
 </script>
 
 <style scoped>
-    .terminal_component {
+    .terminal_container_component {
         display: none;
         position: absolute;
         top: 29px;

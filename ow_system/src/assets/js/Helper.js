@@ -64,7 +64,12 @@ const currentWindowElement = (element) => {
         const windowOpener = document.querySelector(`.window_opener[data-name='${name}']`);
         const containerName = windowOpener.getAttribute("data-container_name");
 
-        return [name, category, windowOpener, containerName];
+        return {
+            name: name,
+            category: category,
+            windowOpener: windowOpener,
+            containerName: containerName
+        }
     }
 
     return null;
@@ -72,12 +77,8 @@ const currentWindowElement = (element) => {
 
 const focusCurrentWindow = (windowComponent) => {
     const focusedComponent = document.querySelector(".window_component.focused");
-    let nameFocused = "";
-
-    if (focusedComponent !== null)
-        nameFocused = focusedComponent.getAttribute("data-name");
-
     const windowComponentList = document.querySelectorAll(".window_component:not(.empty)");
+    const focusedName = focusedComponent !== null ? focusedComponent.getAttribute("data-name") : "";
 
     for (const value of windowComponentList) {
         value.classList.remove("focused");
@@ -89,7 +90,7 @@ const focusCurrentWindow = (windowComponent) => {
         windowComponent.style.display = "block";
         windowComponent.classList.add("focused");
 
-        if (nameFocused !== name)
+        if (focusedName !== name)
             windowComponent.parentNode.appendChild(windowComponent);
     }
 };

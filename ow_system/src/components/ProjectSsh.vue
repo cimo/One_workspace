@@ -41,7 +41,7 @@
             </div>
         </div>
         <div class="part_2_container">
-            <div class="terminal_component"></div>
+            <div class="terminal_project_component"></div>
         </div>
     </div>
 </template>
@@ -58,7 +58,9 @@
     export default {
         name: "ProjectSshComponent",
         //components: {},
-        computed: {},
+        computed: {
+
+        },
         methods: {
             _setting: Config.setting,
             _findParent: Helper.findParent,
@@ -66,7 +68,7 @@
             _replaceName: Helper.replaceName,
             _createXterm() {
                 if (this.windowComponent !== null) {
-                    const terminalComponent = this.windowComponent.querySelector(".terminal_component");
+                    const terminalComponent = this.windowComponent.querySelector(".terminal_project_component");
 
                     this.xterm = new Terminal({
                         cursorBlink: true
@@ -78,9 +80,11 @@
 
                     const clientRect = terminalComponent.getBoundingClientRect();
                     const terminal = terminalComponent.querySelector(".terminal.xterm");
+
                     terminal.style.height = `${clientRect.height}px`;
 
                     this.fitAddon.fit();
+
                     const size = this.fitAddon.proposeDimensions();
 
                     Sio.sendMessage("t_pty_start", {
@@ -108,7 +112,9 @@
 
                     Sio.readMessage("t_pty_o_ssh", (data) => {
                         if (terminalComponent !== null) {
-                            if (data.cmd.indexOf(" closed by ") !== -1 || data.cmd.indexOf("logout") !== -1 || this.selectEdit.selectedIndex === 0) {
+                            if (data.cmd.indexOf(" closed by ") !== -1
+                                || data.cmd.indexOf("logout") !== -1
+                                || this.selectEdit.selectedIndex === 0) {
                                 this._removeXterm();
 
                                 return;
@@ -130,7 +136,7 @@
                 }
             },
             _removeXterm() {
-                const terminalComponent = this.windowComponent.querySelector(".terminal_component");
+                const terminalComponent = this.windowComponent.querySelector(".terminal_project_component");
                 const terminal = terminalComponent.querySelector(".terminal.xterm");
 
                 if (terminal !== null) {
@@ -197,6 +203,9 @@
                 if (currentWindowElement !== null) {
                     this.windowComponent = windowComponent;
 
+                    if (this.xterm !== null)
+                        this.xterm.focus();
+
                     const menuElement = this._findParent(event.target, ["menu_ssh"]);
 
                     if (menuElement !== null) {
@@ -214,8 +223,7 @@
                             if (index === 0) {
                                 this.elementPart1Container.style.display = "block";
                                 this.elementPart2Container.style.display = "none";
-                            }
-                            else if (index === 1) {
+                            } else if (index === 1) {
                                 this.elementPart1Container.style.display = "none";
                                 this.elementPart2Container.style.display = "block";
 
@@ -282,8 +290,7 @@
                                     }
                                 }
                             });
-                        }
-                        else {
+                        } else {
                             if (this.inputName.value === "" || inputNameCheck === false)
                                 this.inputName.style.borderColor = "#ff0000";
                             if (this.inputServer.value === "")
@@ -291,8 +298,7 @@
                             if (this.inputUsername.value === "")
                                 this.inputUsername.style.borderColor = "#ff0000";
                         }
-                    }
-                    else if (event.target.classList.contains("delete") === true) {
+                    } else if (event.target.classList.contains("delete") === true) {
                         if (this.selectEdit.selectedIndex > 0) {
                             this.$root.$refs.promptComponent.show(this.windowComponent, "You really want to delete this ssh?", () => {
                                 Sio.sendMessage("t_exec_i", {
@@ -380,7 +386,7 @@
                 const currentWindowElement = this._currentWindowElement(this.windowComponent);
 
                 if (currentWindowElement !== null) {
-                    const terminalComponent = this.windowComponent.querySelector(".terminal_component");
+                    const terminalComponent = this.windowComponent.querySelector(".terminal_project_component");
 
                     if (terminalComponent !== null) {
                         const terminal = terminalComponent.querySelector(".terminal.xterm");
@@ -392,6 +398,7 @@
                             this.fitAddon.fit();
 
                             const size = this.fitAddon.proposeDimensions();
+
                             Sio.sendMessage("t_pty_resize", {
                                 tag: "ssh",
                                 size: [size.cols, size.rows]
@@ -477,7 +484,7 @@
         left: 0;
         right: 0;
     }
-    .ssh_component .part_2_container .terminal_component {
+    .ssh_component .part_2_container .terminal_project_component {
         position: absolute;
         top: 0;
         bottom: 0;

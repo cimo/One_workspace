@@ -23,6 +23,7 @@
 </template>
 
 <script>
+    import Config from "@/assets/js/Config.js";
     import Helper from "@/assets/js/Helper.js";
     import ProjectComponent from "@/components/Project.vue";
     import ToolComponent from "@/components/Tool.vue";
@@ -37,6 +38,7 @@
         },
         computed: {},
         methods: {
+            _setting: Config.setting,
             _findParent: Helper.findParent,
             _currentWindowElement: Helper.currentWindowElement,
             _focusCurrentWindow: Helper.focusCurrentWindow,
@@ -45,12 +47,11 @@
             _unMinimizeElement: Helper.unMinimizeElement,
             _dragInit: Helper.dragInit,
             _promptLogic: Helper.promptLogic,
-            _changeStatus(event) {
-                let overlayElement = event !== undefined ? this._findParent(event.target, ["overlay"]) : false;
-
-                if (overlayElement !== null && this.windowComponent !== null) {
+            _changeAppearance() {
+                if (this.windowComponent !== null) {
                     if (this.windowComponent.classList.contains("maximized") === false) {
-                        let clientRect = this.windowComponent.getBoundingClientRect();
+                        const clientRect = this.windowComponent.getBoundingClientRect();
+
                         this.windowPositionList[this.windowName].x = clientRect.x;
                         this.windowPositionList[this.windowName].y = clientRect.y;
 
@@ -75,6 +76,9 @@
                     this.windowComponent.classList.toggle("maximized");
 
                     this.resizeLogic();
+
+                    this.$root.$refs.projectSshComponent.resizeLogic();
+                    this.$root.$refs.containerTerminalComponent.resizeLogic();
                 }
             },
             _close() {
@@ -86,17 +90,16 @@
                 this.windowName = "";
             },
             init(windowOpener) {
-                let name = windowOpener.getAttribute("data-name");
-                let category = windowOpener.getAttribute("data-category");
-
-                let windowComponent = document.querySelector(`.window_component[data-name='${name}']`);
+                const name = windowOpener.getAttribute("data-name");
+                const category = windowOpener.getAttribute("data-category");
+                const windowComponent = document.querySelector(`.window_component[data-name='${name}']`);
 
                 if (windowComponent === null) {
                     this.windowName = name;
 
-                    let windowComponentEmpty = document.querySelector(".window_component.empty");
+                    const windowComponentEmpty = document.querySelector(".window_component.empty");
 
-                    let newWindowComponent = windowComponentEmpty.cloneNode(true);
+                    const newWindowComponent = windowComponentEmpty.cloneNode(true);
                     newWindowComponent.classList.remove("empty");
                     newWindowComponent.classList.add("focused");
                     newWindowComponent.setAttribute("data-name", this.windowName);
@@ -127,15 +130,15 @@
                         newWindowComponent.querySelector(".container_component").remove();
                     }
 
-                    let src = windowOpener.querySelector("img").getAttribute("src");
+                    const src = windowOpener.querySelector("img").getAttribute("src");
 
-                    let icon = newWindowComponent.querySelector(".left_column img");
+                    const icon = newWindowComponent.querySelector(".left_column img");
                     icon.setAttribute("src", src);
 
-                    let title = newWindowComponent.querySelector(".left_column p");
+                    const title = newWindowComponent.querySelector(".left_column p");
                     title.innerHTML = this.windowName;
 
-                    let style = window.getComputedStyle(newWindowComponent);
+                    const style = window.getComputedStyle(newWindowComponent);
                     this.windowPositionList[this.windowName] = {x: 0, y: 0};
                     this.windowSizeList[this.windowName] = {width: style.width, height: style.height};
 
@@ -158,13 +161,13 @@
                 if (this._promptLogic() === true)
                     return false;
 
-                let windowComponent = this._findParent(event.target, ["window_component"]);
+                const windowComponent = this._findParent(event.target, ["window_component"]);
 
                 if (windowComponent !== null) {
-                    let currentWindowElement = this._currentWindowElement(windowComponent);
+                    const currentWindowElement = this._currentWindowElement(windowComponent);
 
                     if (currentWindowElement !== null) {
-                        this.windowName = currentWindowElement[0];
+                        this.windowName = currentWindowElement.name;
                         this.windowComponent = windowComponent;
 
                         this._focusCurrentWindow(this.windowComponent);
@@ -182,9 +185,11 @@
                             this._focusCurrentMainbarElement();
                         }
                         else if (event.target.classList.contains("button_maximize") === true)
-                            this._changeStatus();
+                            this._changeAppearance();
                         else if (event.target.classList.contains("button_close") === true) {
-                            this.$root.$refs.projectSshComponent.close(this.windowComponent);
+                            console.log(this.windowComponent);
+
+                            //this.$root.$refs.projectSshComponent.close(this.windowComponent);
 
                             this.$root.$refs.containerCommandComponent.close(this.windowComponent);
                             this.$root.$refs.containerTerminalComponent.close(this.windowComponent);
@@ -209,8 +214,8 @@
                         return false;
                     }
 
-                    let windowOpener = this._findParent(event.target, ["window_opener"]);
-                    let mainbarElement = this._findParent(event.target, ["mainbar_element", "program"]);
+                    const windowOpener = this._findParent(event.target, ["window_opener"]);
+                    const mainbarElement = this._findParent(event.target, ["mainbar_element", "program"]);
 
                     if (windowOpener === null && mainbarElement === null) {
                         this._focusCurrentWindow();
@@ -223,11 +228,14 @@
                 if (this._promptLogic() === true)
                     return false;
 
-                this._changeStatus(event);
+                let overlayElement = event !== undefined ? this._findParent(event.target, ["overlay"]) : null;
+
+                if (overlayElement !== null)
+                    this._changeAppearance();
             },
             resizeLogic() {
-                if (window.innerWidth < 840) {
-                    let windowComponentList = document.querySelectorAll(".window_component:not(.empty)");
+                if (window.innerWidth < this._setting().systemData.desktopWidth) {
+                    const windowComponentList = document.querySelectorAll(".window_component:not(.empty)");
 
                     for (const value of windowComponentList) {
                         value.style.transform = "translate3d(0, 0, 0)";
@@ -250,13 +258,13 @@
     }
 </script>
 
-<style scoped>
-    @media(max-width: 839px) {
+<style lang="scss" scoped>
+    @media(max-width: $mobileWidth) {
         .window_component {
             width: 80%;
         }
     }
-    @media(min-width: 840px) {
+    @media(min-width: $desktopWidth) {
         .window_component {
             width: 50%;
         }

@@ -51,7 +51,7 @@
             _findParent: Helper.findParent,
             _promptLogic: Helper.promptLogic,
             clickLogic(event) {
-                let menuRootComponent = this._findParent(event.target, ["menuRoot_component"]);
+                const menuRootComponent = this._findParent(event.target, ["menuRoot_component"]);
 
                 if (menuRootComponent !== null) {
                     this.menuRootContainer = menuRootComponent.querySelector(".menuRoot_container");
@@ -72,10 +72,11 @@
                     const windowOpener = this._findParent(event.target, ["window_opener"]);
 
                     if (windowOpener !== null) {
-                        let name = windowOpener.getAttribute("data-name");
+                        const name = windowOpener.getAttribute("data-name");
 
                         if (name === "VueJs") {
-                            let tab = window.open(`http://localhost:${this._setting().vuejs.ui_port}`, "_blank");
+                            const tab = window.open(`http://localhost:${this._setting().vuejs.ui_port}`, "_blank");
+
                             tab.focus();
                         }
                         else {
@@ -93,10 +94,8 @@
             }
         },
         data() {
-            let menuRoot = this._setting().menu_root;
-
             return {
-                menuRoot,
+                menuRoot: this._setting().menu_root,
                 menuRootContainer: null
             };
         },

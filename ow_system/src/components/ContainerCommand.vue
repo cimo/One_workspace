@@ -54,7 +54,7 @@
 
                     Sio.readMessage(`t_exec_o_${containerName}_status`, (data) => {
                         if (containerName !== null && this.commandStatusList[containerName] < 0) {
-                            let result = data.out !== undefined ? data.out : data.err;
+                            const result = data.out !== undefined ? data.out : data.err;
 
                             if (result !== undefined && result.indexOf("Up ") !== -1)
                                 this.elementStatusList[containerName].innerHTML = "Running...";
@@ -63,10 +63,11 @@
                 }
             },
             init(windowComponent) {
-                let currentWindowElement = this._currentWindowElement(windowComponent);
+                const currentWindowElement = this._currentWindowElement(windowComponent);
 
                 if (currentWindowElement !== null) {
-                    let containerName = currentWindowElement[3];
+                    const containerName = currentWindowElement.containerName;
+
                     this.windowComponentList[containerName] = windowComponent;
 
                     this.buttonCommandList[containerName] = this.windowComponentList[containerName].querySelectorAll(".command_component .right .cmd");
@@ -77,15 +78,16 @@
                 }
             },
             clickLogic(event) {
-                let windowComponent = this._findParent(event.target, ["command_component"], ["window_component"]);
-                let currentWindowElement = this._currentWindowElement(windowComponent);
+                const windowComponent = this._findParent(event.target, ["command_component"], ["window_component"]);
+                const currentWindowElement = this._currentWindowElement(windowComponent);
 
                 if (currentWindowElement !== null) {
-                    let containerName = currentWindowElement[3];
+                    const containerName = currentWindowElement.containerName;
+
                     this.windowComponentList[containerName] = windowComponent;
 
                     if (event.target.classList.contains("cmd") === true) {
-                        let index = Array.from(this.buttonCommandList[containerName]).indexOf(event.target);
+                        const index = Array.from(this.buttonCommandList[containerName]).indexOf(event.target);
 
                         if (index === 0) {
                             Sio.sendMessage("t_exec_i", {
@@ -129,10 +131,11 @@
                 }
             },
             close(windowComponent) {
-                let currentWindowElement = this._currentWindowElement(windowComponent);
+                const currentWindowElement = this._currentWindowElement(windowComponent);
 
                 if (currentWindowElement !== null) {
-                    let containerName = currentWindowElement[3];
+                    const containerName = currentWindowElement.containerName;
+
                     this.windowComponentList[containerName] = windowComponent;
 
                     Sio.stopRead(`t_exec_o_${containerName}_status`);

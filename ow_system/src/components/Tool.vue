@@ -25,12 +25,12 @@
             _currentWindowElement: Helper.currentWindowElement,
             _showComponent() {
                 if (this.windowName === "Git") {
-                    let terserComponent = this.windowComponent.querySelector(".terser_component");
+                    const terserComponent = this.windowComponent.querySelector(".terser_component");
 
                     if (terserComponent !== null)
                         terserComponent.remove();
 
-                    let sassComponent = this.windowComponent.querySelector(".sass_component");
+                    const sassComponent = this.windowComponent.querySelector(".sass_component");
 
                     if (sassComponent !== null)
                         sassComponent.remove();
@@ -38,33 +38,33 @@
                     this.$root.$refs.toolGitComponent.init(this.windowComponent);
                 }
                 else if (this.windowName === "Terser") {
-                    let gitComponent = this.windowComponent.querySelector(".git_component");
+                    const gitComponent = this.windowComponent.querySelector(".git_component");
 
                     if (gitComponent !== null)
                         gitComponent.remove();
 
-                    let sassComponent = this.windowComponent.querySelector(".sass_component");
+                    const sassComponent = this.windowComponent.querySelector(".sass_component");
 
                     if (sassComponent !== null)
                         sassComponent.remove();
                 }
                 else if (this.windowName === "Sass") {
-                    let gitComponent = this.windowComponent.querySelector(".git_component");
+                    const gitComponent = this.windowComponent.querySelector(".git_component");
 
                     if (gitComponent !== null)
                         gitComponent.remove();
 
-                    let terserComponent = this.windowComponent.querySelector(".terser_component");
+                    const terserComponent = this.windowComponent.querySelector(".terser_component");
 
                     if (terserComponent !== null)
                         terserComponent.remove();
                 }
             },
             init(windowComponent) {
-                let currentWindowElement = this._currentWindowElement(windowComponent);
+                const currentWindowElement = this._currentWindowElement(windowComponent);
 
                 if (currentWindowElement !== null) {
-                    this.windowName = currentWindowElement[0];
+                    this.windowName = currentWindowElement.name;
                     this.windowComponent = windowComponent;
 
                     this._showComponent();

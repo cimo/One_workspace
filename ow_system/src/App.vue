@@ -25,7 +25,7 @@
     }
 </script>
 
-<style>
+<style lang="scss">
     body {
         /* cyrillic-ext */
         @font-face {
@@ -127,15 +127,17 @@
         line-height: 34px;
         background-color: #505050;
         text-align: center;
-    }
-    .button_cmd_window:hover {
-        background-color: #707070;
-        border: 1px solid #f7f7f7;
-        width: 148px;
-        height: 32px;
-        line-height: 32px;
-    }
-    .button_cmd_window:active {
-        background-color: #9b9b9b;
+
+        &:hover {
+            background-color: #707070;
+            border: 1px solid #f7f7f7;
+            width: 148px;
+            height: 32px;
+            line-height: 32px;
+        }
+
+        &:active {
+            background-color: #9b9b9b;
+        }
     }
 </style>

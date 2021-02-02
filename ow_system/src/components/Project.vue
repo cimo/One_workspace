@@ -22,7 +22,7 @@
             _currentWindowElement: Helper.currentWindowElement,
             _showComponent() {
                 if (this.windowName === "Explore") {
-                    let sshComponent = this.windowComponent.querySelector(".ssh_component");
+                    const sshComponent = this.windowComponent.querySelector(".ssh_component");
 
                     if (sshComponent !== null)
                         sshComponent.remove();
@@ -30,7 +30,7 @@
                     this.$root.$refs.projectExploreComponent.init(this.windowComponent);
                 }
                 else if (this.windowName === "Ssh") {
-                    let exploreComponent = this.windowComponent.querySelector(".explore_component");
+                    const exploreComponent = this.windowComponent.querySelector(".explore_component");
 
                     if (exploreComponent !== null)
                         exploreComponent.remove();
@@ -39,10 +39,10 @@
                 }
             },
             init(windowComponent) {
-                let currentWindowElement = this._currentWindowElement(windowComponent);
+                const currentWindowElement = this._currentWindowElement(windowComponent);
 
                 if (currentWindowElement !== null) {
-                    this.windowName = currentWindowElement[0];
+                    this.windowName = currentWindowElement.name;
                     this.windowComponent = windowComponent;
 
                     this._showComponent();

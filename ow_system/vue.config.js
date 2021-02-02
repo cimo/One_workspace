@@ -14,5 +14,13 @@ module.exports = {
             aggregateTimeout: 300,
             poll: 1000
         }
+    },
+    css: {
+        loaderOptions: {
+            sass: {
+                implementation: require('sass'),
+                additionalData: '@import "@/assets/scss/global.scss";'
+            }
+        }
     }
 };

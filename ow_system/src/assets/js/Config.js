@@ -6,7 +6,7 @@ const domain = "localhost";
 const nodeJsPort = window.location.protocol === "http:" ? 1080 : 1443;
 const websocketProtocol = window.location.protocol === "http:" ? "ws:" : "wss:";
 
-const setting = function() {
+const setting = () => {
     return {
         nodejs: {
             url: `${window.location.protocol}//${domain}:${nodeJsPort}`
@@ -23,7 +23,9 @@ const setting = function() {
             pathProject: "/home/user_1/root/project",
             extensionProject: ".prj",
             extensionSsh: ".ssh",
-            extensionGit: ".pgit"
+            extensionGit: ".pgit",
+            mobileWidth: 839,
+            desktopWidth: 840,
         },
         menu_root: {
             sideItems: [

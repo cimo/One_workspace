@@ -58,20 +58,22 @@
                 }
             },
             init(windowComponent) {
-                let currentWindowElement = this._currentWindowElement(windowComponent);
+                const currentWindowElement = this._currentWindowElement(windowComponent);
 
                 if (currentWindowElement !== null) {
-                    let containerName = currentWindowElement[3];
+                    const containerName = currentWindowElement.containerName;
+
                     this.windowComponentList[containerName] = windowComponent;
 
                     this._checkStatus(containerName);
                 }
             },
             close(windowComponent) {
-                let currentWindowElement = this._currentWindowElement(windowComponent);
+                const currentWindowElement = this._currentWindowElement(windowComponent);
 
                 if (currentWindowElement !== null) {
-                    let containerName = currentWindowElement[3];
+                    const containerName = currentWindowElement.containerName;
+
                     this.windowComponentList[containerName] = windowComponent;
 
                     Sio.stopRead(`t_exec_o_${containerName}_data`);
