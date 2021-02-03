@@ -67,7 +67,7 @@
     }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
     .body_component {
         background-color: #000000;
         position: fixed;

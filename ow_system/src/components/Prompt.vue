@@ -94,7 +94,7 @@
     }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
     .prompt_component {
         display: none;
         position: fixed;
@@ -109,46 +109,50 @@
         box-shadow: 0px 0px 5px #000000;
         -webkit-box-shadow: 0px 0px 5px #000000;
         -moz-box-shadow: 0px 0px 5px #000000;
-    }
 
-    .prompt_component .header {
-        position: relative;
-        display: flex;
-        justify-content: space-between;
-        background-color: #0078d7;
-        height: 28px;
-    }
-    .prompt_component .header p {
-        color: #ffffff;
-        margin: 5px;
-    }
+        .header {
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            background-color: #0078d7;
+            height: 28px;
 
-    .prompt_component .body {
-        position: relative;
-        background: #232323;
-        height: calc(100% - 28px);
-        color: #ffffff;
-    }
-    .prompt_component .body .message {
-        color: #ffffff;
-        padding: 10px;
-    }
+            p {
+                color: #ffffff;
+                margin: 5px;
+            }
+        }
 
-    .prompt_component .footer {
-        text-align: right;
-        position: relative;
-        bottom: 40px;
-    }
-    .prompt_component .footer .button_cmd_window {
-        display: inline-block;
-        margin-right: 20px;
-        width: 80px;
-    }
-    .prompt_component .footer .button_cmd_window:hover {
-        width: 78px;
-    }
+        .body {
+            position: relative;
+            background: #232323;
+            height: calc(100% - 28px);
+            color: #ffffff;
 
-    .prompt_component .drag {
-        cursor: move;
+            .message {
+                color: #ffffff;
+                padding: 10px;
+            }
+        }
+
+        .footer {
+            text-align: right;
+            position: relative;
+            bottom: 40px;
+
+            .button_cmd_window {
+                display: inline-block;
+                margin-right: 20px;
+                width: 80px;
+
+                &:hover {
+                    width: 78px;
+                }
+            }
+        }
+
+        .drag {
+            cursor: move;
+        }
     }
 </style>

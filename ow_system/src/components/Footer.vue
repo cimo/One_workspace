@@ -92,7 +92,7 @@
     }
 </script>
 
-<style>
+<style lang="scss">
     .footer_component {
         display: flex;
         justify-content: space-between;
@@ -103,48 +103,58 @@
         right: 0;
         bottom: 0;
         border-bottom: 1px solid #424242;
-    }
 
-    .footer_component .left_column .mainbar_element {
-        margin-left: 5px;
-    }
+        .left_column {
+            .mainbar_element {
+                margin-left: 5px;
+            }
+        }
 
-    .footer_component .right_column .mainbar_element {
-        margin-right: 5px;
-    }
+        .right_column {
+            .mainbar_element {
+                margin-right: 5px;
+            }
+        }
 
-    .footer_component .mainbar_element {
-        text-align: center;
-        display: inline-block;
-        color: #ffffff;
-        cursor: pointer;
-        height: 37px;
-        width: 50px;
-        padding-top: 2px;
-    }
-    .footer_component .mainbar_element .icon_window, .menuRoot_image {
-        position: relative;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        display: block;
-        width: 25px;
-    }
-    .footer_component .mainbar_element.empty {
-        display: none;
-    }
-    .footer_component .mainbar_element.focused {
-        background-color: rgba(0, 120, 215, 0.5);
-    }
-    .footer_component .mainbar_element:hover {
-        background-color: rgba(255, 255, 255, 0.1);
-    }
-    .footer_component .mainbar_element.minimized {
-        height: 34px !important;
-        background-color: transparent !important;
-        border-bottom: 3px solid rgba(255, 255, 255, 0.5);
-    }
-    .footer_component .mainbar_element.minimized:hover {
-        background-color: rgba(255, 255, 255, 0.1) !important;
+        .mainbar_element {
+            text-align: center;
+            display: inline-block;
+            color: #ffffff;
+            cursor: pointer;
+            height: 37px;
+            width: 50px;
+            padding-top: 2px;
+
+            .icon_window, .menuRoot_image {
+                position: relative;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                display: block;
+                width: 25px;
+            }
+
+            &.empty {
+                display: none;
+            }
+
+            &.focused {
+                background-color: rgba(0, 120, 215, 0.5);
+            }
+
+            &:hover {
+                background-color: rgba(255, 255, 255, 0.1);
+            }
+
+            .minimized {
+                height: 34px !important;
+                background-color: transparent !important;
+                border-bottom: 3px solid rgba(255, 255, 255, 0.5);
+
+                &:hover {
+                    background-color: rgba(255, 255, 255, 0.1) !important;
+                }
+            }
+        }
     }
 </style>

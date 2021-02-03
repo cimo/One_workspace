@@ -82,22 +82,29 @@
     }
 </script>
 
-<style scoped>
-    .container_component .menu_container {
-        height: 28px;
-        background-color: #2b2b2b;
-        border-bottom: 1px solid #a0a0a0;
-        cursor: pointer;
-    }
-    .container_component .menu_container .button {
-        display: inline-block;
-        padding: 7px 8px;
-        font-size: 12px;
-    }
-    .container_component .menu_container .focused {
-        background-color: #0060ad;
-    }
-    .container_component .menu_container p:hover {
-        background-color: #808080;
+<style lang="scss" scoped>
+    .container_component {
+        .menu_container {
+            height: 28px;
+            background-color: #2b2b2b;
+            border-bottom: 1px solid #a0a0a0;
+            cursor: pointer;
+
+            .button {
+                display: inline-block;
+                padding: 7px 8px;
+                font-size: 12px;
+            }
+
+            .focused {
+                background-color: #0060ad;
+            }
+
+            p {
+                &:hover {
+                    background-color: #808080;
+                }
+            }
+        }
     }
 </style>

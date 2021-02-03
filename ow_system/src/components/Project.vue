@@ -62,6 +62,6 @@
     }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
     .project_component {}
 </style>

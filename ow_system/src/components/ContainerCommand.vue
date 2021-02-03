@@ -66,10 +66,10 @@
                 const currentWindowElement = this._currentWindowElement(windowComponent);
 
                 if (currentWindowElement !== null) {
+                    this.windowName = currentWindowElement.name;
                     const containerName = currentWindowElement.containerName;
 
                     this.windowComponentList[containerName] = windowComponent;
-
                     this.buttonCommandList[containerName] = this.windowComponentList[containerName].querySelectorAll(".command_component .right .cmd");
                     this.elementStatusList[containerName] = this.windowComponentList[containerName].querySelector(".command_component .status");
                     this.commandStatusList[containerName] = -1;
@@ -82,6 +82,7 @@
                 const currentWindowElement = this._currentWindowElement(windowComponent);
 
                 if (currentWindowElement !== null) {
+                    this.windowName = currentWindowElement.name;
                     const containerName = currentWindowElement.containerName;
 
                     this.windowComponentList[containerName] = windowComponent;
@@ -130,29 +131,26 @@
                     }
                 }
             },
-            close(windowComponent) {
-                const currentWindowElement = this._currentWindowElement(windowComponent);
+            close(currentWindowElement) {
+                if (this.windowName === currentWindowElement.name) {
+                    Sio.stopRead(`t_exec_o_${currentWindowElement.containerName}_status`);
 
-                if (currentWindowElement !== null) {
-                    const containerName = currentWindowElement.containerName;
+                    clearInterval(this.intervalStatusList[currentWindowElement.containerName]);
 
-                    this.windowComponentList[containerName] = windowComponent;
+                    this.windowName = "";
 
-                    Sio.stopRead(`t_exec_o_${containerName}_status`);
-
-                    clearInterval(this.intervalStatusList[containerName]);
-
-                    delete this.windowComponentList[containerName];
-                    delete this.buttonCommandList[containerName];
-                    delete this.intervalStatusList[containerName];
-                    delete this.elementStatusList[containerName];
-                    delete this.commandStatusList[containerName];
+                    delete this.windowComponentList[currentWindowElement.containerName];
+                    delete this.buttonCommandList[currentWindowElement.containerName];
+                    delete this.intervalStatusList[currentWindowElement.containerName];
+                    delete this.elementStatusList[currentWindowElement.containerName];
+                    delete this.commandStatusList[currentWindowElement.containerName];
 
                 }
             }
         },
         data() {
             return {
+                windowName: "",
                 windowComponentList: [],
                 buttonCommandList: [],
                 intervalStatusList: [],
@@ -167,7 +165,7 @@
     }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
     .command_component {
         display: block;
         position: absolute;
@@ -176,17 +174,20 @@
         left: 0;
         right: 0;
         padding: 10px;
-    }
-    .command_component .section {
-        margin-bottom: 20px;
-    }
-    .command_component .section .left {
-        display: inline-block;
-        width: 70%;
-    }
-    .command_component .section .right {
-        display: inline-block;
-        width: 30%;
-        text-align: center;
+
+        .section {
+            margin-bottom: 20px;
+
+            .left {
+                display: inline-block;
+                width: 70%;
+            }
+
+            .right {
+                display: inline-block;
+                width: 30%;
+                text-align: center;
+            }
+        }
     }
 </style>

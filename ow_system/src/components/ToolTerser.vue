@@ -20,7 +20,7 @@
     }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
     .terser_component {
         display: block;
         position: absolute;

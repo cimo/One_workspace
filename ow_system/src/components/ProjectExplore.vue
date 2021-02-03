@@ -299,7 +299,7 @@
     }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
     .explore_component {
         position: absolute;
         top: 0;
@@ -307,48 +307,68 @@
         left: 0;
         right: 0;
         padding: 10px;
-    }
-    .explore_component .left, .explore_component .right {
-        vertical-align: top;
-        display: inline-block;
-        width: 50%;
-    }
-    .explore_component .left .section {
-        margin-bottom: 20px;
-    }
-    .explore_component .left .section input {
-        width: 90%;
-    }
-    .explore_component .left .section textarea {
-        width: 90%;
-        resize: none;
-    }
-    .explore_component .left .section .button_cmd_window.delete {
-        display: none;
-        margin-left: 10px;
-        background-color: #ff0000;
-    }
-    .explore_component .right .sub_left, .explore_component .right .sub_right {
-        vertical-align: top;
-        display: inline-block;
-        width: 50%;
-        text-align: center;
-    }
-    .explore_component .right .sub_left .text {
-        margin: 13px;
-    }
-    .explore_component .right .sub_right input {
-        display: block;
-        margin: 18px auto;
-    }
-    .explore_component .bottom {
-        position: absolute;
-        bottom: 10px;
-        width: 100%;
-        text-align: right;
-    }
-    .explore_component .bottom .button_cmd_window {
-        display: inline-block;
-        margin-right: 25px;
+
+        .left, .right {
+            vertical-align: top;
+            display: inline-block;
+            width: 50%;
+        }
+
+        .left {
+            .section {
+                margin-bottom: 20px;
+
+                input {
+                    width: 90%;
+                }
+
+                textarea {
+                    width: 90%;
+                    resize: none;
+                }
+
+                .button_cmd_window {
+                    &.delete {
+                        display: none;
+                        margin-left: 10px;
+                        background-color: #ff0000;
+                    }
+                }
+            }
+        }
+
+        .right {
+            .sub_left, .sub_right {
+                vertical-align: top;
+                display: inline-block;
+                width: 50%;
+                text-align: center;
+            }
+
+            .sub_left {
+                .text {
+                    margin: 13px;
+                }
+            }
+
+            .sub_right {
+                input {
+                    display: block;
+                    margin: 18px auto;
+                }
+            }
+        }
+
+        .bottom {
+            position: absolute;
+            bottom: 10px;
+            width: 100%;
+            text-align: right;
+
+            .button_cmd_window {
+                display: inline-block;
+                margin-right: 25px;
+            }
+        }
     }
 </style>

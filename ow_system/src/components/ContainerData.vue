@@ -61,6 +61,7 @@
                 const currentWindowElement = this._currentWindowElement(windowComponent);
 
                 if (currentWindowElement !== null) {
+                    this.windowName = currentWindowElement.name;
                     const containerName = currentWindowElement.containerName;
 
                     this.windowComponentList[containerName] = windowComponent;
@@ -68,25 +69,22 @@
                     this._checkStatus(containerName);
                 }
             },
-            close(windowComponent) {
-                const currentWindowElement = this._currentWindowElement(windowComponent);
+            close(currentWindowElement) {
+                if (this.windowName === currentWindowElement.name) {
+                    Sio.stopRead(`t_exec_o_${currentWindowElement.containerName}_data`);
 
-                if (currentWindowElement !== null) {
-                    const containerName = currentWindowElement.containerName;
+                    clearInterval(this.intervalStatusList[currentWindowElement.containerName]);
 
-                    this.windowComponentList[containerName] = windowComponent;
+                    this.windowName = "";
 
-                    Sio.stopRead(`t_exec_o_${containerName}_data`);
-
-                    clearInterval(this.intervalStatusList[containerName]);
-
-                    delete this.windowComponentList[containerName];
-                    delete this.intervalStatusList[containerName];
+                    delete this.windowComponentList[currentWindowElement.containerName];
+                    delete this.intervalStatusList[currentWindowElement.containerName];
                 }
             }
         },
         data() {
             return {
+                windowName: "",
                 windowComponentList: [],
                 intervalStatusList: []
             };
@@ -98,7 +96,7 @@
     }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
     .data_component {
         display: none;
         position: absolute;
@@ -107,50 +105,58 @@
         left: 0;
         right: 0;
         padding: 0;
-    }
-    .data_component .square .title {
-        position: relative;
-        top: 40%;
-        font-size: 32px;
-    }
-    .data_component .square .value {
-        position: relative;
-        top: 45%;
-    }
-    .data_component .square_1 {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 50%;
-        bottom: 50%;
-        border-right: 1px solid #cccccc;
-        border-bottom: 1px solid #cccccc;
-        text-align: center;
-    }
-    .data_component .square_2 {
-        position: absolute;
-        top: 0;
-        left: 50%;
-        right: 0;
-        bottom: 50%;
-        border-bottom: 1px solid #cccccc;
-        text-align: center;
-    }
-    .data_component .square_3 {
-        position: absolute;
-        top: 50%;
-        left: 0;
-        right: 50%;
-        bottom: 0;
-        border-right: 1px solid #cccccc;
-        text-align: center;
-    }
-    .data_component .square_4 {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        right: 0;
-        bottom: 0;
-        text-align: center;
+
+        .square {
+            .title {
+                position: relative;
+                top: 40%;
+                font-size: 32px;
+            }
+
+            .value {
+                position: relative;
+                top: 45%;
+            }
+        }
+
+        .square_1 {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 50%;
+            bottom: 50%;
+            border-right: 1px solid #cccccc;
+            border-bottom: 1px solid #cccccc;
+            text-align: center;
+        }
+
+        .square_2 {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            right: 0;
+            bottom: 50%;
+            border-bottom: 1px solid #cccccc;
+            text-align: center;
+        }
+
+        .square_3 {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 50%;
+            bottom: 0;
+            border-right: 1px solid #cccccc;
+            text-align: center;
+        }
+
+        .square_4 {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            right: 0;
+            bottom: 0;
+            text-align: center;
+        }
     }
 </style>

@@ -17,63 +17,63 @@
         methods: {
             _findParent: Helper.findParent,
             _currentWindowElement: Helper.currentWindowElement,
-            _createXterm() {
-                if (this.windowName !== "" && this.containerName !== "" && this.windowComponent !== null) {
+            _createXterm(containerName) {
+                if (this.windowName !== "" && containerName !== "" && this.windowComponent !== null) {
                     const terminalComponent = this.windowComponent.querySelector(".terminal_container_component");
 
-                    this.xtermList[this.containerName] = new Terminal({
+                    this.xtermList[containerName] = new Terminal({
                         cursorBlink: true
                     });
-                    this.fitAddonList[this.containerName] = new FitAddon();
-                    this.xtermList[this.containerName].loadAddon(this.fitAddonList[this.containerName]);
-                    this.xtermList[this.containerName].open(terminalComponent);
-                    this.xtermList[this.containerName].focus();
+                    this.fitAddonList[containerName] = new FitAddon();
+                    this.xtermList[containerName].loadAddon(this.fitAddonList[containerName]);
+                    this.xtermList[containerName].open(terminalComponent);
+                    this.xtermList[containerName].focus();
 
                     const clientRect = terminalComponent.getBoundingClientRect();
                     const terminal = terminalComponent.querySelector(".terminal.xterm");
                     terminal.style.height = `${clientRect.height}px`;
 
-                    this.fitAddonList[this.containerName].fit();
-                    const size = this.fitAddonList[this.containerName].proposeDimensions();
+                    this.fitAddonList[containerName].fit();
+                    const size = this.fitAddonList[containerName].proposeDimensions();
 
                     Sio.sendMessage("t_pty_start", {
-                        tag: this.containerName,
+                        tag: containerName,
                         size: [size.cols, size.rows]
                     });
 
                     if (this.windowName !== "NodeJs") {
                         Sio.sendMessage("t_pty_i", {
-                            tag: this.containerName,
-                            cmd: `docker exec -it ${this.containerName} /bin/bash\r`
+                            tag: containerName,
+                            cmd: `docker exec -it ${containerName} /bin/bash\r`
                         });
                     }
 
                     Sio.sendMessage("t_pty_i", {
-                        tag: this.containerName,
+                        tag: containerName,
                         cmd: `history -c && history -w && clear\r`
                     });
 
-                    this.xtermList[this.containerName].onData((data) => {
+                    this.xtermList[containerName].onData((data) => {
                         Sio.sendMessage("t_pty_i", {
-                            tag: this.containerName,
+                            tag: containerName,
                             cmd: data
                         });
                     });
 
-                    Sio.readMessage(`t_pty_o_${this.containerName}`, (data) => {
+                    Sio.readMessage(`t_pty_o_${containerName}`, (data) => {
                         if (terminalComponent !== null) {
                             if (data.cmd.indexOf(" is not running") !== -1) {
-                                this._removeXterm();
+                                this._removeXterm(containerName);
 
                                 return;
                             }
 
                             if ((this.windowName !== "NodeJs" && data.cmd.trim() === "exit") || data.cmd === "xterm_reset") {
-                                Sio.stopRead(`t_pty_o_${this.containerName}`);
+                                Sio.stopRead(`t_pty_o_${containerName}`);
 
-                                this._removeXterm();
+                                this._removeXterm(containerName);
 
-                                this._createXterm();
+                                this._createXterm(containerName);
                             }
                             else {
                                 if (this.xtermList[data.tag] !== undefined && data.tag !== undefined && data.cmd !== undefined)
@@ -83,17 +83,17 @@
                     });
                 }
             },
-            _removeXterm() {
+            _removeXterm(containerName) {
                 const terminalComponent = this.windowComponent.querySelector(".terminal_container_component");
                 const terminal = terminalComponent.querySelector(".terminal.xterm");
 
                 if (terminal !== null) {
-                    Sio.stopRead(`t_pty_o_${this.containerName}`);
+                    Sio.stopRead(`t_pty_o_${containerName}`);
 
-                    Sio.sendMessage("t_pty_close", {tag: this.containerName});
+                    Sio.sendMessage("t_pty_close", {tag: containerName});
 
-                    delete this.xtermList[this.containerName];
-                    delete this.fitAddonList[this.containerName];
+                    delete this.xtermList[containerName];
+                    delete this.fitAddonList[containerName];
 
                     terminal.remove();
                 }
@@ -103,13 +103,13 @@
 
                 if (currentWindowElement !== null) {
                     this.windowName = currentWindowElement.name;
-                    this.containerName = currentWindowElement.containerName;
+                    const containerName = currentWindowElement.containerName;
                     this.windowComponent = windowComponent;
 
                     const terminal = this.windowComponent.querySelector(".terminal.xterm");
 
                     if (terminal === null)
-                        this._createXterm();
+                        this._createXterm(containerName);
                 }
             },
             clickLogic(event) {
@@ -118,11 +118,11 @@
 
                 if (currentWindowElement !== null) {
                     this.windowName = currentWindowElement.name;
-                    this.containerName = currentWindowElement.containerName;
+                    const containerName = currentWindowElement.containerName;
                     this.windowComponent = windowComponent;
 
-                    if (this.xtermList[this.containerName] !== undefined)
-                        this.xtermList[this.containerName].focus();
+                    if (this.xtermList[containerName] !== undefined)
+                        this.xtermList[containerName].focus();
                 }
             },
             resizeLogic() {
@@ -130,45 +130,38 @@
 
                 if (currentWindowElement !== null) {
                     this.windowName = currentWindowElement.name;
-                    this.containerName = currentWindowElement.containerName;
+                    const containerName = currentWindowElement.containerName;
 
                     const terminalComponent = this.windowComponent.querySelector(".terminal_container_component");
 
                     if (terminalComponent !== null) {
                         const terminal = terminalComponent.querySelector(".terminal.xterm");
 
-                        if (terminal !== null && this.fitAddonList[this.containerName] !== undefined) {
+                        if (terminal !== null && this.fitAddonList[containerName] !== undefined) {
                             const clientRect = terminalComponent.getBoundingClientRect();
                             terminal.style.height = `${clientRect.height}px`;
 
-                            this.fitAddonList[this.containerName].fit();
+                            this.fitAddonList[containerName].fit();
 
-                            const size = this.fitAddonList[this.containerName].proposeDimensions();
+                            const size = this.fitAddonList[containerName].proposeDimensions();
                             Sio.sendMessage("t_pty_resize", {
-                                tag: this.containerName,
+                                tag: containerName,
                                 size: [size.cols, size.rows]
                             });
                         }
                     }
                 }
             },
-            close(windowComponent) {
-                const currentWindowElement = this._currentWindowElement(windowComponent);
+            close(currentWindowElement) {
+                if (this.windowName === currentWindowElement.name) {
+                    Sio.stopRead(`t_pty_o_${currentWindowElement.containerName}`);
 
-                if (currentWindowElement !== null) {
-                    this.windowName = currentWindowElement.name;
-                    this.containerName = currentWindowElement.containerName;
-                    this.windowComponent = windowComponent;
+                    Sio.sendMessage("t_pty_close", {tag: currentWindowElement.containerName});
 
-                    Sio.stopRead(`t_pty_o_${this.containerName}`);
-
-                    Sio.sendMessage("t_pty_close", {tag: this.containerName});
-
-                    delete this.xtermList[this.containerName];
-                    delete this.fitAddonList[this.containerName];
+                    delete this.xtermList[currentWindowElement.containerName];
+                    delete this.fitAddonList[currentWindowElement.containerName];
 
                     this.windowName = "";
-                    this.containerName = "";
                     this.windowComponent = null;
                 }
             }
@@ -176,7 +169,6 @@
         data() {
             return {
                 windowName: "",
-                containerName: "",
                 windowComponent: null,
                 xtermList: [],
                 fitAddonList: []
@@ -189,7 +181,7 @@
     }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
     .terminal_container_component {
         display: none;
         position: absolute;

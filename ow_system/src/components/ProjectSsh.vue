@@ -154,6 +154,7 @@
                 const currentWindowElement = this._currentWindowElement(windowComponent);
 
                 if (currentWindowElement !== null) {
+                    this.windowName = currentWindowElement.name;
                     this.windowComponent = windowComponent;
 
                     this.elementPart1Container = this.windowComponent.querySelector(".part_1_container");
@@ -201,6 +202,7 @@
                 const currentWindowElement = this._currentWindowElement(windowComponent);
 
                 if (currentWindowElement !== null) {
+                    this.windowName = currentWindowElement.name;
                     this.windowComponent = windowComponent;
 
                     if (this.xterm !== null)
@@ -334,6 +336,7 @@
                 const currentWindowElement = this._currentWindowElement(windowComponent);
 
                 if (currentWindowElement !== null) {
+                    this.windowName = currentWindowElement.name;
                     this.windowComponent = windowComponent;
 
                     if (event.target.classList.contains("edit") === true) {
@@ -391,7 +394,7 @@
                     if (terminalComponent !== null) {
                         const terminal = terminalComponent.querySelector(".terminal.xterm");
 
-                        if (terminal !== null && this.fitAddon !== undefined) {
+                        if (terminal !== null && this.fitAddon !== null) {
                             const clientRect = terminalComponent.getBoundingClientRect();
                             terminal.style.height = `${clientRect.height}px`;
 
@@ -407,12 +410,8 @@
                     }
                 }
             },
-            close(windowComponent) {
-                const currentWindowElement = this._currentWindowElement(windowComponent);
-
-                if (currentWindowElement !== null) {
-                    this.windowComponent = windowComponent;
-
+            close(currentWindowElement) {
+                if (this.windowName === currentWindowElement.name) {
                     Sio.stopRead("t_pty_o_ssh");
 
                     Sio.sendMessage("t_pty_close", {tag: "ssh"});
@@ -420,12 +419,14 @@
                     this.xterm = null;
                     this.fitAddon = null;
 
+                    this.windowName = "";
                     this.windowComponent = null;
                 }
             }
         },
         data() {
             return {
+                windowName: "",
                 windowComponent: null,
                 elementPart1Container: null,
                 elementPart2Container: null,
@@ -451,75 +452,89 @@
     }
 </script>
 
-<style scoped>
-    .ssh_component .menu_ssh {
-        height: 28px;
-        background-color: #2b2b2b;
-        border-bottom: 1px solid #a0a0a0;
-        cursor: pointer;
-    }
-    .ssh_component .menu_ssh .button {
-        display: inline-block;
-        padding: 7px 8px;
-        font-size: 12px;
-    }
-    .ssh_component .menu_ssh .focused {
-        background-color: #0060ad;
-    }
-    .ssh_component .menu_ssh p:hover {
-        background-color: #808080;
-    }
-    .ssh_component .part_1_container {
-        position: absolute;
-        top: 28px;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        padding: 10px;
-    }
-    .ssh_component .part_2_container {
-        position: absolute;
-        top: 29px;
-        bottom: 0;
-        left: 0;
-        right: 0;
-    }
-    .ssh_component .part_2_container .terminal_project_component {
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        left: 0;
-        right: 0;
-    }
-    .ssh_component .part_1_container {
-        display: block;
-    }
-    .ssh_component .part_2_container {
-        display: none;
-    }
-    .ssh_component .section {
-        margin-bottom: 20px;
-    }
-    .ssh_component .section input {
-        width: 40%;
-    }
-    .ssh_component .section textarea {
-        width: 40%;
-        resize: none;
-    }
-    .ssh_component .section .button_cmd_window.delete {
-        display: none;
-        margin-left: 10px;
-        background-color: #ff0000;
-    }
-    .ssh_component .bottom {
-        position: absolute;
-        bottom: 10px;
-        width: 100%;
-        text-align: right;
-    }
-    .ssh_component .bottom .button_cmd_window {
-        display: inline-block;
-        margin-right: 25px;
+<style lang="scss" scoped>
+    .ssh_component {
+        .menu_ssh {
+            height: 28px;
+            background-color: #2b2b2b;
+            border-bottom: 1px solid #a0a0a0;
+            cursor: pointer;
+
+            .button {
+                display: inline-block;
+                padding: 7px 8px;
+                font-size: 12px;
+            }
+
+            .focused {
+                background-color: #0060ad;
+            }
+
+            p {
+                &:hover {
+                    background-color: #808080;
+                }
+            }
+        }
+
+        .part_1_container {
+            position: absolute;
+            top: 28px;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 10px;
+            display: block;
+        }
+
+        .part_2_container {
+            position: absolute;
+            top: 29px;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: none;
+
+            .terminal_project_component {
+                position: absolute;
+                top: 0;
+                bottom: 0;
+                left: 0;
+                right: 0;
+            }
+        }
+
+        .section {
+            margin-bottom: 20px;
+
+            input {
+                width: 40%;
+            }
+
+            textarea {
+                width: 40%;
+                resize: none;
+            }
+
+            .button_cmd_window {
+                &.delete {
+                    display: none;
+                    margin-left: 10px;
+                    background-color: #ff0000;
+                }
+            }
+        }
+
+        .bottom {
+            position: absolute;
+            bottom: 10px;
+            width: 100%;
+            text-align: right;
+
+            .button_cmd_window {
+                display: inline-block;
+                margin-right: 25px;
+            }
+        }
     }
 </style>

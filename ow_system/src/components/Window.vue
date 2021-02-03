@@ -187,13 +187,11 @@
                         else if (event.target.classList.contains("button_maximize") === true)
                             this._changeAppearance();
                         else if (event.target.classList.contains("button_close") === true) {
-                            console.log(this.windowComponent);
+                            this.$root.$refs.projectSshComponent.close(currentWindowElement);
 
-                            //this.$root.$refs.projectSshComponent.close(this.windowComponent);
-
-                            this.$root.$refs.containerCommandComponent.close(this.windowComponent);
-                            this.$root.$refs.containerTerminalComponent.close(this.windowComponent);
-                            this.$root.$refs.containerDataComponent.close(this.windowComponent);
+                            this.$root.$refs.containerCommandComponent.close(currentWindowElement);
+                            this.$root.$refs.containerTerminalComponent.close(currentWindowElement);
+                            this.$root.$refs.containerDataComponent.close(currentWindowElement);
 
                             this.windowComponent.parentNode.removeChild(this.windowComponent);
 
@@ -279,79 +277,98 @@
         box-shadow: 0px 0px 5px #000000;
         -webkit-box-shadow: 0px 0px 5px #000000;
         -moz-box-shadow: 0px 0px 5px #000000;
-    }
 
-    .window_component .header {
-        position: relative;
-        display: flex;
-        justify-content: space-between;
-        background-color: #0078d7;
-        height: 28px;
-    }
-    .window_component .header .overlay {
-        position: absolute;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        left: 0;
-        background: #ececec;
-        opacity: 0.5;
-    }
-    .window_component .header .left_column {
-        cursor: default;
-    }
-    .window_component .header .left_column img {
-        position: relative;
-        top: 50%;
-        left: 8px;
-        transform: translate(0, -50%);
-        display: block;
-        width: 20px;
-    }
-    .window_component .header .left_column p {
-        color: #ffffff;
-        margin: 5px;
-        position: absolute;
-        top: 0;
-        left: 30px;
-    }
-    .window_component .header .right_column .button {
-        width: 18px;
-        height: 18px;
-        cursor: pointer;
-        padding: 5px 13px;
-    }
-    .window_component .header .right_column .button:hover {
-        background-color: #1a86db;
-    }
-    .window_component .header .right_column .button_close:hover {
-        background-color: #ff0000 !important;
-    }
+        &.focused {
+            .header {
+                .overlay {
+                    opacity: 0;
+                    right: 132px;
+                }
 
-    .window_component .body {
-        position: relative;
-        background: #232323;
-        height: calc(100% - 28px);
-        color: #ffffff;
-    }
-    .window_component .body .overlay {
-        display: block;
-        position: absolute;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        left: 0;
-    }
+                .drag {
+                    cursor: move;
+                }
+            }
 
-    .window_component.focused .header .overlay {
-        opacity: 0;
-        right: 132px;
-    }
-    .window_component.focused .header .drag {
-        cursor: move;
-    }
+            .body {
+                .overlay {
+                    display: none;
+                }
+            }
+        }
 
-    .window_component.focused .body .overlay {
-        display: none;
+        .header {
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            background-color: #0078d7;
+            height: 28px;
+
+            .overlay {
+                position: absolute;
+                top: 0;
+                right: 0;
+                bottom: 0;
+                left: 0;
+                background: #ececec;
+                opacity: 0.5;
+            }
+
+            .left_column {
+                cursor: default;
+
+                img {
+                    position: relative;
+                    top: 50%;
+                    left: 8px;
+                    transform: translate(0, -50%);
+                    display: block;
+                    width: 20px;
+                }
+
+                p {
+                    color: #ffffff;
+                    margin: 5px;
+                    position: absolute;
+                    top: 0;
+                    left: 30px;
+                }
+            }
+
+            .right_column {
+                .button {
+                    width: 18px;
+                    height: 18px;
+                    cursor: pointer;
+                    padding: 5px 13px;
+
+                    &:hover {
+                        background-color: #1a86db;
+                    }
+                }
+
+                .button_close {
+                    &:hover {
+                        background-color: #ff0000 !important;
+                    }
+                }
+            }
+        }
+
+        .body {
+            position: relative;
+            background: #232323;
+            height: calc(100% - 28px);
+            color: #ffffff;
+
+            .overlay {
+                display: block;
+                position: absolute;
+                top: 0;
+                right: 0;
+                bottom: 0;
+                left: 0;
+            }
+        }
     }
 </style>

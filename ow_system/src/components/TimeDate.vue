@@ -11,16 +11,6 @@
         //components: {},
         computed: {},
         methods: {
-            init() {
-                this.elementTime = document.querySelector(".timeDate_component .time");
-                this.elementDate = document.querySelector(".timeDate_component .date");
-
-                this._execute();
-
-                this.interval = setInterval(() => {
-                    this._execute();
-                }, 1000);
-            },
             _execute() {
                 if (this.elementTime !== null && this.elementDate !== null) {
                     const currentDate = new Date();
@@ -38,6 +28,16 @@
 
                     this.elementTime.innerHTML = `${currentDate.getHours()}:${minute}`;
                 }
+            },
+            init() {
+                this.elementTime = document.querySelector(".timeDate_component .time");
+                this.elementDate = document.querySelector(".timeDate_component .date");
+
+                this._execute();
+
+                this.interval = setInterval(() => {
+                    this._execute();
+                }, 1000);
             }
         },
         data() {
@@ -56,12 +56,13 @@
     }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
     .timeDate_component {
         width: 90px !important;
         padding-top: 6px !important;
-    }
-    .timeDate_component p {
-        font-size: 12px;
+
+        p {
+            font-size: 12px;
+        }
     }
 </style>

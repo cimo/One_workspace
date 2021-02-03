@@ -84,6 +84,6 @@
     }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
     .tool_component {}
 </style>

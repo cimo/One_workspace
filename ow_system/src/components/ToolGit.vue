@@ -445,76 +445,109 @@
     }
 </script>
 
-<style scoped>
-    .git_component .menu_git {
-        height: 28px;
-        background-color: #2b2b2b;
-        border-bottom: 1px solid #a0a0a0;
-        cursor: pointer;
-    }
-    .git_component .menu_git .button {
-        display: inline-block;
-        padding: 7px 8px;
-        font-size: 12px;
-    }
-    .git_component .menu_git .focused {
-        background-color: #0060ad;
-    }
-    .git_component .menu_git p:hover {
-        background-color: #808080;
-    }
-    .git_component .part_1_container, .git_component .part_2_container {
-        position: absolute;
-        top: 28px;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        padding: 10px;
-    }
-    .git_component .part_1_container {
-        display: block;
-    }
-    .git_component .part_1_container .section .output {
-      height: 100px;
-    }
-    .git_component .part_2_container {
-        display: none;
-    }
-    .git_component .part_2_container .section .output {
-      height: 280px;
-    }
-    .git_component .left, .git_component .right {
-        vertical-align: top;
-        display: inline-block;
-        width: 50%;
-    }
-    .git_component .left .section {
-        margin-bottom: 20px;
-    }
-    .git_component .left .section input {
-        width: 90%;
-    }
-    .git_component .left .section input[name='branchName'] {
-        width: 40%;
-    }
-    .git_component .right .section {
-        text-align: center;
-    }
-    .git_component .right .section .button_cmd_window.git_command {
-        display: inline-block;
-        margin: 5px;
-    }
-    .git_component .section .output {
-        overflow-y: auto;
-    }
-    .git_component .bottom {
-        position: absolute;
-        bottom: 10px;
-        width: 100%;
-        text-align: right;
-    }
-    .git_component .bottom .button_cmd_window {
-        display: inline-block;
-        margin-right: 25px;
+<style lang="scss" scoped>
+    .git_component {
+        .menu_git {
+            height: 28px;
+            background-color: #2b2b2b;
+            border-bottom: 1px solid #a0a0a0;
+            cursor: pointer;
+
+            .button {
+                display: inline-block;
+                padding: 7px 8px;
+                font-size: 12px;
+            }
+
+            .focused {
+                background-color: #0060ad;
+            }
+
+            p {
+                &:hover {
+                    background-color: #808080;
+                }
+            }
+        }
+
+        .part_1_container, .part_2_container {
+            position: absolute;
+            top: 28px;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 10px;
+        }
+
+        .part_1_container {
+            display: block;
+
+            .section {
+                .output {
+                    height: 100px;
+                }
+            }
+        }
+
+        .part_2_container {
+            display: none;
+
+            .section {
+                .output {
+                    height: 280px;
+                }
+            }
+        }
+
+        .left, .right {
+            vertical-align: top;
+            display: inline-block;
+            width: 50%;
+        }
+
+        .left {
+            .section {
+                margin-bottom: 20px;
+
+                input {
+                    width: 90%;
+                }
+
+                input[name='branchName'] {
+                    width: 40%;
+                }
+            }
+        }
+
+        .right {
+            .section {
+                text-align: center;
+
+                .button_cmd_window {
+                    &.git_command {
+                        display: inline-block;
+                        margin: 5px;
+                    }
+                }
+            }
+        }
+
+        .section {
+            .output {
+                overflow-y: auto;
+            }
+        }
+
+        .bottom {
+            position: absolute;
+            bottom: 10px;
+            width: 100%;
+            text-align: right;
+
+            .button_cmd_window {
+                display: inline-block;
+                margin-right: 25px;
+            }
+        }
     }
 </style>
