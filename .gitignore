@@ -47,19 +47,19 @@ Temporary Items
 .apdisk
 
 # cimo +
-_system/*
 core/node_modules
+core/Env.js
 !key/.gitkeep
 key/*
-ow_system/node_modules
-ow_system/setting/*
-!ow_system/setting/.gitkeep
 project/*
 !project/.digest_htpasswd
 !project/favicon.ico
 !project/index.html
 !project/opcache.php
 !project/robots.txt
+system/node_modules
+system/setting/*
+!system/setting/.gitkeep
 .env
 .digest_htpasswd
 error.log
