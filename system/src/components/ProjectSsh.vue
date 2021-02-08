@@ -131,14 +131,16 @@
                 });
             },
             _removeXterm(terminal) {
-                Sio.stopRead("t_pty_o_ssh");
+                if (terminal !== null) {
+                    Sio.stopRead("t_pty_o_ssh");
 
-                Sio.sendMessage("t_pty_close", {tag: "ssh"});
+                    Sio.sendMessage("t_pty_close", {tag: "ssh"});
 
-                this.xterm = null;
-                this.fitAddon = null;
+                    this.xterm = null;
+                    this.fitAddon = null;
 
-                terminal.remove();
+                    terminal.remove();
+                }
             },
             init(windowComponent) {
                 const currentWindowElement = this._currentWindowElement(windowComponent);

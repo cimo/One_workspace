@@ -82,14 +82,16 @@
                 });
             },
             _removeXterm(terminal, currentWindowElement) {
-                Sio.stopRead(`t_pty_o_${currentWindowElement.containerName}`);
+                if (terminal !== null) {
+                    Sio.stopRead(`t_pty_o_${currentWindowElement.containerName}`);
 
-                Sio.sendMessage("t_pty_close", {tag: currentWindowElement.containerName});
+                    Sio.sendMessage("t_pty_close", {tag: currentWindowElement.containerName});
 
-                delete this.xtermList[currentWindowElement.containerName];
-                delete this.fitAddonList[currentWindowElement.containerName];
+                    delete this.xtermList[currentWindowElement.containerName];
+                    delete this.fitAddonList[currentWindowElement.containerName];
 
-                terminal.remove();
+                    terminal.remove();
+                }
             },
             init(windowComponent) {
                 const currentWindowElement = this._currentWindowElement(windowComponent);
