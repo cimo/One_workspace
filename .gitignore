@@ -49,8 +49,8 @@ Temporary Items
 # cimo +
 core/node_modules
 core/Env.js
-!key/.gitkeep
 key/*
+!key/.gitkeep
 project/*
 !project/.digest_htpasswd
 !project/favicon.ico
