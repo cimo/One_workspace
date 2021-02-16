@@ -32,7 +32,7 @@ module.exports = {
 				singleQuote: false,
 				tabWidth: 4,
 				trailingComma: "none",
-				useTabs: true,
+				useTabs: false,
 				vueIndentScriptAndStyle: true
 			}
 		]
