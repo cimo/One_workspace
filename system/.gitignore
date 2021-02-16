@@ -1,6 +1,4 @@
 .DS_Store
-node_modules
-/dist
 
 
 # local env files
@@ -21,3 +19,22 @@ pnpm-debug.log*
 *.njsproj
 *.sln
 *.sw?
+
+# cimo +
+core/node_modules
+core/Env.js
+!key/.gitkeep
+key/*
+project/*
+!project/.digest_htpasswd
+!project/favicon.ico
+!project/index.html
+!project/opcache.php
+!project/robots.txt
+system/node_modules
+system/setting/*
+!system/setting/.gitkeep
+.env
+.digest_htpasswd
+error.log
+debug.log
