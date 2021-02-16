@@ -1,5 +1,6 @@
 module.exports = {
-    publicPath: "",
+    outputDir: "./dist",
+    publicPath: "/",
     configureWebpack: {
         mode: "development"
     },
@@ -19,7 +20,7 @@ module.exports = {
         loaderOptions: {
             sass: {
                 implementation: require("sass"),
-                additionalData: '@import "@/assets/scss/global.scss";'
+                prependData: '@import "@/scss/global.scss";'
             }
         }
     }

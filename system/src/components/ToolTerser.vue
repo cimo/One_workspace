@@ -9,16 +9,18 @@
             </div>
             <div class="section">
                 <p>Folder input:</p>
-                <input type="text" name="folder_input" value=""/>
+                <input type="text" name="folder_input" value="" />
             </div>
             <div class="section">
                 <p>Folder output:</p>
-                <input type="text" name="folder_output" value=""/>
+                <input type="text" name="folder_output" value="" />
             </div>
         </div>
         <div class="right">
             <div class="section">
-                <div class="button_cmd_window terser_command execute">Execute</div>
+                <div class="button_cmd_window terser_command execute">
+                    Execute
+                </div>
             </div>
         </div>
         <div class="section">
@@ -32,46 +34,62 @@
 </template>
 
 <script>
-import Config from "@/assets/js/Config.js";
-import Helper from "@/assets/js/Helper";
-import Sio from "@/assets/js/Sio";
+import * as Config from "@/assets/js/Config";
+import * as Helper from "@/assets/js/Helper";
+import * as Sio from "@/assets/js/Sio";
 
 export default {
     name: "ToolTerserComponent",
     //components: {},
     computed: {},
     methods: {
-        _setting: Config.setting,
-        _findParent: Helper.findParent,
-        _capitalizeFirstLetter: Helper.capitalizeFirstLetter,
-        _currentWindowElement: Helper.currentWindowElement,
         init(windowComponent) {
-            const currentWindowElement = this._currentWindowElement(windowComponent);
+            const currentWindowElement = Helper.currentWindowElement(
+                windowComponent
+            );
 
             if (currentWindowElement !== null) {
-                this.selectEdit = windowComponent.querySelector("select[name='edit']");
-                this.inputFolderInput = windowComponent.querySelector("input[name='folder_input']");
-                this.inputFolderOutput = windowComponent.querySelector("input[name='folder_output']");
-                this.buttonSave = windowComponent.querySelector(".button_cmd_window.save");
+                this.selectEdit = windowComponent.querySelector(
+                    "select[name='edit']"
+                );
+                this.inputFolderInput = windowComponent.querySelector(
+                    "input[name='folder_input']"
+                );
+                this.inputFolderOutput = windowComponent.querySelector(
+                    "input[name='folder_output']"
+                );
+                this.buttonSave = windowComponent.querySelector(
+                    ".button_cmd_window.save"
+                );
                 this.elementOutput = windowComponent.querySelector(".output");
 
                 if (this.selectEdit !== null) {
                     Sio.sendMessage("t_exec_i", {
                         tag: "terserInit",
-                        cmd: `ls "${this._setting().systemData.pathSetting}"/*${this._setting().systemData.extensionTerser} | sed 's#.*/##'`
+                        cmd: `ls "${Config.setting.systemData.pathSetting}"/*${Config.setting.systemData.extensionTerser} | sed 's#.*/##'`
                     });
 
-                    Sio.readMessage("t_exec_o_terserInit", (data) => {
-                        const result = data.out !== undefined ? data.out : data.err;
+                    Sio.readMessage("t_exec_o_terserInit", data => {
+                        const result =
+                            data.out !== undefined ? data.out : data.err;
 
                         if (result !== undefined) {
                             const outSplit = result.split("\n");
 
                             for (const value of outSplit) {
-                                if (value !== "" && value.indexOf("ls: ") === -1) {
-                                    const option = document.createElement("option");
+                                if (
+                                    value !== "" &&
+                                    value.indexOf("ls: ") === -1
+                                ) {
+                                    const option = document.createElement(
+                                        "option"
+                                    );
                                     option.value = value;
-                                    option.text = value.replace(this._setting().systemData.extensionTerser, "");
+                                    option.text = value.replace(
+                                        Config.setting.systemData
+                                            .extensionTerser,
+                                        ""
+                                    );
                                     this.selectEdit.appendChild(option);
                                 }
                             }
@@ -84,8 +102,14 @@ export default {
             }
         },
         clickLogic(event) {
-            const windowComponent = this._findParent(event.target, ["terser_component"], ["window_component"]);
-            const currentWindowElement = this._currentWindowElement(windowComponent);
+            const windowComponent = Helper.findParent(
+                event.target,
+                ["terser_component"],
+                ["window_component"]
+            );
+            const currentWindowElement = Helper.currentWindowElement(
+                windowComponent
+            );
 
             if (currentWindowElement !== null) {
                 this.selectEdit.style.borderColor = "transparent";
@@ -93,17 +117,25 @@ export default {
                 this.inputFolderOutput.style.borderColor = "transparent";
 
                 if (event.target.classList.contains("save") === true) {
-                    if (this.projectName !== "" && this.inputFolderInput.value !== "" && this.inputFolderOutput !== "")
+                    if (
+                        this.projectName !== "" &&
+                        this.inputFolderInput.value !== "" &&
+                        this.inputFolderOutput !== ""
+                    )
                         this.createFile();
                     else {
                         if (this.inputFolderInput.value === "")
                             this.inputFolderInput.style.borderColor = "#ff0000";
                         if (this.inputFolderOutput.value === "")
-                            this.inputFolderOutput.style.borderColor = "#ff0000";
+                            this.inputFolderOutput.style.borderColor =
+                                "#ff0000";
                     }
                 }
 
-                if (event.target.classList.contains("button_cmd_window") === true) {
+                if (
+                    event.target.classList.contains("button_cmd_window") ===
+                    true
+                ) {
                     if (this.projectName === "") {
                         this.selectEdit.style.borderColor = "#ff0000";
 
@@ -119,24 +151,32 @@ export default {
 
                     if (event.target.classList.contains("execute") === true) {
                         command = `find "${input}" -name '*.min.js' -delete`;
-                        command += "&& echo \"$(find \"" + input + "\" -name '*.js')\" | while read fileName; do terser \"$fileName\" --compress --mangle --output \"" + output + "/$(basename ${fileName%%.*}).min.js\"; done";
+                        command +=
+                            '&& echo "$(find "' +
+                            input +
+                            '" -name \'*.js\')" | while read fileName; do terser "$fileName" --compress --mangle --output "' +
+                            output +
+                            '/$(basename ${fileName%%.*}).min.js"; done';
                         command += `&& ls "${output}"/*.min.js | sed 's#.*/##'`;
                     }
 
-                    if (command === "")
-                        return false;
+                    if (command === "") return false;
 
                     Sio.sendMessage("t_exec_i", {
                         tag: "terserCommand",
-                        cmd: command,
+                        cmd: command
                     });
 
                     let buffer = "";
 
-                    Sio.readMessage("t_exec_o_terserCommand", (data) => {
-                        const result = data.out !== undefined ? data.out : data.err;
+                    Sio.readMessage("t_exec_o_terserCommand", data => {
+                        const result =
+                            data.out !== undefined ? data.out : data.err;
 
-                        if (result !== undefined && event.target.classList.contains("execute") === true) {
+                        if (
+                            result !== undefined &&
+                            event.target.classList.contains("execute") === true
+                        ) {
                             buffer = result;
                             this.elementOutput.innerHTML = buffer;
                         }
@@ -151,39 +191,51 @@ export default {
             }
         },
         changeLogic(event) {
-            const windowComponent = this._findParent(event.target, ["terser_component"], ["window_component"]);
-            const currentWindowElement = this._currentWindowElement(windowComponent);
+            const windowComponent = Helper.findParent(
+                event.target,
+                ["terser_component"],
+                ["window_component"]
+            );
+            const currentWindowElement = Helper.currentWindowElement(
+                windowComponent
+            );
 
             if (currentWindowElement !== null) {
                 if (event.target.classList.contains("edit") === true) {
                     if (this.selectEdit.selectedIndex > 0) {
-                        const optionValue = this.selectEdit.options[this.selectEdit.selectedIndex].value;
+                        const optionValue = this.selectEdit.options[
+                            this.selectEdit.selectedIndex
+                        ].value;
 
                         Sio.sendMessage("t_exec_stream_i", {
                             tag: "terserChangeLogicEdit",
                             cmd: "read",
-                            path: `${this._setting().systemData.pathSetting}/${optionValue}`
+                            path: `${Config.setting.systemData.pathSetting}/${optionValue}`
                         });
 
                         let buffer = "";
 
-                        Sio.readMessage("t_exec_stream_o_terserChangeLogicEdit", (data) => {
-                            if (data.chunk !== "end")
-                                buffer += data.chunk;
-                            else {
-                                Sio.stopRead("t_exec_stream_o_terserChangeLogicEdit");
+                        Sio.readMessage(
+                            "t_exec_stream_o_terserChangeLogicEdit",
+                            data => {
+                                if (data.chunk !== "end") buffer += data.chunk;
+                                else {
+                                    Sio.stopRead(
+                                        "t_exec_stream_o_terserChangeLogicEdit"
+                                    );
 
-                                const result = JSON.parse(buffer);
+                                    const result = JSON.parse(buffer);
 
-                                this.projectName = result.name;
-                                this.projectPath = result.path;
-                                this.inputFolderInput.value = result.input;
-                                this.inputFolderOutput.value = result.output;
-                                this.elementOutput.innerHTML = "";
+                                    this.projectName = result.name;
+                                    this.projectPath = result.path;
+                                    this.inputFolderInput.value = result.input;
+                                    this.inputFolderOutput.value =
+                                        result.output;
+                                    this.elementOutput.innerHTML = "";
+                                }
                             }
-                        });
-                    }
-                    else {
+                        );
+                    } else {
                         this.projectName = "";
                         this.projectPath = "";
                         this.inputFolderInput.value = "";
@@ -194,15 +246,19 @@ export default {
             }
         },
         createFile(name, path) {
-            if (name !== undefined)
-                this.projectName = name;
+            if (name !== undefined) this.projectName = name;
 
-            if (path !== undefined)
-                this.projectPath = path;
+            if (path !== undefined) this.projectPath = path;
 
             const content = {
-                input: this.inputFolderInput !== null ? this.inputFolderInput.value : "",
-                output: this.inputFolderOutput !== null ? this.inputFolderOutput.value : "",
+                input:
+                    this.inputFolderInput !== null
+                        ? this.inputFolderInput.value
+                        : "",
+                output:
+                    this.inputFolderOutput !== null
+                        ? this.inputFolderOutput.value
+                        : "",
                 name: this.projectName,
                 path: this.projectPath
             };
@@ -210,33 +266,47 @@ export default {
             Sio.sendMessage("t_exec_stream_i", {
                 tag: "terserClickLogicSave",
                 cmd: "write",
-                path: `${this._setting().systemData.pathSetting}/${this.projectName}${this._setting().systemData.extensionTerser}`,
+                path: `${Config.setting.systemData.pathSetting}/${this.projectName}${Config.setting.systemData.extensionTerser}`,
                 content: JSON.stringify(content)
             });
 
             if (this.selectEdit !== null) {
-                Sio.readMessage("t_exec_stream_o_terserClickLogicSave", (data) => {
-                    if (data.chunk === "end") {
-                        Sio.stopRead("t_exec_stream_o_terserClickLogicSave");
+                Sio.readMessage(
+                    "t_exec_stream_o_terserClickLogicSave",
+                    data => {
+                        if (data.chunk === "end") {
+                            Sio.stopRead(
+                                "t_exec_stream_o_terserClickLogicSave"
+                            );
 
-                        const optionValue = `${this.projectName}${this._setting().systemData.extensionTerser}`;
+                            const optionValue = `${this.projectName}${Config.setting.systemData.extensionTerser}`;
 
-                        if (this.selectEdit.querySelector(`option[value='${optionValue}'`) === null) {
-                            const option = document.createElement("option");
-                            option.value = optionValue;
-                            option.text = this.projectName;
-                            this.selectEdit.appendChild(option);
+                            if (
+                                this.selectEdit.querySelector(
+                                    `option[value='${optionValue}'`
+                                ) === null
+                            ) {
+                                const option = document.createElement("option");
+                                option.value = optionValue;
+                                option.text = this.projectName;
+                                this.selectEdit.appendChild(option);
 
-                            this.selectEdit.querySelector(`option[value='${optionValue}'`).selected = true;
+                                this.selectEdit.querySelector(
+                                    `option[value='${optionValue}'`
+                                ).selected = true;
+                            }
                         }
                     }
-                });
+                );
             }
         },
         deleteOption() {
             if (this.selectEdit !== null) {
                 for (const option of this.selectEdit.options) {
-                    if (option.value === `${this.projectName}${this._setting().systemData.extensionTerser}`) {
+                    if (
+                        option.value ===
+                        `${this.projectName}${Config.setting.systemData.extensionTerser}`
+                    ) {
                         option.remove();
                         this.selectEdit.selectedIndex = 0;
 
@@ -267,7 +337,7 @@ export default {
         this.$root.$refs.toolTerserComponent = this;
     },
     beforeDestroy() {}
-}
+};
 </script>
 
 <style lang="scss" scoped>
@@ -279,7 +349,8 @@ export default {
     right: 0;
     padding: 10px;
 
-    .left, .right {
+    .left,
+    .right {
         vertical-align: top;
         display: inline-block;
         width: 50%;
