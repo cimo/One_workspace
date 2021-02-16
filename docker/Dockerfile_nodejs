@@ -24,6 +24,7 @@ COPY ${PATH_ROOT}/entrypoint_nodejs.sh /usr/local/bin/entrypoint.sh
 
 # System
 RUN cd ~ \
+&& ln -s ~/ /home/link_root \
 && chmod +x /usr/local/bin/entrypoint.sh \
 && apt-get update && apt-get install -y \
 software-properties-common \
@@ -47,8 +48,6 @@ sshpass \
 && dpkg-reconfigure -f noninteractive tzdata \
 # Npm
 && npm install -g @vue/cli \
-&& npm install -g typescript \
-&& npm install -g eslint \
 && npm install -g terser \
 && npm install -g sass \
 # Clean

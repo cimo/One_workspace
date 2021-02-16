@@ -55,6 +55,7 @@ Is a docker service container for have, in one space, a large and complete devel
 5) Add in your hosts file:
 
         127.0.0.1 localhost
+        127.0.0.1 localhost_html
         127.0.0.1 localhost-php5
         127.0.0.1 localhost-php7
 

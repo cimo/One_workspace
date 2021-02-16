@@ -39,13 +39,5 @@
         "sass-loader": "^8.0.2",
         "typescript": "~3.9.3",
         "vue-template-compiler": "^2.6.11"
-    },
-    "browserslist": [
-        "> 1%",
-        "last 2 versions",
-        "not dead"
-    ],
-    "jest": {
-        "preset": "@vue/cli-plugin-unit-jest/presets/typescript-and-babel"
     }
 }

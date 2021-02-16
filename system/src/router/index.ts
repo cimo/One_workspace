@@ -7,7 +7,7 @@ Vue.use(VueRouter);
 const routes: Array<RouteConfig> = [
 	{
 		path: "/",
-		name: "One workspace",
+		name: "Body",
 		component: Body
 	}
 ];
