@@ -43,20 +43,18 @@ Is a docker service container for have, in one space, a large and complete devel
         sudo cp core/Env.dist.js Env.js
         sudo nano core/Env.js
 
-3) Modify file with your configuration, save and close the file.
-
-   Add your path in the shared folder docker dashboard and write on terminal:
+3) Edit with your system configuration, save and close the file and write on terminal:
 
         sudo docker-compose up -d --build
 
-5) Add in your hosts file:
+4) Add in your hosts file:
 
         127.0.0.1 localhost
         127.0.0.1 localhost_html
         127.0.0.1 localhost-php5
         127.0.0.1 localhost-php7
 
-6) Write on your browser "http://localhost".
+5) Write on your browser "http://localhost".
 
 | Library: |
 |:---|
