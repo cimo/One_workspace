@@ -32,8 +32,24 @@ const httpAuthOption = httpAuth.digest({
     file: `${config.setting.digest.path}.digest_htpasswd`
 });
 
+const portVueAppSplit = config.setting.port.vue_app.split("-");
+const portVueAppCount = portVueAppSplit[1] - portVueAppSplit[0];
+let portVueAppList = [];
+
+for (let i = 0; i <= portVueAppCount; i ++) {
+    const port = parseInt(portVueAppSplit[0]) + i;
+
+    portVueAppList.push(port);
+}
+
+let origin = [`http://${config.setting.socketIo.domain}`];
+
+for (const value of portVueAppList) {
+    origin.push(`http://${config.setting.socketIo.domain}:${value}`);
+}
+
 const corsOption = {
-	origin: [`http://${config.setting.socketIo.domain}`, `http://${config.setting.socketIo.domain}:${config.setting.port.vue_app}`],
+	origin: origin,
 	methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"],
 	optionsSuccessStatus: 200
 };
@@ -52,7 +68,7 @@ const httpsServer = https.createServer(certificate, app);
 
 const socketIoHttpServer = socketIo(httpServer, {
     cors: {
-		origin: [`http://${config.setting.socketIo.domain}`, `http://${config.setting.socketIo.domain}:${config.setting.port.vue_app}`],
+		origin: origin,
 		methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"]
 	},
 	cookie: {
@@ -63,7 +79,7 @@ const socketIoHttpServer = socketIo(httpServer, {
 });
 const socketIoHttpsServer = socketIo(httpsServer, {
 	cors: {
-		origin: [`https://${config.setting.socketIo.domain}`, `https://${config.setting.socketIo.domain}:${config.setting.port.vue_app}`],
+		origin: origin,
 		methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"]
 	},
     cookie: {

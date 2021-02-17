@@ -1,15 +1,12 @@
 One workspace
 ==============
 
-One workspace for all your delevelop.
-
 Is a docker service container for have, in one space, a large and complete develop tools that look and work in same way on all machine.
 
 | Info: |
 |:---|
-| Secure and fast ui tools for increase your productivity |
-| Cross browser and responsive (Chrome, Firefox, Edge, Opera, Safari) |
 | Cross platform (Windows, Linux, Mac, Android, Ios) |
+| Cross browser and responsive (Chrome, Firefox, Edge, Opera, Safari) |
 
 | Project: |
 |:---|
@@ -61,11 +58,12 @@ Is a docker service container for have, in one space, a large and complete devel
 
 6) Write on your browser "http://localhost".
 
-<b>By CIMO - https://reinventsoftware.org</b>
-
 | Library: |
 |:---|
 | Docker - https://www.docker.com/ |
+| VueJs - https://www.vuejs.org/ |
+
+By CIMO - https://reinventsoftware.org
 
 Supported By:
 

@@ -1,540 +1,540 @@
 <template>
-	<div class="ssh_component">
-		<div class="menu_ssh">
-			<p class="button focused">Data</p>
-			<p class="button">Console</p>
-		</div>
-		<div class="part_1_container">
-			<div class="section">
-				<p>List:</p>
-				<select class="edit" name="edit">
-					<option value="0">Edit exist ssh</option>
-				</select>
-				<div class="button_cmd_window delete">Delete selected</div>
-			</div>
-			<div class="section">
-				<p>Name:</p>
-				<input type="text" name="name" value="" />
-			</div>
-			<div class="section">
-				<p>Server:</p>
-				<input type="text" name="server" value="" />
-			</div>
-			<div class="section">
-				<p>Username:</p>
-				<input type="text" name="username" value="" />
-			</div>
-			<div class="section">
-				<p>Password:</p>
-				<input type="password" name="password" value="" />
-			</div>
-			<div class="section">
-				<p>Key public:</p>
-				<input type="text" name="key_public" value="" />
-			</div>
-			<div class="section">
-				<p>Description:</p>
-				<textarea name="description" rows="4"></textarea>
-			</div>
-			<div class="bottom">
-				<div class="button_cmd_window save">Save</div>
-			</div>
-		</div>
-		<div class="part_2_container">
-			<div class="terminal_project_component"></div>
-		</div>
-	</div>
+    <div class="ssh_component">
+        <div class="menu_ssh">
+            <p class="button focused">Data</p>
+            <p class="button">Console</p>
+        </div>
+        <div class="part_1_container">
+            <div class="section">
+                <p>List:</p>
+                <select class="edit" name="edit">
+                    <option value="0">Edit exist ssh</option>
+                </select>
+                <div class="button_cmd_window delete">Delete selected</div>
+            </div>
+            <div class="section">
+                <p>Name:</p>
+                <input type="text" name="name" value="" />
+            </div>
+            <div class="section">
+                <p>Server:</p>
+                <input type="text" name="server" value="" />
+            </div>
+            <div class="section">
+                <p>Username:</p>
+                <input type="text" name="username" value="" />
+            </div>
+            <div class="section">
+                <p>Password:</p>
+                <input type="password" name="password" value="" />
+            </div>
+            <div class="section">
+                <p>Key public:</p>
+                <input type="text" name="key_public" value="" />
+            </div>
+            <div class="section">
+                <p>Description:</p>
+                <textarea name="description" rows="4"></textarea>
+            </div>
+            <div class="bottom">
+                <div class="button_cmd_window save">Save</div>
+            </div>
+        </div>
+        <div class="part_2_container">
+            <div class="terminal_project_component"></div>
+        </div>
+    </div>
 </template>
 
 <script>
-	import * as Config from "@/assets/js/Config";
-	import * as Helper from "@/assets/js/Helper";
-	import * as Sio from "@/assets/js/Sio";
-
-	import { Terminal } from "xterm";
-	import { FitAddon } from "xterm-addon-fit";
-	import "xterm/css/xterm.css";
-
-	export default {
-		name: "ProjectSshComponent",
-		//components: {},
-		computed: {},
-		methods: {
-			_createXterm(windowComponent) {
-				const terminalComponent = windowComponent.querySelector(".terminal_project_component");
-
-				this.xterm = new Terminal({
-					cursorBlink: true
-				});
-				this.fitAddon = new FitAddon();
-				this.xterm.loadAddon(this.fitAddon);
-				this.xterm.open(terminalComponent);
-				this.xterm.focus();
-
-				const clientRect = terminalComponent.getBoundingClientRect();
-				const terminal = terminalComponent.querySelector(".terminal.xterm");
-
-				terminal.style.height = `${clientRect.height}px`;
-
-				this.fitAddon.fit();
-
-				const size = this.fitAddon.proposeDimensions();
-
-				Sio.sendMessage("t_pty_start", {
-					tag: "ssh",
-					size: [size.cols, size.rows]
-				});
-
-				const pathKey = `${Config.setting.systemData.pathKey}/${this.inputKeyPublic.value}`;
-
-				let command = "";
-
-				if (this.inputPassword.value !== "") {
-					command = `sshpass -p "${this.inputPassword.value}" ssh ${this.inputUsername.value}@${this.inputServer.value}`;
-				} else if (this.inputKeyPublic.value !== "") {
-					command = `chmod 400 ${pathKey} && ssh -i ${pathKey} ${this.inputUsername.value}@${this.inputServer.value}`;
-				}
-
-				if (command === "") {
-					return false;
-				}
-
-				Sio.sendMessage("t_pty_i", {
-					tag: "ssh",
-					cmd: `history -c && history -w && clear && ${command}\r`
-				});
-
-				this.xterm.onData((data) => {
-					Sio.sendMessage("t_pty_i", {
-						tag: "ssh",
-						cmd: data
-					});
-				});
-
-				Sio.readMessage("t_pty_o_ssh", (data) => {
-					if (terminal !== null) {
-						if (data.cmd.indexOf(" closed by ") !== -1 || data.cmd.indexOf("logout") !== -1 || this.selectEdit.selectedIndex === 0) {
-							this._removeXterm(terminal);
-
-							return;
-						}
-
-						if (this.xterm !== undefined && data.tag !== undefined && data.cmd !== undefined) {
-							this.xterm.write(data.cmd);
-						}
-					}
-				});
-			},
-			_removeXterm(terminal) {
-				if (terminal !== null) {
-					Sio.stopRead("t_pty_o_ssh");
-
-					Sio.sendMessage("t_pty_close", { tag: "ssh" });
-
-					this.xterm = null;
-					this.fitAddon = null;
-
-					terminal.remove();
-				}
-			},
-			init(windowComponent) {
-				const currentWindowElement = Helper.currentWindowElement(windowComponent);
-
-				if (currentWindowElement !== null) {
-					this.elementPart1Container = windowComponent.querySelector(".part_1_container");
-					this.elementPart2Container = windowComponent.querySelector(".part_2_container");
-					this.selectEdit = windowComponent.querySelector(".part_1_container select[name='edit']");
-					this.inputName = windowComponent.querySelector(".part_1_container input[name='name']");
-					this.inputServer = windowComponent.querySelector(".part_1_container input[name='server']");
-					this.inputUsername = windowComponent.querySelector(".part_1_container input[name='username']");
-					this.inputPassword = windowComponent.querySelector(".part_1_container input[name='password']");
-					this.inputKeyPublic = windowComponent.querySelector(".part_1_container input[name='key_public']");
-					this.textareaDescription = windowComponent.querySelector("textarea[name='description']");
-					this.buttonDelete = windowComponent.querySelector(".button_cmd_window.delete");
-					this.buttonSave = windowComponent.querySelector(".button_cmd_window.save");
-
-					if (this.selectEdit !== null) {
-						Sio.sendMessage("t_exec_i", {
-							tag: "sshInit",
-							cmd: `ls "${Config.setting.systemData.pathSetting}"/*${Config.setting.systemData.extensionSsh} | sed 's#.*/##'`
-						});
-
-						Sio.readMessage("t_exec_o_sshInit", (data) => {
-							const result = data.out !== undefined ? data.out : data.err;
-
-							if (result !== undefined) {
-								const outSplit = result.split("\n");
-
-								for (const value of outSplit) {
-									if (value !== "" && value.indexOf("ls: ") === -1) {
-										const option = document.createElement("option");
-										option.value = value;
-										option.text = value.replace(Config.setting.systemData.extensionSsh, "");
-										this.selectEdit.appendChild(option);
-									}
-								}
-							}
-
-							if (data.close !== undefined) {
-								Sio.stopRead("t_exec_o_sshInit");
-							}
-						});
-					}
-				}
-			},
-			clickLogic(event) {
-				const windowComponent = Helper.findParent(event.target, ["ssh_component"], ["window_component"]);
-				const currentWindowElement = Helper.currentWindowElement(windowComponent);
-
-				if (currentWindowElement !== null) {
-					if (this.xterm !== null) {
-						this.xterm.focus();
-					}
-
-					const menuElement = Helper.findParent(event.target, ["menu_ssh"]);
-
-					if (menuElement !== null) {
-						const buttonList = menuElement.querySelectorAll(".button");
-
-						const index = Array.from(buttonList).indexOf(event.target);
-
-						if (index >= 0) {
-							for (const value of buttonList) {
-								value.classList.remove("focused");
-							}
-
-							buttonList[index].classList.add("focused");
-
-							if (index === 0) {
-								this.elementPart1Container.style.display = "block";
-								this.elementPart2Container.style.display = "none";
-							} else if (index === 1) {
-								this.elementPart1Container.style.display = "none";
-								this.elementPart2Container.style.display = "block";
-
-								const terminal = windowComponent.querySelector(".terminal.xterm");
-
-								if (terminal === null && this.selectEdit.selectedIndex > 0) {
-									this._createXterm(windowComponent);
-								} else {
-									if (this.selectEditIndexOld != this.selectEdit.selectedIndex) {
-										this._removeXterm(terminal);
-
-										this._createXterm(windowComponent);
-									}
-								}
-
-								this.selectEditIndexOld = this.selectEdit.selectedIndex;
-							}
-						}
-					}
-
-					this.selectEdit.style.borderColor = "transparent";
-					this.inputName.style.borderColor = "transparent";
-					this.inputServer.style.borderColor = "transparent";
-					this.inputUsername.style.borderColor = "transparent";
-
-					if (event.target.classList.contains("save") === true) {
-						const inputNameCheck = /^[A-Za-z0-9-_ ]+$/.test(this.inputName.value);
-
-						if (inputNameCheck === true && this.inputName.value !== "" && this.inputServer.value !== "" && this.inputUsername.value !== "") {
-							this.inputNameReplace = Helper.replaceName(this.inputName.value, /\s/g, true);
-
-							Sio.sendMessage("t_crypt_encrypt_i", {
-								tag: "sshSetting",
-								text: this.inputPassword !== null ? this.inputPassword.value : ""
-							});
-
-							Sio.readMessage("t_crypt_encrypt_o_sshSetting", (data) => {
-								Sio.stopRead("t_crypt_encrypt_o_sshSetting");
-
-								const content = {
-									name: this.inputName.value,
-									server: this.inputServer.value,
-									username: this.inputUsername.value,
-									password: data.out,
-									keyPublic: this.inputKeyPublic.value,
-									description: this.textareaDescription.value
-								};
-
-								// Create setting file
-								Sio.sendMessage("t_exec_stream_i", {
-									tag: "sshClickLogicSave",
-									cmd: "write",
-									path: `${Config.setting.systemData.pathSetting}/${this.inputNameReplace}${Config.setting.systemData.extensionSsh}`,
-									content: JSON.stringify(content)
-								});
-
-								Sio.readMessage("t_exec_stream_o_sshClickLogicSave", (data) => {
-									if (data.chunk === "end") {
-										Sio.stopRead("t_exec_stream_o_sshClickLogicSave");
-
-										const optionValue = `${this.inputNameReplace}${Config.setting.systemData.extensionSsh}`;
-
-										if (this.selectEdit.querySelector(`option[value='${optionValue}'`) === null) {
-											const option = document.createElement("option");
-											option.value = optionValue;
-											option.text = this.inputNameReplace;
-											this.selectEdit.appendChild(option);
-
-											this.selectEdit.querySelector(`option[value='${optionValue}'`).selected = true;
-
-											this.buttonDelete.style.display = "inline-block";
-										}
-									}
-								});
-							});
-						} else {
-							if (this.inputName.value === "" || inputNameCheck === false) {
-								this.inputName.style.borderColor = "#ff0000";
-							}
-							if (this.inputServer.value === "") {
-								this.inputServer.style.borderColor = "#ff0000";
-							}
-							if (this.inputUsername.value === "") {
-								this.inputUsername.style.borderColor = "#ff0000";
-							}
-						}
-					} else if (event.target.classList.contains("delete") === true) {
-						if (this.selectEdit.selectedIndex > 0) {
-							this.$root.$refs.promptComponent.show(windowComponent, "You really want to delete this ssh?", () => {
-								Sio.sendMessage("t_exec_i", {
-									tag: "sshClickLogicDelete",
-									cmd: `rm "${Config.setting.systemData.pathSetting}/${this.inputNameReplace}${Config.setting.systemData.extensionSsh}"`
-								});
-
-								Sio.readMessage("t_exec_o_sshClickLogicDelete", (data) => {
-									if (data.close !== undefined && this.selectEdit.selectedIndex > 0 && this.selectEdit.options[this.selectEdit.selectedIndex].value !== null) {
-										Sio.stopRead("t_exec_o_sshClickLogicDelete");
-
-										this.selectEdit.options[this.selectEdit.selectedIndex].remove();
-										this.selectEdit.selectedIndex = 0;
-
-										this.inputName.value = "";
-										this.inputNameReplace = "";
-										this.inputServer.value = "";
-										this.inputUsername.value = "";
-										this.inputPassword.value = "";
-										this.inputKeyPublic.value = "";
-										this.textareaDescription.value = "";
-
-										this.buttonDelete.style.display = "none";
-									}
-								});
-							});
-						}
-					}
-				}
-			},
-			changeLogic(event) {
-				const windowComponent = Helper.findParent(event.target, ["ssh_component"], ["window_component"]);
-				const currentWindowElement = Helper.currentWindowElement(windowComponent);
-
-				if (currentWindowElement !== null) {
-					if (event.target.classList.contains("edit") === true) {
-						if (this.selectEdit.selectedIndex > 0) {
-							const optionValue = this.selectEdit.options[this.selectEdit.selectedIndex].value;
-
-							Sio.sendMessage("t_exec_stream_i", {
-								tag: "sshChangeLogicEdit",
-								cmd: "read",
-								path: `${Config.setting.systemData.pathSetting}/${optionValue}`
-							});
-
-							let buffer = "";
-
-							Sio.readMessage("t_exec_stream_o_sshChangeLogicEdit", (data) => {
-								if (data.chunk !== "end") {
-									buffer += data.chunk;
-								} else {
-									Sio.stopRead("t_exec_stream_o_sshChangeLogicEdit");
-
-									const result = JSON.parse(buffer);
-
-									this.inputName.value = result.name;
-									this.inputNameReplace = Helper.replaceName(result.name, /\s/g, true);
-									this.inputServer.value = result.server;
-									this.inputUsername.value = result.username;
-									this.inputKeyPublic.value = result.keyPublic;
-									this.textareaDescription.value = result.description;
-
-									this.buttonDelete.style.display = "inline-block";
-
-									Sio.sendMessage("t_crypt_decrypt_i", {
-										tag: "sshSetting",
-										hex: result.password
-									});
-
-									Sio.readMessage("t_crypt_decrypt_o_sshSetting", (data) => {
-										Sio.stopRead("t_crypt_decrypt_o_sshSetting");
-
-										this.inputPassword.value = data.out;
-									});
-								}
-							});
-						} else {
-							this.inputName.value = "";
-							this.inputNameReplace = "";
-							this.inputServer.value = "";
-							this.inputUsername.value = "";
-							this.inputPassword.value = "";
-							this.inputKeyPublic.value = "";
-							this.textareaDescription.value = "";
-
-							this.buttonDelete.style.display = "none";
-						}
-					}
-				}
-			},
-			resizeLogic() {
-				const terminalComponentList = document.querySelectorAll(".terminal_project_component");
-
-				for (const value of terminalComponentList) {
-					const windowComponent = Helper.findParent(value, ["window_component"]);
-					const currentWindowElement = Helper.currentWindowElement(windowComponent);
-
-					if (currentWindowElement !== null) {
-						const terminal = value.querySelector(".terminal.xterm");
-
-						if (terminal !== null && this.fitAddon !== null) {
-							const clientRect = value.getBoundingClientRect();
-							terminal.style.height = `${clientRect.height}px`;
-
-							this.fitAddon.fit();
-
-							const size = this.fitAddon.proposeDimensions();
-
-							Sio.sendMessage("t_pty_resize", {
-								tag: "ssh",
-								size: [size.cols, size.rows]
-							});
-						}
-					}
-				}
-			},
-			close(windowComponent) {
-				const currentWindowElement = Helper.currentWindowElement(windowComponent);
-
-				if (currentWindowElement !== null && currentWindowElement.name === "Ssh") {
-					Sio.stopRead("t_pty_o_ssh");
-
-					Sio.sendMessage("t_pty_close", { tag: "ssh" });
-
-					this.xterm = null;
-					this.fitAddon = null;
-				}
-			}
-		},
-		data() {
-			return {
-				elementPart1Container: null,
-				elementPart2Container: null,
-				selectEdit: null,
-				selectEditIndexOld: 0,
-				inputName: null,
-				inputNameReplace: "",
-				inputServer: null,
-				inputUsername: null,
-				inputPassword: null,
-				inputKeyPublic: null,
-				textareaDescription: null,
-				buttonDelete: null,
-				buttonSave: null,
-				xterm: null,
-				fitAddon: null
-			};
-		},
-		created() {
-			this.$root.$refs.projectSshComponent = this;
-		},
-		beforeDestroy() {}
-	};
+    import * as Config from "../assets/js/Config";
+    import * as Helper from "../assets/js/Helper";
+    import * as Sio from "../assets/js/Sio";
+
+    import { Terminal } from "xterm";
+    import { FitAddon } from "xterm-addon-fit";
+    import "xterm/css/xterm.css";
+
+    export default {
+        name: "ProjectSshComponent",
+        //components: {},
+        computed: {},
+        methods: {
+            _createXterm(windowComponent) {
+                const terminalComponent = windowComponent.querySelector(".terminal_project_component");
+
+                this.xterm = new Terminal({
+                    cursorBlink: true
+                });
+                this.fitAddon = new FitAddon();
+                this.xterm.loadAddon(this.fitAddon);
+                this.xterm.open(terminalComponent);
+                this.xterm.focus();
+
+                const clientRect = terminalComponent.getBoundingClientRect();
+                const terminal = terminalComponent.querySelector(".terminal.xterm");
+
+                terminal.style.height = `${clientRect.height}px`;
+
+                this.fitAddon.fit();
+
+                const size = this.fitAddon.proposeDimensions();
+
+                Sio.sendMessage("t_pty_start", {
+                    tag: "ssh",
+                    size: [size.cols, size.rows]
+                });
+
+                const pathKey = `${Config.setting.systemData.pathKey}/${this.inputKeyPublic.value}`;
+
+                let command = "";
+
+                if (this.inputPassword.value !== "") {
+                    command = `sshpass -p "${this.inputPassword.value}" ssh ${this.inputUsername.value}@${this.inputServer.value}`;
+                } else if (this.inputKeyPublic.value !== "") {
+                    command = `chmod 400 ${pathKey} && ssh -i ${pathKey} ${this.inputUsername.value}@${this.inputServer.value}`;
+                }
+
+                if (command === "") {
+                    return false;
+                }
+
+                Sio.sendMessage("t_pty_i", {
+                    tag: "ssh",
+                    cmd: `history -c && history -w && clear && ${command}\r`
+                });
+
+                this.xterm.onData((data) => {
+                    Sio.sendMessage("t_pty_i", {
+                        tag: "ssh",
+                        cmd: data
+                    });
+                });
+
+                Sio.readMessage("t_pty_o_ssh", (data) => {
+                    if (terminal !== null) {
+                        if (data.cmd.indexOf(" closed by ") !== -1 || data.cmd.indexOf("logout") !== -1 || this.selectEdit.selectedIndex === 0) {
+                            this._removeXterm(terminal);
+
+                            return;
+                        }
+
+                        if (this.xterm !== undefined && data.tag !== undefined && data.cmd !== undefined) {
+                            this.xterm.write(data.cmd);
+                        }
+                    }
+                });
+            },
+            _removeXterm(terminal) {
+                if (terminal !== null) {
+                    Sio.stopRead("t_pty_o_ssh");
+
+                    Sio.sendMessage("t_pty_close", { tag: "ssh" });
+
+                    this.xterm = null;
+                    this.fitAddon = null;
+
+                    terminal.remove();
+                }
+            },
+            init(windowComponent) {
+                const currentWindowElement = Helper.currentWindowElement(windowComponent);
+
+                if (currentWindowElement !== null) {
+                    this.elementPart1Container = windowComponent.querySelector(".part_1_container");
+                    this.elementPart2Container = windowComponent.querySelector(".part_2_container");
+                    this.selectEdit = windowComponent.querySelector(".part_1_container select[name='edit']");
+                    this.inputName = windowComponent.querySelector(".part_1_container input[name='name']");
+                    this.inputServer = windowComponent.querySelector(".part_1_container input[name='server']");
+                    this.inputUsername = windowComponent.querySelector(".part_1_container input[name='username']");
+                    this.inputPassword = windowComponent.querySelector(".part_1_container input[name='password']");
+                    this.inputKeyPublic = windowComponent.querySelector(".part_1_container input[name='key_public']");
+                    this.textareaDescription = windowComponent.querySelector("textarea[name='description']");
+                    this.buttonDelete = windowComponent.querySelector(".button_cmd_window.delete");
+                    this.buttonSave = windowComponent.querySelector(".button_cmd_window.save");
+
+                    if (this.selectEdit !== null) {
+                        Sio.sendMessage("t_exec_i", {
+                            tag: "sshInit",
+                            cmd: `ls "${Config.setting.systemData.pathSetting}"/*${Config.setting.systemData.extensionSsh} | sed 's#.*/##'`
+                        });
+
+                        Sio.readMessage("t_exec_o_sshInit", (data) => {
+                            const result = data.out !== undefined ? data.out : data.err;
+
+                            if (result !== undefined) {
+                                const outSplit = result.split("\n");
+
+                                for (const value of outSplit) {
+                                    if (value !== "" && value.indexOf("ls: ") === -1) {
+                                        const option = document.createElement("option");
+                                        option.value = value;
+                                        option.text = value.replace(Config.setting.systemData.extensionSsh, "");
+                                        this.selectEdit.appendChild(option);
+                                    }
+                                }
+                            }
+
+                            if (data.close !== undefined) {
+                                Sio.stopRead("t_exec_o_sshInit");
+                            }
+                        });
+                    }
+                }
+            },
+            clickLogic(event) {
+                const windowComponent = Helper.findParent(event.target, ["ssh_component"], ["window_component"]);
+                const currentWindowElement = Helper.currentWindowElement(windowComponent);
+
+                if (currentWindowElement !== null) {
+                    if (this.xterm !== null) {
+                        this.xterm.focus();
+                    }
+
+                    const menuElement = Helper.findParent(event.target, ["menu_ssh"]);
+
+                    if (menuElement !== null) {
+                        const buttonList = menuElement.querySelectorAll(".button");
+
+                        const index = Array.from(buttonList).indexOf(event.target);
+
+                        if (index >= 0) {
+                            for (const value of buttonList) {
+                                value.classList.remove("focused");
+                            }
+
+                            buttonList[index].classList.add("focused");
+
+                            if (index === 0) {
+                                this.elementPart1Container.style.display = "block";
+                                this.elementPart2Container.style.display = "none";
+                            } else if (index === 1) {
+                                this.elementPart1Container.style.display = "none";
+                                this.elementPart2Container.style.display = "block";
+
+                                const terminal = windowComponent.querySelector(".terminal.xterm");
+
+                                if (terminal === null && this.selectEdit.selectedIndex > 0) {
+                                    this._createXterm(windowComponent);
+                                } else {
+                                    if (this.selectEditIndexOld != this.selectEdit.selectedIndex) {
+                                        this._removeXterm(terminal);
+
+                                        this._createXterm(windowComponent);
+                                    }
+                                }
+
+                                this.selectEditIndexOld = this.selectEdit.selectedIndex;
+                            }
+                        }
+                    }
+
+                    this.selectEdit.style.borderColor = "transparent";
+                    this.inputName.style.borderColor = "transparent";
+                    this.inputServer.style.borderColor = "transparent";
+                    this.inputUsername.style.borderColor = "transparent";
+
+                    if (event.target.classList.contains("save") === true) {
+                        const inputNameCheck = /^[A-Za-z0-9-_ ]+$/.test(this.inputName.value);
+
+                        if (inputNameCheck === true && this.inputName.value !== "" && this.inputServer.value !== "" && this.inputUsername.value !== "") {
+                            this.inputNameReplace = Helper.replaceName(this.inputName.value, /\s/g, true);
+
+                            Sio.sendMessage("t_crypt_encrypt_i", {
+                                tag: "sshSetting",
+                                text: this.inputPassword !== null ? this.inputPassword.value : ""
+                            });
+
+                            Sio.readMessage("t_crypt_encrypt_o_sshSetting", (data) => {
+                                Sio.stopRead("t_crypt_encrypt_o_sshSetting");
+
+                                const content = {
+                                    name: this.inputName.value,
+                                    server: this.inputServer.value,
+                                    username: this.inputUsername.value,
+                                    password: data.out,
+                                    keyPublic: this.inputKeyPublic.value,
+                                    description: this.textareaDescription.value
+                                };
+
+                                // Create setting file
+                                Sio.sendMessage("t_exec_stream_i", {
+                                    tag: "sshClickLogicSave",
+                                    cmd: "write",
+                                    path: `${Config.setting.systemData.pathSetting}/${this.inputNameReplace}${Config.setting.systemData.extensionSsh}`,
+                                    content: JSON.stringify(content)
+                                });
+
+                                Sio.readMessage("t_exec_stream_o_sshClickLogicSave", (data) => {
+                                    if (data.chunk === "end") {
+                                        Sio.stopRead("t_exec_stream_o_sshClickLogicSave");
+
+                                        const optionValue = `${this.inputNameReplace}${Config.setting.systemData.extensionSsh}`;
+
+                                        if (this.selectEdit.querySelector(`option[value='${optionValue}'`) === null) {
+                                            const option = document.createElement("option");
+                                            option.value = optionValue;
+                                            option.text = this.inputNameReplace;
+                                            this.selectEdit.appendChild(option);
+
+                                            this.selectEdit.querySelector(`option[value='${optionValue}'`).selected = true;
+
+                                            this.buttonDelete.style.display = "inline-block";
+                                        }
+                                    }
+                                });
+                            });
+                        } else {
+                            if (this.inputName.value === "" || inputNameCheck === false) {
+                                this.inputName.style.borderColor = "#ff0000";
+                            }
+                            if (this.inputServer.value === "") {
+                                this.inputServer.style.borderColor = "#ff0000";
+                            }
+                            if (this.inputUsername.value === "") {
+                                this.inputUsername.style.borderColor = "#ff0000";
+                            }
+                        }
+                    } else if (event.target.classList.contains("delete") === true) {
+                        if (this.selectEdit.selectedIndex > 0) {
+                            this.$root.$refs.promptComponent.show(windowComponent, "You really want to delete this ssh?", () => {
+                                Sio.sendMessage("t_exec_i", {
+                                    tag: "sshClickLogicDelete",
+                                    cmd: `rm "${Config.setting.systemData.pathSetting}/${this.inputNameReplace}${Config.setting.systemData.extensionSsh}"`
+                                });
+
+                                Sio.readMessage("t_exec_o_sshClickLogicDelete", (data) => {
+                                    if (data.close !== undefined && this.selectEdit.selectedIndex > 0 && this.selectEdit.options[this.selectEdit.selectedIndex].value !== null) {
+                                        Sio.stopRead("t_exec_o_sshClickLogicDelete");
+
+                                        this.selectEdit.options[this.selectEdit.selectedIndex].remove();
+                                        this.selectEdit.selectedIndex = 0;
+
+                                        this.inputName.value = "";
+                                        this.inputNameReplace = "";
+                                        this.inputServer.value = "";
+                                        this.inputUsername.value = "";
+                                        this.inputPassword.value = "";
+                                        this.inputKeyPublic.value = "";
+                                        this.textareaDescription.value = "";
+
+                                        this.buttonDelete.style.display = "none";
+                                    }
+                                });
+                            });
+                        }
+                    }
+                }
+            },
+            changeLogic(event) {
+                const windowComponent = Helper.findParent(event.target, ["ssh_component"], ["window_component"]);
+                const currentWindowElement = Helper.currentWindowElement(windowComponent);
+
+                if (currentWindowElement !== null) {
+                    if (event.target.classList.contains("edit") === true) {
+                        if (this.selectEdit.selectedIndex > 0) {
+                            const optionValue = this.selectEdit.options[this.selectEdit.selectedIndex].value;
+
+                            Sio.sendMessage("t_exec_stream_i", {
+                                tag: "sshChangeLogicEdit",
+                                cmd: "read",
+                                path: `${Config.setting.systemData.pathSetting}/${optionValue}`
+                            });
+
+                            let buffer = "";
+
+                            Sio.readMessage("t_exec_stream_o_sshChangeLogicEdit", (data) => {
+                                if (data.chunk !== "end") {
+                                    buffer += data.chunk;
+                                } else {
+                                    Sio.stopRead("t_exec_stream_o_sshChangeLogicEdit");
+
+                                    const result = JSON.parse(buffer);
+
+                                    this.inputName.value = result.name;
+                                    this.inputNameReplace = Helper.replaceName(result.name, /\s/g, true);
+                                    this.inputServer.value = result.server;
+                                    this.inputUsername.value = result.username;
+                                    this.inputKeyPublic.value = result.keyPublic;
+                                    this.textareaDescription.value = result.description;
+
+                                    this.buttonDelete.style.display = "inline-block";
+
+                                    Sio.sendMessage("t_crypt_decrypt_i", {
+                                        tag: "sshSetting",
+                                        hex: result.password
+                                    });
+
+                                    Sio.readMessage("t_crypt_decrypt_o_sshSetting", (data) => {
+                                        Sio.stopRead("t_crypt_decrypt_o_sshSetting");
+
+                                        this.inputPassword.value = data.out;
+                                    });
+                                }
+                            });
+                        } else {
+                            this.inputName.value = "";
+                            this.inputNameReplace = "";
+                            this.inputServer.value = "";
+                            this.inputUsername.value = "";
+                            this.inputPassword.value = "";
+                            this.inputKeyPublic.value = "";
+                            this.textareaDescription.value = "";
+
+                            this.buttonDelete.style.display = "none";
+                        }
+                    }
+                }
+            },
+            resizeLogic() {
+                const terminalComponentList = document.querySelectorAll(".terminal_project_component");
+
+                for (const value of terminalComponentList) {
+                    const windowComponent = Helper.findParent(value, ["window_component"]);
+                    const currentWindowElement = Helper.currentWindowElement(windowComponent);
+
+                    if (currentWindowElement !== null) {
+                        const terminal = value.querySelector(".terminal.xterm");
+
+                        if (terminal !== null && this.fitAddon !== null) {
+                            const clientRect = value.getBoundingClientRect();
+                            terminal.style.height = `${clientRect.height}px`;
+
+                            this.fitAddon.fit();
+
+                            const size = this.fitAddon.proposeDimensions();
+
+                            Sio.sendMessage("t_pty_resize", {
+                                tag: "ssh",
+                                size: [size.cols, size.rows]
+                            });
+                        }
+                    }
+                }
+            },
+            close(windowComponent) {
+                const currentWindowElement = Helper.currentWindowElement(windowComponent);
+
+                if (currentWindowElement !== null && currentWindowElement.name === "Ssh") {
+                    Sio.stopRead("t_pty_o_ssh");
+
+                    Sio.sendMessage("t_pty_close", { tag: "ssh" });
+
+                    this.xterm = null;
+                    this.fitAddon = null;
+                }
+            }
+        },
+        data() {
+            return {
+                elementPart1Container: null,
+                elementPart2Container: null,
+                selectEdit: null,
+                selectEditIndexOld: 0,
+                inputName: null,
+                inputNameReplace: "",
+                inputServer: null,
+                inputUsername: null,
+                inputPassword: null,
+                inputKeyPublic: null,
+                textareaDescription: null,
+                buttonDelete: null,
+                buttonSave: null,
+                xterm: null,
+                fitAddon: null
+            };
+        },
+        created() {
+            this.$root.$refs.projectSshComponent = this;
+        },
+        beforeDestroy() {}
+    };
 </script>
 
 <style lang="scss" scoped>
-	.ssh_component {
-		.menu_ssh {
-			height: 28px;
-			background-color: #2b2b2b;
-			border-bottom: 1px solid #a0a0a0;
+    .ssh_component {
+        .menu_ssh {
+            height: 28px;
+            background-color: #2b2b2b;
+            border-bottom: 1px solid #a0a0a0;
 
-			.button {
-				display: inline-block;
-				padding: 7px 8px;
-				font-size: 12px;
-			}
+            .button {
+                display: inline-block;
+                padding: 7px 8px;
+                font-size: 12px;
+            }
 
-			.focused {
-				background-color: #0060ad;
-			}
+            .focused {
+                background-color: #0060ad;
+            }
 
-			p {
-				cursor: pointer;
+            p {
+                cursor: pointer;
 
-				&:hover {
-					background-color: #808080;
-				}
-			}
-		}
+                &:hover {
+                    background-color: #808080;
+                }
+            }
+        }
 
-		.part_1_container {
-			position: absolute;
-			top: 28px;
-			bottom: 0;
-			left: 0;
-			right: 0;
-			padding: 10px;
-			display: block;
-		}
+        .part_1_container {
+            position: absolute;
+            top: 28px;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 10px;
+            display: block;
+        }
 
-		.part_2_container {
-			position: absolute;
-			top: 29px;
-			bottom: 0;
-			left: 0;
-			right: 0;
-			display: none;
+        .part_2_container {
+            position: absolute;
+            top: 29px;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: none;
 
-			.terminal_project_component {
-				position: absolute;
-				top: 0;
-				bottom: 0;
-				left: 0;
-				right: 0;
-			}
-		}
+            .terminal_project_component {
+                position: absolute;
+                top: 0;
+                bottom: 0;
+                left: 0;
+                right: 0;
+            }
+        }
 
-		.section {
-			margin-bottom: 20px;
+        .section {
+            margin-bottom: 20px;
 
-			input {
-				width: 40%;
-			}
+            input {
+                width: 40%;
+            }
 
-			textarea {
-				width: 40%;
-				resize: none;
-			}
+            textarea {
+                width: 40%;
+                resize: none;
+            }
 
-			.button_cmd_window {
-				&.delete {
-					display: none;
-					margin-left: 10px;
-					background-color: #ff0000;
-				}
-			}
-		}
+            .button_cmd_window {
+                &.delete {
+                    display: none;
+                    margin-left: 10px;
+                    background-color: #ff0000;
+                }
+            }
+        }
 
-		.bottom {
-			position: absolute;
-			bottom: 10px;
-			width: 100%;
-			text-align: right;
+        .bottom {
+            position: absolute;
+            bottom: 10px;
+            width: 100%;
+            text-align: right;
 
-			.button_cmd_window {
-				display: inline-block;
-				margin-right: 25px;
-			}
-		}
-	}
+            .button_cmd_window {
+                display: inline-block;
+                margin-right: 25px;
+            }
+        }
+    }
 </style>

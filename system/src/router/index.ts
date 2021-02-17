@@ -5,17 +5,17 @@ import Body from "../components/Body.vue";
 Vue.use(VueRouter);
 
 const routes: Array<RouteConfig> = [
-	{
-		path: "/",
-		name: "Body",
-		component: Body
-	}
+    {
+        path: "/",
+        name: "Body",
+        component: Body
+    }
 ];
 
 const router = new VueRouter({
-	mode: "history",
-	base: process.env.BASE_URL,
-	routes
+    mode: "history",
+    base: process.env.BASE_URL,
+    routes
 });
 
 export default router;
