@@ -13,235 +13,252 @@
             <div class="overlay drag"></div>
         </div>
         <div class="body">
-            <ProjectComponent />
-            <ToolComponent />
-            <ContainerComponent />
+            <ComponentProject />
+            <ComponentTool />
+            <ComponentContainer />
             <div class="overlay"></div>
         </div>
         <div class="footer"></div>
     </div>
 </template>
 
-<script>
+<script lang="ts">
+    import { Component, Vue } from "vue-property-decorator";
+
+    import ComponentProject from "./Project.vue";
+    import ComponentTool from "./Tool.vue";
+    import ComponentContainer from "./Container.vue";
+
     import * as Config from "../assets/js/Config";
+    import * as Interface from "../assets/js/Interface";
     import * as Helper from "../assets/js/Helper";
-    import ProjectComponent from "./Project.vue";
-    import ToolComponent from "./Tool.vue";
-    import ContainerComponent from "./Container.vue";
 
-    export default {
-        name: "WindowComponent",
+    @Component({
         components: {
-            ProjectComponent,
-            ToolComponent,
-            ContainerComponent
-        },
-        computed: {},
-        methods: {
-            _changeAppearance(windowComponent) {
-                const currentWindowElement = Helper.currentWindowElement(windowComponent);
+            ComponentProject,
+            ComponentTool,
+            ComponentContainer
+        }
+    })
+    export default class ComponentWindow extends Vue {
+        // Variables
+        private windowPositionList!: Interface.Position[];
+        private windowSizeList!: Interface.Size[];
 
-                if (currentWindowElement !== null) {
-                    if (windowComponent.classList.contains("maximized") === false) {
-                        const clientRect = windowComponent.getBoundingClientRect();
+        // Functions
+        protected created(): void {
+            Helper.component.window = this;
 
-                        this.windowPositionList[currentWindowElement.name].x = clientRect.x;
-                        this.windowPositionList[currentWindowElement.name].y = clientRect.y;
+            this.windowPositionList = [];
+            this.windowSizeList = [];
+        }
 
-                        windowComponent.style.left = "0";
-                        windowComponent.style.top = "0";
+        protected beforeDestroy(): void {}
 
-                        windowComponent.style.width = "calc(100% - 2px)";
-                        windowComponent.style.height = "calc(100% - 44px)";
+        // Logic
+        private logicChangeAppearance(componentWindow: HTMLElement): void {
+            const currentWindow = Helper.currentWindow(componentWindow);
 
-                        windowComponent.querySelector(".overlay").classList.remove("drag");
-                    } else {
-                        windowComponent.style.left = `${this.windowPositionList[currentWindowElement.name].x}px`;
-                        windowComponent.style.top = `${this.windowPositionList[currentWindowElement.name].y}px`;
+            if (currentWindow) {
+                const elementOverlay = componentWindow.querySelector(".overlay") as HTMLElement;
 
-                        windowComponent.style.width = this.windowSizeList[currentWindowElement.name].width;
-                        windowComponent.style.height = this.windowSizeList[currentWindowElement.name].height;
+                if (!componentWindow.classList.contains("maximized")) {
+                    const computedStyle = window.getComputedStyle(componentWindow);
 
-                        windowComponent.querySelector(".overlay").classList.add("drag");
-                    }
+                    this.windowPositionList[currentWindow.name as any].left = computedStyle.left;
+                    this.windowPositionList[currentWindow.name as any].top = computedStyle.top;
 
-                    windowComponent.classList.toggle("maximized");
+                    componentWindow.style.left = "0";
+                    componentWindow.style.top = "0";
 
-                    this.resizeLogic();
-                }
-            },
-            _close(windowComponent) {
-                const currentWindowElement = Helper.currentWindowElement(windowComponent);
+                    componentWindow.style.width = "calc(100% - 2px)";
+                    componentWindow.style.height = "calc(100% - 44px)";
 
-                if (currentWindowElement !== null) {
-                    delete this.windowPositionList[currentWindowElement.name];
-                    delete this.windowSizeList[currentWindowElement.name];
-                }
-            },
-            init(windowOpener) {
-                const name = windowOpener.getAttribute("data-name");
-                const category = windowOpener.getAttribute("data-category");
-
-                let windowComponent = document.querySelector(`.window_component[data-name='${name}']`);
-
-                if (windowComponent === null) {
-                    const windowComponentEmpty = document.querySelector(".window_component.empty");
-
-                    const newWindowComponent = windowComponentEmpty.cloneNode(true);
-                    newWindowComponent.classList.remove("empty");
-                    newWindowComponent.classList.add("focused");
-                    newWindowComponent.setAttribute("data-name", name);
-                    newWindowComponent.setAttribute("data-category", category);
-                    newWindowComponent.style.display = "block";
-
-                    if (category === "project") {
-                        newWindowComponent.querySelector(".tool_component").remove();
-                        newWindowComponent.querySelector(".container_component").remove();
-
-                        this.$root.$refs.projectComponent.init(newWindowComponent);
-                    } else if (category === "tool") {
-                        newWindowComponent.querySelector(".project_component").remove();
-                        newWindowComponent.querySelector(".container_component").remove();
-
-                        this.$root.$refs.toolComponent.init(newWindowComponent);
-                    } else if (category === "container") {
-                        newWindowComponent.querySelector(".project_component").remove();
-                        newWindowComponent.querySelector(".tool_component").remove();
-
-                        this.$root.$refs.containerComponent.init(newWindowComponent);
-                    } else {
-                        newWindowComponent.querySelector(".project_component").remove();
-                        newWindowComponent.querySelector(".tool_component").remove();
-                        newWindowComponent.querySelector(".container_component").remove();
-                    }
-
-                    const src = windowOpener.querySelector("img").getAttribute("src");
-
-                    const icon = newWindowComponent.querySelector(".left_column img");
-                    icon.setAttribute("src", src);
-
-                    const title = newWindowComponent.querySelector(".left_column p");
-                    title.innerHTML = name;
-
-                    const style = window.getComputedStyle(newWindowComponent);
-                    this.windowPositionList[name] = { x: 0, y: 0 };
-                    this.windowSizeList[name] = {
-                        width: style.width,
-                        height: style.height
-                    };
-
-                    document.querySelector(".body_component").appendChild(newWindowComponent);
-
-                    windowComponent = newWindowComponent;
-
-                    Helper.dragInit(newWindowComponent, ["window_component", "focused"]);
-
-                    this.$root.$refs.footerComponent.init(windowOpener);
+                    elementOverlay.classList.remove("drag");
                 } else {
-                    Helper.unMinimizeElement(name);
+                    componentWindow.style.left = this.windowPositionList[currentWindow.name as any].left;
+                    componentWindow.style.top = this.windowPositionList[currentWindow.name as any].top;
+
+                    componentWindow.style.width = this.windowSizeList[currentWindow.name as any].width;
+                    componentWindow.style.height = this.windowSizeList[currentWindow.name as any].height;
+
+                    elementOverlay.classList.add("drag");
                 }
 
-                Helper.focusCurrentWindow(windowComponent);
+                componentWindow.classList.toggle("maximized");
 
-                Helper.focusCurrentMainbarElement();
-            },
-            clickLogic(event) {
-                if (Helper.promptLogic() === true) {
-                    return false;
+                this.resizeLogic();
+            }
+        }
+
+        private logicClose(componentWindow: HTMLElement): void {
+            const currentWindow = Helper.currentWindow(componentWindow);
+
+            if (currentWindow) {
+                delete this.windowPositionList[currentWindow.name as any];
+                delete this.windowSizeList[currentWindow.name as any];
+            }
+        }
+
+        public logicInit(openerWindow: HTMLElement): void {
+            const openerWindowDataName = openerWindow.getAttribute("data-name") as string;
+            const openerWindowDataCategory = openerWindow.getAttribute("data-category") as string;
+
+            let elementComponentWindow = document.querySelector(`.window_component[data-name='${openerWindowDataName}']`) as HTMLElement;
+
+            if (!elementComponentWindow) {
+                const elementComponentWindowEmpty = document.querySelector(".window_component.empty") as HTMLElement;
+
+                const elementComponentWindowNew = elementComponentWindowEmpty.cloneNode(true) as HTMLElement;
+                elementComponentWindowNew.classList.remove("empty");
+                elementComponentWindowNew.classList.add("focused");
+                elementComponentWindowNew.setAttribute("data-name", openerWindowDataName);
+                elementComponentWindowNew.setAttribute("data-category", openerWindowDataCategory);
+                elementComponentWindowNew.style.display = "block";
+
+                const elementComponentProject = elementComponentWindowNew.querySelector(".project_component") as HTMLElement;
+                const elementComponentTool = elementComponentWindowNew.querySelector(".tool_component") as HTMLElement;
+                const elementComponentContainer = elementComponentWindowNew.querySelector(".container_component") as HTMLElement;
+
+                if (openerWindowDataCategory === "project") {
+                    elementComponentTool.remove();
+                    elementComponentContainer.remove();
+
+                    Helper.component.project.logicInit(elementComponentWindowNew);
+                } else if (openerWindowDataCategory === "tool") {
+                    elementComponentProject.remove();
+                    elementComponentContainer.remove();
+
+                    Helper.component.tool.logicInit(elementComponentWindowNew);
+                } else if (openerWindowDataCategory === "container") {
+                    elementComponentProject.remove();
+                    elementComponentTool.remove();
+
+                    Helper.component.container.logicInit(elementComponentWindowNew);
+                } else {
+                    elementComponentProject.remove();
+                    elementComponentTool.remove();
+                    elementComponentContainer.remove();
                 }
 
-                const windowComponent = Helper.findParent(event.target, ["window_component"]);
+                const elementImage = openerWindow.querySelector("img") as HTMLElement;
+                const elementImageDataSrc = elementImage.getAttribute("src") as string;
 
-                if (windowComponent !== null) {
-                    const currentWindowElement = Helper.currentWindowElement(windowComponent);
+                const elementIcon = elementComponentWindowNew.querySelector(".left_column img") as HTMLElement;
+                elementIcon.setAttribute("src", elementImageDataSrc);
 
-                    if (currentWindowElement !== null) {
-                        Helper.focusCurrentWindow(windowComponent);
+                const elementTitle = elementComponentWindowNew.querySelector(".left_column p") as HTMLElement;
+                elementTitle.innerHTML = openerWindowDataName;
 
-                        Helper.focusCurrentMainbarElement();
+                const computedStyle = window.getComputedStyle(elementComponentWindowNew);
 
-                        if (event.target.classList.contains("button_minimize") === true) {
-                            windowComponent.classList.add("minimized");
-                            windowComponent.style.display = "none";
+                this.windowPositionList[openerWindowDataName as any] = { left: "0", top: "0" };
+                this.windowSizeList[openerWindowDataName as any] = { width: computedStyle.width, height: computedStyle.height };
+
+                const elementComponentBody = document.querySelector(".body_component") as HTMLElement;
+                elementComponentBody.appendChild(elementComponentWindowNew);
+
+                elementComponentWindow = elementComponentWindowNew;
+
+                Helper.dragInit(elementComponentWindowNew, ["window_component", "focused"]);
+
+                Helper.component.footer.logicInit(openerWindow);
+            } else {
+                Helper.unMinimizeElement(openerWindowDataName);
+            }
+
+            Helper.focusCurrentWindow(elementComponentWindow);
+
+            Helper.focusCurrentTaskbarElement();
+        }
+
+        public logicClick(event: Event): void {
+            if (!Helper.promptLogic()) {
+                const elementEventTarget = event.target as HTMLElement;
+
+                const componentWindow = Helper.findElement(elementEventTarget, ["window_component"]);
+
+                if (componentWindow) {
+                    const currentWindow = Helper.currentWindow(componentWindow);
+
+                    if (currentWindow) {
+                        Helper.focusCurrentWindow(componentWindow);
+
+                        Helper.focusCurrentTaskbarElement();
+
+                        if (elementEventTarget.classList.contains("button_minimize")) {
+                            componentWindow.classList.add("minimized");
+                            componentWindow.style.display = "none";
 
                             Helper.focusNextWindow();
 
-                            this.$root.$refs.footerComponent.minimize(windowComponent);
+                            Helper.component.footer.logicMinimize(componentWindow);
 
-                            Helper.focusCurrentMainbarElement();
-                        } else if (event.target.classList.contains("button_maximize") === true) {
-                            this._changeAppearance(windowComponent);
-                        } else if (event.target.classList.contains("button_close") === true) {
-                            this.$root.$refs.projectSshComponent.close(windowComponent);
-                            this.$root.$refs.containerCommandComponent.close(windowComponent);
-                            this.$root.$refs.containerTerminalComponent.close(windowComponent);
-                            this.$root.$refs.containerDataComponent.close(windowComponent);
+                            Helper.focusCurrentTaskbarElement();
+                        } else if (elementEventTarget.classList.contains("button_maximize")) {
+                            this.logicChangeAppearance(componentWindow);
+                        } else if (elementEventTarget.classList.contains("button_close")) {
+                            Helper.component.projectSsh.logicClose(componentWindow);
+                            Helper.component.containerCommand.logicClose(componentWindow);
+                            Helper.component.containerTerminal.logicClose(componentWindow);
+                            Helper.component.containerData.logicClose(componentWindow);
 
-                            windowComponent.parentNode.removeChild(windowComponent);
+                            const componentWindowParentNode = componentWindow.parentNode as HTMLElement;
+                            componentWindowParentNode.removeChild(componentWindow);
 
                             Helper.focusNextWindow();
 
-                            this.$root.$refs.footerComponent.remove(windowComponent);
+                            Helper.component.footer.logicRemove(componentWindow);
 
-                            Helper.focusCurrentMainbarElement();
+                            Helper.focusCurrentTaskbarElement();
 
-                            this._close(windowComponent);
+                            this.logicClose(componentWindow);
                         }
                     }
                 } else {
-                    if (this.$root.$refs.promptComponent.clicked === true) {
-                        this.$root.$refs.promptComponent.clicked = false;
+                    if (Helper.component.prompt.isClicked) {
+                        Helper.component.prompt.isClicked = false;
+                    } else {
+                        const openerWindow = Helper.findElement(elementEventTarget, ["window_opener"]);
+                        const taskbar = Helper.findElement(elementEventTarget, ["taskbar_element", "program"]);
 
-                        return false;
-                    }
+                        if (openerWindow && taskbar) {
+                            Helper.focusCurrentWindow();
 
-                    const windowOpener = Helper.findParent(event.target, ["window_opener"]);
-                    const mainbarElement = Helper.findParent(event.target, ["mainbar_element", "program"]);
-
-                    if (windowOpener === null && mainbarElement === null) {
-                        Helper.focusCurrentWindow();
-
-                        Helper.focusCurrentMainbarElement();
+                            Helper.focusCurrentTaskbarElement();
+                        }
                     }
                 }
-            },
-            doubleClickLogic(event) {
-                if (Helper.promptLogic() === true) {
-                    return false;
-                }
-
-                const windowComponent = Helper.findParent(event.target, ["window_component"]);
-
-                const overlayElement = event !== undefined ? Helper.findParent(event.target, ["overlay"]) : null;
-
-                if (overlayElement !== null) {
-                    this._changeAppearance(windowComponent);
-                }
-            },
-            resizeLogic() {
-                if (window.innerWidth < Config.setting.systemData.desktopWidth) {
-                    const windowComponentList = document.querySelectorAll(".window_component:not(.empty)");
-
-                    for (const value of windowComponentList) {
-                        value.style.transform = "translate3d(0, 0, 0)";
-                    }
-                }
-
-                this.$root.$refs.projectSshComponent.resizeLogic();
-                this.$root.$refs.containerTerminalComponent.resizeLogic();
             }
-        },
-        data() {
-            return {
-                windowPositionList: [],
-                windowSizeList: []
-            };
-        },
-        created() {
-            this.$root.$refs.windowComponent = this;
-        },
-        beforeDestroy() {}
-    };
+        }
+
+        public logicDoubleClick(event: Event): void {
+            if (!Helper.promptLogic()) {
+                const elementEventTarget = event.target as HTMLElement;
+
+                const componentWindow = Helper.findElement(elementEventTarget, ["window_component"]);
+
+                const overlay = elementEventTarget ? Helper.findElement(elementEventTarget, ["overlay"]) : null;
+
+                if (componentWindow && overlay) {
+                    this.logicChangeAppearance(componentWindow);
+                }
+            }
+        }
+
+        public resizeLogic(): void {
+            if (window.innerWidth < Config.setting.systemData.desktopWidth) {
+                const elementComponentWindowList = (document.querySelectorAll(".window_component:not(.empty)") as any) as HTMLElement[];
+
+                for (const value of elementComponentWindowList) {
+                    value.style.transform = "translate3d(0, 0, 0)";
+                }
+            }
+
+            Helper.component.projectSsh.logicResize();
+            Helper.component.containerTerminal.logicResize();
+        }
+    }
 </script>
 
 <style lang="scss" scoped>

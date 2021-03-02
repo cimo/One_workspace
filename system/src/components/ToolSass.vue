@@ -33,84 +33,104 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+    import { Component, Vue } from "vue-property-decorator";
+
     import * as Config from "../assets/js/Config";
+    import * as Interface from "../assets/js/Interface";
     import * as Helper from "../assets/js/Helper";
     import * as Sio from "../assets/js/Sio";
 
-    export default {
-        name: "ToolSassComponent",
-        //components: {},
-        computed: {},
-        methods: {
-            init(windowComponent) {
-                const currentWindowElement = Helper.currentWindowElement(windowComponent);
+    @Component({
+        components: {}
+    })
+    export default class ComponentToolSass extends Vue {
+        // Variables
+        private selectEdit!: HTMLSelectElement;
+        private inputFolderInput!: HTMLInputElement;
+        private inputFolderOutput!: HTMLInputElement;
+        private elementOutput!: HTMLElement;
+        private buttonSave!: HTMLButtonElement;
+        private projectName!: string;
+        private projectPath!: string;
 
-                if (currentWindowElement !== null) {
-                    this.selectEdit = windowComponent.querySelector("select[name='edit']");
-                    this.inputFolderInput = windowComponent.querySelector("input[name='folder_input']");
-                    this.inputFolderOutput = windowComponent.querySelector("input[name='folder_output']");
-                    this.buttonSave = windowComponent.querySelector(".button_cmd_window.save");
-                    this.elementOutput = windowComponent.querySelector(".output");
+        // Functions
+        protected created(): void {
+            Helper.component.toolSass = this;
 
-                    if (this.selectEdit !== null) {
-                        Sio.sendMessage("t_exec_i", {
-                            tag: "sassInit",
-                            cmd: `ls "${Config.setting.systemData.pathSetting}"/*${Config.setting.systemData.extensionSass} | sed 's#.*/##'`
-                        });
+            this.projectName = "";
+            this.projectPath = "";
+        }
 
-                        Sio.readMessage("t_exec_o_sassInit", (data) => {
-                            const result = data.out !== undefined ? data.out : data.err;
+        protected beforeDestroy(): void {}
 
-                            if (result !== undefined) {
-                                const outSplit = result.split("\n");
+        // Logic
+        public logicInit(componentWindow: HTMLElement): void {
+            const currentWindow = Helper.currentWindow(componentWindow);
 
-                                for (const value of outSplit) {
-                                    if (value !== "" && value.indexOf("ls: ") === -1) {
-                                        const option = document.createElement("option");
-                                        option.value = value;
-                                        option.text = value.replace(Config.setting.systemData.extensionSass, "");
-                                        this.selectEdit.appendChild(option);
-                                    }
+            if (currentWindow) {
+                this.selectEdit = componentWindow.querySelector("select[name='edit']") as HTMLSelectElement;
+                this.inputFolderInput = componentWindow.querySelector("input[name='folder_input']") as HTMLInputElement;
+                this.inputFolderOutput = componentWindow.querySelector("input[name='folder_output']") as HTMLInputElement;
+                this.elementOutput = componentWindow.querySelector(".output") as HTMLElement;
+                this.buttonSave = componentWindow.querySelector(".button_cmd_window.save") as HTMLButtonElement;
+
+                if (this.selectEdit) {
+                    Sio.sendMessage("t_exec_i", {
+                        tag: "sassInit",
+                        cmd: `ls "${Config.setting.systemData.pathSetting}"/*${Config.setting.systemData.extensionSass} | sed 's#.*/##'`
+                    });
+
+                    Sio.readMessage("t_exec_o_sassInit", (data: Interface.SocketData): void => {
+                        const result = data.out !== undefined ? data.out : data.err;
+
+                        if (result !== undefined) {
+                            const outSplit = result.split("\n");
+
+                            for (const value of outSplit) {
+                                if (value !== "" && value.indexOf("ls: ") === -1) {
+                                    const option = document.createElement("option");
+                                    option.value = value;
+                                    option.text = value.replace(Config.setting.systemData.extensionSass, "");
+                                    this.selectEdit.appendChild(option);
                                 }
                             }
+                        }
 
-                            if (data.close !== undefined) {
-                                Sio.stopRead("t_exec_o_sassInit");
-                            }
-                        });
+                        if (data.close !== undefined) {
+                            Sio.stopRead("t_exec_o_sassInit");
+                        }
+                    });
+                }
+            }
+        }
+
+        public logicClick(event: Event): void {
+            const elementEventTarget = event.target as HTMLElement;
+
+            const componentWindow = Helper.findElement(elementEventTarget, ["sass_component"], ["window_component"]);
+            const currentWindow = Helper.currentWindow(componentWindow);
+
+            if (currentWindow) {
+                this.selectEdit.style.borderColor = "transparent";
+                this.inputFolderInput.style.borderColor = "transparent";
+                this.inputFolderOutput.style.borderColor = "transparent";
+
+                if (elementEventTarget.classList.contains("save")) {
+                    if (this.projectName !== "" && this.inputFolderInput.value !== "" && this.inputFolderOutput.value !== "") {
+                        this.logicCreateFile();
+                    } else {
+                        if (this.inputFolderInput.value === "") {
+                            this.inputFolderInput.style.borderColor = "#ff0000";
+                        }
+                        if (this.inputFolderOutput.value === "") {
+                            this.inputFolderOutput.style.borderColor = "#ff0000";
+                        }
                     }
                 }
-            },
-            clickLogic(event) {
-                const windowComponent = Helper.findParent(event.target, ["sass_component"], ["window_component"]);
-                const currentWindowElement = Helper.currentWindowElement(windowComponent);
 
-                if (currentWindowElement !== null) {
-                    this.selectEdit.style.borderColor = "transparent";
-                    this.inputFolderInput.style.borderColor = "transparent";
-                    this.inputFolderOutput.style.borderColor = "transparent";
-
-                    if (event.target.classList.contains("save") === true) {
-                        if (this.projectName !== "" && this.inputFolderInput.value !== "" && this.inputFolderOutput !== "") {
-                            this.createFile();
-                        } else {
-                            if (this.inputFolderInput.value === "") {
-                                this.inputFolderInput.style.borderColor = "#ff0000";
-                            }
-                            if (this.inputFolderOutput.value === "") {
-                                this.inputFolderOutput.style.borderColor = "#ff0000";
-                            }
-                        }
-                    }
-
-                    if (event.target.classList.contains("button_cmd_window") === true) {
-                        if (this.projectName === "") {
-                            this.selectEdit.style.borderColor = "#ff0000";
-
-                            return false;
-                        }
-
+                if (elementEventTarget.classList.contains("button_cmd_window")) {
+                    if (this.projectName !== "") {
                         this.elementOutput.innerHTML = "";
 
                         const input = `${this.projectPath}${this.inputFolderInput.value}`;
@@ -118,160 +138,147 @@
 
                         let command = "";
 
-                        if (event.target.classList.contains("execute") === true) {
-                            command = `find "${output}" -name '*.css.map' -delete \
-                            && find "${output}" -name '*.css' -delete \
-                            && sass "${input}":"${output}" --style compressed \
-                            && ls "${output}"`;
+                        if (elementEventTarget.classList.contains("execute")) {
+                            command = `find "${output}" -name '*.css.map' -delete && find "${output}" -name '*.css' -delete && sass "${input}":"${output}" --style compressed && ls "${output}"`;
                         }
 
-                        if (command === "") {
-                            return false;
-                        }
-
-                        Sio.sendMessage("t_exec_i", {
-                            tag: "sassCommand",
-                            cmd: command
-                        });
-
-                        let buffer = "";
-
-                        Sio.readMessage("t_exec_o_sassCommand", (data) => {
-                            const result = data.out !== undefined ? data.out : data.err;
-
-                            if (result !== undefined && event.target.classList.contains("execute") === true) {
-                                buffer = result;
-                                this.elementOutput.innerHTML = buffer;
-                            }
-
-                            if (data.close !== undefined) {
-                                Sio.stopRead("t_exec_o_sassCommand");
-
-                                this.elementOutput.innerHTML = buffer;
-                            }
-                        });
-                    }
-                }
-            },
-            changeLogic(event) {
-                const windowComponent = Helper.findParent(event.target, ["sass_component"], ["window_component"]);
-                const currentWindowElement = Helper.currentWindowElement(windowComponent);
-
-                if (currentWindowElement !== null) {
-                    if (event.target.classList.contains("edit") === true) {
-                        if (this.selectEdit.selectedIndex > 0) {
-                            const optionValue = this.selectEdit.options[this.selectEdit.selectedIndex].value;
-
-                            Sio.sendMessage("t_exec_stream_i", {
-                                tag: "sassChangeLogicEdit",
-                                cmd: "read",
-                                path: `${Config.setting.systemData.pathSetting}/${optionValue}`
+                        if (this.selectEdit.selectedIndex > 0 && input !== "" && output !== "" && command !== "") {
+                            Sio.sendMessage("t_exec_i", {
+                                tag: "sassCommand",
+                                cmd: command
                             });
 
                             let buffer = "";
 
-                            Sio.readMessage("t_exec_stream_o_sassChangeLogicEdit", (data) => {
-                                if (data.chunk !== "end") {
-                                    buffer += data.chunk;
-                                } else {
-                                    Sio.stopRead("t_exec_stream_o_sassChangeLogicEdit");
+                            Sio.readMessage("t_exec_o_sassCommand", (data: Interface.SocketData): void => {
+                                const result = data.out !== undefined ? data.out : data.err;
 
-                                    const result = JSON.parse(buffer);
+                                if (result !== undefined && elementEventTarget.classList.contains("execute")) {
+                                    buffer = result;
+                                    this.elementOutput.innerHTML = buffer;
+                                }
 
-                                    this.projectName = result.name;
-                                    this.projectPath = result.path;
-                                    this.inputFolderInput.value = result.input;
-                                    this.inputFolderOutput.value = result.output;
-                                    this.elementOutput.innerHTML = "";
+                                if (data.close !== undefined) {
+                                    Sio.stopRead("t_exec_o_sassCommand");
+
+                                    this.elementOutput.innerHTML = buffer;
                                 }
                             });
-                        } else {
-                            this.projectName = "";
-                            this.projectPath = "";
-                            this.inputFolderInput.value = "";
-                            this.inputFolderOutput.value = "";
-                            this.elementOutput.innerHTML = "";
                         }
-                    }
-                }
-            },
-            createFile(name, path) {
-                if (name !== undefined) {
-                    this.projectName = name;
-                }
-
-                if (path !== undefined) {
-                    this.projectPath = path;
-                }
-
-                const content = {
-                    input: this.inputFolderInput !== null ? this.inputFolderInput.value : "",
-                    output: this.inputFolderOutput !== null ? this.inputFolderOutput.value : "",
-                    name: this.projectName,
-                    path: this.projectPath
-                };
-
-                Sio.sendMessage("t_exec_stream_i", {
-                    tag: "sassClickLogicSave",
-                    cmd: "write",
-                    path: `${Config.setting.systemData.pathSetting}/${this.projectName}${Config.setting.systemData.extensionSass}`,
-                    content: JSON.stringify(content)
-                });
-
-                if (this.selectEdit !== null) {
-                    Sio.readMessage("t_exec_stream_o_sassClickLogicSave", (data) => {
-                        if (data.chunk === "end") {
-                            Sio.stopRead("t_exec_stream_o_sassClickLogicSave");
-
-                            const optionValue = `${this.projectName}${Config.setting.systemData.extensionSass}`;
-
-                            if (this.selectEdit.querySelector(`option[value='${optionValue}'`) === null) {
-                                const option = document.createElement("option");
-                                option.value = optionValue;
-                                option.text = this.projectName;
-                                this.selectEdit.appendChild(option);
-
-                                this.selectEdit.querySelector(`option[value='${optionValue}'`).selected = true;
-                            }
-                        }
-                    });
-                }
-            },
-            deleteOption() {
-                if (this.selectEdit !== null) {
-                    for (const option of this.selectEdit.options) {
-                        if (option.value === `${this.projectName}${Config.setting.systemData.extensionSass}`) {
-                            option.remove();
-                            this.selectEdit.selectedIndex = 0;
-
-                            this.projectName = "";
-                            this.projectPath = "";
-                            this.inputFolderInput.value = "";
-                            this.inputFolderOutput.value = "";
-                            this.elementOutput.innerHTML = "";
-
-                            break;
-                        }
+                    } else {
+                        this.selectEdit.style.borderColor = "#ff0000";
                     }
                 }
             }
-        },
-        data() {
-            return {
-                projectName: "",
-                projectPath: "",
-                selectEdit: null,
-                inputFolderInput: null,
-                inputFolderOutput: null,
-                elementOutput: null,
-                buttonSave: null
+        }
+
+        public logicChange(event: Event): void {
+            const elementEventTarget = event.target as HTMLElement;
+
+            const componentWindow = Helper.findElement(elementEventTarget, ["sass_component"], ["window_component"]);
+            const currentWindow = Helper.currentWindow(componentWindow);
+
+            if (currentWindow) {
+                if (elementEventTarget.classList.contains("edit")) {
+                    if (this.selectEdit.selectedIndex > 0) {
+                        const optionValue = this.selectEdit.options[this.selectEdit.selectedIndex].value;
+
+                        Sio.sendMessage("t_exec_stream_i", {
+                            tag: "sassChangeLogicEdit",
+                            cmd: "read",
+                            path: `${Config.setting.systemData.pathSetting}/${optionValue}`
+                        });
+
+                        let buffer = "";
+
+                        Sio.readMessage("t_exec_stream_o_sassChangeLogicEdit", (data: Interface.SocketData): void => {
+                            if (data.chunk !== "end") {
+                                buffer += data.chunk;
+                            } else {
+                                Sio.stopRead("t_exec_stream_o_sassChangeLogicEdit");
+
+                                const result = JSON.parse(buffer);
+
+                                this.projectName = result.name;
+                                this.projectPath = result.path;
+                                this.inputFolderInput.value = result.input;
+                                this.inputFolderOutput.value = result.output;
+                                this.elementOutput.innerHTML = "";
+                            }
+                        });
+                    } else {
+                        this.projectName = "";
+                        this.projectPath = "";
+                        this.inputFolderInput.value = "";
+                        this.inputFolderOutput.value = "";
+                        this.elementOutput.innerHTML = "";
+                    }
+                }
+            }
+        }
+
+        public logicCreateFile(name?: string, path?: string): void {
+            if (name !== undefined) {
+                this.projectName = name;
+            }
+
+            if (path !== undefined) {
+                this.projectPath = path;
+            }
+
+            const content = {
+                input: this.inputFolderInput ? this.inputFolderInput.value : "",
+                output: this.inputFolderOutput ? this.inputFolderOutput.value : "",
+                name: this.projectName,
+                path: this.projectPath
             };
-        },
-        created() {
-            this.$root.$refs.toolSassComponent = this;
-        },
-        beforeDestroy() {}
-    };
+
+            Sio.sendMessage("t_exec_stream_i", {
+                tag: "sassClickLogicSave",
+                cmd: "write",
+                path: `${Config.setting.systemData.pathSetting}/${this.projectName}${Config.setting.systemData.extensionSass}`,
+                content: JSON.stringify(content)
+            });
+
+            if (this.selectEdit) {
+                Sio.readMessage("t_exec_stream_o_sassClickLogicSave", (data: Interface.SocketData): void => {
+                    if (data.chunk === "end") {
+                        Sio.stopRead("t_exec_stream_o_sassClickLogicSave");
+
+                        const optionValue = `${this.projectName}${Config.setting.systemData.extensionSass}`;
+                        const elementOption = this.selectEdit.querySelector(`option[value="${optionValue}"`) as HTMLOptionElement;
+
+                        if (!elementOption) {
+                            const option = document.createElement("option");
+                            option.value = optionValue;
+                            option.text = this.projectName;
+                            option.selected = true;
+                            this.selectEdit.appendChild(option);
+                        }
+                    }
+                });
+            }
+        }
+
+        public logicDeleteOption(): void {
+            if (this.selectEdit) {
+                for (const option of this.selectEdit.options) {
+                    if (option.value === `${this.projectName}${Config.setting.systemData.extensionSass}`) {
+                        option.remove();
+
+                        this.projectName = "";
+                        this.projectPath = "";
+                        this.selectEdit.selectedIndex = 0;
+                        this.inputFolderInput.value = "";
+                        this.inputFolderOutput.value = "";
+                        this.elementOutput.innerHTML = "";
+
+                        break;
+                    }
+                }
+            }
+        }
+    }
 </script>
 
 <style lang="scss" scoped>

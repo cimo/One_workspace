@@ -1,58 +1,64 @@
 <template>
     <div class="project_component">
-        <ProjectExploreComponent />
-        <ProjectSshComponent />
+        <ComponentProjectExplore />
+        <ComponentProjectSsh />
     </div>
 </template>
 
-<script>
+<script lang="ts">
+    import { Component, Vue } from "vue-property-decorator";
+
+    import ComponentProjectExplore from "./ProjectExplore.vue";
+    import ComponentProjectSsh from "./ProjectSsh.vue";
+
     import * as Helper from "../assets/js/Helper";
-    import ProjectExploreComponent from "./ProjectExplore.vue";
-    import ProjectSshComponent from "./ProjectSsh.vue";
+    import * as Interface from "../assets/js/Interface";
 
-    export default {
-        name: "ProjectComponent",
+    @Component({
         components: {
-            ProjectExploreComponent,
-            ProjectSshComponent
-        },
-        computed: {},
-        methods: {
-            _showComponent(windowComponent, currentWindowElement) {
-                if (currentWindowElement.name === "Explore") {
-                    const sshComponent = windowComponent.querySelector(".ssh_component");
+            ComponentProjectExplore,
+            ComponentProjectSsh
+        }
+    })
+    export default class ComponentProject extends Vue {
+        // Variables
 
-                    if (sshComponent !== null) {
-                        sshComponent.remove();
-                    }
+        // Functions
+        protected created(): void {
+            Helper.component.project = this;
+        }
 
-                    this.$root.$refs.projectExploreComponent.init(windowComponent);
-                } else if (currentWindowElement.name === "Ssh") {
-                    const exploreComponent = windowComponent.querySelector(".explore_component");
+        protected beforeDestroy(): void {}
 
-                    if (exploreComponent !== null) {
-                        exploreComponent.remove();
-                    }
+        // Logic
+        private logicShowComponent(componentWindow: HTMLElement, currentWindow: Interface.Window): void {
+            if (currentWindow.name === "Explore") {
+                const sshComponent = componentWindow.querySelector(".ssh_component") as HTMLElement;
 
-                    this.$root.$refs.projectSshComponent.init(windowComponent);
+                if (sshComponent) {
+                    sshComponent.remove();
                 }
-            },
-            init(windowComponent) {
-                const currentWindowElement = Helper.currentWindowElement(windowComponent);
 
-                if (currentWindowElement !== null) {
-                    this._showComponent(windowComponent, currentWindowElement);
+                Helper.component.projectExplore.logicInit(componentWindow);
+            } else if (currentWindow.name === "Ssh") {
+                const exploreComponent = componentWindow.querySelector(".explore_component") as HTMLElement;
+
+                if (exploreComponent) {
+                    exploreComponent.remove();
                 }
+
+                Helper.component.projectSsh.logicInit(componentWindow);
             }
-        },
-        data() {
-            return {};
-        },
-        created() {
-            this.$root.$refs.projectComponent = this;
-        },
-        beforeDestroy() {}
-    };
+        }
+
+        public logicInit(componentWindow: HTMLElement): void {
+            const currentWindow = Helper.currentWindow(componentWindow);
+
+            if (currentWindow) {
+                this.logicShowComponent(componentWindow, currentWindow);
+            }
+        }
+    }
 </script>
 
 <style lang="scss" scoped>

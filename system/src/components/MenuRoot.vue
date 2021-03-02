@@ -1,11 +1,11 @@
 <template>
-    <div class="menuRoot_component mainbar_element">
+    <div class="menuRoot_component taskbar_element">
         <img class="menuRoot_image" src="../assets/images/menu_root.svg" alt="menu_root.svg" />
 
         <div class="menuRoot_container">
             <div class="menuRoot_side">
                 <div class="menuRoot_side_container">
-                    <div v-for="(value, key) in menuRoot.sideItemList" v-bind:key="`${key}-${value.name}`" class="window_opener" v-bind:data-category="value.category" v-bind:data-name="value.name">
+                    <div v-for="(value, key) in interfaceSetting.menuRoot.sideItemList" v-bind:key="`${key}-${value.name}`" class="window_opener" v-bind:data-category="value.category" v-bind:data-name="value.name">
                         <div class="item">
                             <img class="icon" v-bind:src="value.imagePath" v-bind:alt="value.imageName" />
                         </div>
@@ -14,28 +14,21 @@
             </div>
             <div class="menuRoot_panel">
                 <p class="label">Project</p>
-                <div v-for="(value, key) in menuRoot.projectItemList" v-bind:key="`${key}-${value.name}`" class="window_opener" v-bind:data-category="value.category" v-bind:data-name="value.name">
+                <div v-for="(value, key) in interfaceSetting.menuRoot.projectItemList" v-bind:key="`${key}-${value.name}`" class="window_opener" v-bind:data-category="value.category" v-bind:data-name="value.name">
                     <div class="program">
                         <img class="icon" v-bind:src="value.imagePath" v-bind:alt="value.imageName" />
                         <p class="text">{{ value.name }}</p>
                     </div>
                 </div>
                 <p class="label">Tool</p>
-                <div v-for="(value, key) in menuRoot.toolItemList" v-bind:key="`${key}-${value.name}`" class="window_opener" v-bind:data-category="value.category" v-bind:data-name="value.name">
+                <div v-for="(value, key) in interfaceSetting.menuRoot.toolItemList" v-bind:key="`${key}-${value.name}`" class="window_opener" v-bind:data-category="value.category" v-bind:data-name="value.name">
                     <div class="program">
                         <img class="icon" v-bind:src="value.imagePath" v-bind:alt="value.imageName" />
                         <p class="text">{{ value.name }}</p>
                     </div>
                 </div>
                 <p class="label">Container</p>
-                <div
-                    v-for="(value, key) in menuRoot.containerItemList"
-                    v-bind:key="`${key}-${value.name}`"
-                    class="window_opener"
-                    v-bind:data-category="value.category"
-                    v-bind:data-name="value.name"
-                    v-bind:data-container_name="value.containerName"
-                >
+                <div v-for="(value, key) in interfaceSetting.menuRoot.containerItemList" v-bind:key="`${key}-${value.name}`" class="window_opener" v-bind:data-category="value.category" v-bind:data-name="value.name" v-bind:data-container_name="value.containerName">
                     <div class="program">
                         <img class="icon" v-bind:src="value.imagePath" v-bind:alt="value.imageName" />
                         <p class="text">{{ value.name }}</p>
@@ -46,69 +39,81 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+    import { Component, Vue } from "vue-property-decorator";
+
     import * as Config from "../assets/js/Config";
+    import * as Interface from "../assets/js/Interface";
     import * as Helper from "../assets/js/Helper";
 
-    export default {
-        name: "MenuRootComponent",
-        computed: {},
-        methods: {
-            clickLogic(event) {
-                const menuRootComponent = Helper.findParent(event.target, ["menuRoot_component"]);
+    @Component({
+        components: {}
+    })
+    export default class ComponentMenuRoot extends Vue {
+        // Variables
+        private menuRootContainer!: HTMLElement;
+        private interfaceSetting!: Interface.Setting;
 
-                if (menuRootComponent !== null) {
-                    this.menuRootContainer = menuRootComponent.querySelector(".menuRoot_container");
+        // Functions
+        protected created(): void {
+            Helper.component.menuRoot = this;
 
-                    if (menuRootComponent === null) {
+            this.interfaceSetting = Config.setting;
+        }
+
+        protected beforeDestroy(): void {}
+
+        // Logic
+        public logicClick(event: Event): boolean {
+            const elementEventTarget = event.target as HTMLElement;
+
+            const menuRootComponent = Helper.findElement(elementEventTarget, ["menuRoot_component"]);
+
+            if (menuRootComponent) {
+                this.menuRootContainer = menuRootComponent.querySelector(".menuRoot_container") as HTMLElement;
+
+                if (!menuRootComponent) {
+                    this.menuRootContainer.style.display = "none";
+
+                    return false;
+                }
+
+                if (elementEventTarget.classList.contains("menuRoot_component") || elementEventTarget.classList.contains("menuRoot_image")) {
+                    if (this.menuRootContainer.style.display === "" || this.menuRootContainer.style.display === "none") {
+                        this.menuRootContainer.style.display = "block";
+                    } else {
                         this.menuRootContainer.style.display = "none";
-
-                        return;
                     }
+                }
 
-                    if (event.target.classList.contains("menuRoot_component") === true || event.target.classList.contains("menuRoot_image") === true) {
-                        if (this.menuRootContainer.style.display === "" || this.menuRootContainer.style.display === "none") {
-                            this.menuRootContainer.style.display = "block";
-                        } else {
-                            this.menuRootContainer.style.display = "none";
-                        }
-                    }
+                const openerWindow = Helper.findElement(elementEventTarget, ["window_opener"]);
 
-                    const windowOpener = Helper.findParent(event.target, ["window_opener"]);
+                if (openerWindow) {
+                    const openerWindowDataName = openerWindow.getAttribute("data-name") as string;
 
-                    if (windowOpener !== null) {
-                        const name = windowOpener.getAttribute("data-name");
+                    if (openerWindowDataName === "VueJs") {
+                        const tab = window.open(`http://localhost:${Config.setting.vueJs.uiPort}`, "_blank");
 
-                        if (name === "VueJs") {
-                            const tab = window.open(`http://localhost:${Config.setting.vueJs.uiPort}`, "_blank");
-
+                        if (tab) {
                             tab.focus();
-                        } else {
-                            if (Helper.promptLogic() === true) {
-                                return false;
-                            }
-
-                            this.$root.$refs.windowComponent.init(windowOpener);
+                        }
+                    } else {
+                        if (Helper.promptLogic()) {
+                            return false;
                         }
 
-                        this.menuRootContainer.style.display = "none";
+                        Helper.component.window.logicInit(openerWindow);
                     }
-                } else if (this.menuRootContainer !== null) {
+
                     this.menuRootContainer.style.display = "none";
                 }
+            } else if (this.menuRootContainer) {
+                this.menuRootContainer.style.display = "none";
             }
-        },
-        data() {
-            return {
-                menuRoot: Config.setting.menuRoot,
-                menuRootContainer: null
-            };
-        },
-        created() {
-            this.$root.$refs.menuRootComponent = this;
-        },
-        beforeDestroy() {}
-    };
+
+            return true;
+        }
+    }
 </script>
 
 <style lang="scss" scoped>

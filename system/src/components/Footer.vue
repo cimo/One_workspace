@@ -1,95 +1,110 @@
 <template>
     <div class="footer_component">
         <div class="left_column">
-            <MenuRootComponent />
-            <div class="mainbar_element program empty">
+            <ComponentMenuRoot />
+            <div class="taskbar_element program empty">
                 <img class="icon_window" src="" alt="" />
             </div>
         </div>
         <div class="right_column">
-            <TimeDateComponent />
+            <ComponentTimeDate />
         </div>
     </div>
 </template>
 
-<script>
+<script lang="ts">
+    import { Component, Vue } from "vue-property-decorator";
+
+    import ComponentMenuRoot from "./MenuRoot.vue";
+    import ComponentTimeDate from "./TimeDate.vue";
+
     import * as Helper from "../assets/js/Helper";
-    import MenuRootComponent from "./MenuRoot.vue";
-    import TimeDateComponent from "./TimeDate.vue";
 
-    export default {
-        name: "FooterComponent",
+    @Component({
         components: {
-            MenuRootComponent,
-            TimeDateComponent
-        },
-        computed: {},
-        methods: {
-            init(windowOpener) {
-                const name = windowOpener.getAttribute("data-name");
-                const category = windowOpener.getAttribute("data-category");
+            ComponentMenuRoot,
+            ComponentTimeDate
+        }
+    })
+    export default class ComponentFooter extends Vue {
+        // Variables
 
-                const mainbarElementEmpty = document.querySelector(".footer_component .left_column .mainbar_element.empty");
+        // Functions
+        protected created(): void {
+            Helper.component.footer = this;
+        }
 
-                const newMainbarElement = mainbarElementEmpty.cloneNode(true);
-                newMainbarElement.classList.remove("empty");
-                newMainbarElement.classList.add("focused");
-                newMainbarElement.setAttribute("data-name", name);
-                newMainbarElement.setAttribute("data-category", category);
+        protected beforeDestroy(): void {}
 
-                const src = windowOpener.querySelector("img").getAttribute("src");
+        // Logic
+        public logicInit(openerWindow: HTMLElement): void {
+            const openerWindowDataName = openerWindow.getAttribute("data-name") as string;
+            const openerWindowDataCategory = openerWindow.getAttribute("data-category") as string;
 
-                const icon = newMainbarElement.querySelector("img");
-                icon.setAttribute("src", src);
+            const elementTaskbarEmpty = document.querySelector(".footer_component .left_column .taskbar_element.empty") as HTMLElement;
 
-                document.querySelector(".footer_component .left_column").appendChild(newMainbarElement);
-            },
-            clickLogic(event) {
-                if (Helper.promptLogic() === true) {
-                    return false;
-                }
+            const elementTaskbarNew = elementTaskbarEmpty.cloneNode(true) as HTMLElement;
+            elementTaskbarNew.classList.remove("empty");
+            elementTaskbarNew.classList.add("focused");
+            elementTaskbarNew.setAttribute("data-name", openerWindowDataName);
+            elementTaskbarNew.setAttribute("data-category", openerWindowDataCategory);
 
-                const mainbarElement = Helper.findParent(event.target, ["mainbar_element"]);
+            const openerWindowElementImg = openerWindow.querySelector("img") as HTMLElement;
+            const openerWindowElementImgSrc = openerWindowElementImg.getAttribute("src") as string;
 
-                if (mainbarElement !== null) {
-                    const name = mainbarElement.getAttribute("data-name");
+            const elementIcon = elementTaskbarNew.querySelector("img") as HTMLElement;
+            elementIcon.setAttribute("src", openerWindowElementImgSrc);
 
-                    if (name !== null) {
-                        const windowComponent = document.querySelector(`.window_component[data-name='${name}']`);
+            const elementLeftColumn = document.querySelector(".footer_component .left_column") as HTMLElement;
+            elementLeftColumn.appendChild(elementTaskbarNew);
+        }
 
-                        if (mainbarElement.classList.contains("focused") === true) {
-                            this.minimize(windowComponent);
-                        } else {
-                            Helper.unMinimizeElement(name);
-                        }
+        public logicClick(event: Event): boolean {
+            const elementEventTarget = event.target as HTMLElement;
+
+            if (Helper.promptLogic()) {
+                return false;
+            }
+
+            const elementTaskbar = Helper.findElement(elementEventTarget, ["taskbar_element"]);
+
+            if (elementTaskbar) {
+                const elementTaskbarDataName = elementTaskbar.getAttribute("data-name") as string;
+
+                if (elementTaskbarDataName) {
+                    const componentWindow = document.querySelector(`.window_component[data-name="${elementTaskbarDataName}"]`) as HTMLElement;
+
+                    if (elementTaskbar.classList.contains("focused")) {
+                        this.logicMinimize(componentWindow);
+                    } else {
+                        Helper.unMinimizeElement(elementTaskbarDataName);
                     }
                 }
-            },
-            minimize(windowComponent) {
-                const name = windowComponent.getAttribute("data-name");
-
-                const mainbarElement = document.querySelector(`.footer_component .left_column .mainbar_element[data-name='${name}']`);
-
-                mainbarElement.classList.add("minimized");
-
-                windowComponent.querySelector(".button_minimize").click();
-            },
-            remove(windowComponent) {
-                const name = windowComponent.getAttribute("data-name");
-
-                const mainbarElement = document.querySelector(`.footer_component .left_column .mainbar_element[data-name='${name}']`);
-
-                mainbarElement.parentNode.removeChild(mainbarElement);
             }
-        },
-        data() {
-            return {};
-        },
-        created() {
-            this.$root.$refs.footerComponent = this;
-        },
-        beforeDestroy() {}
-    };
+
+            return true;
+        }
+
+        public logicMinimize(openerWindow: HTMLElement): void {
+            const openerWindowDataName = openerWindow.getAttribute("data-name") as string;
+
+            const elementTaskbar = document.querySelector(`.footer_component .left_column .taskbar_element[data-name="${openerWindowDataName}"]`) as HTMLElement;
+
+            elementTaskbar.classList.add("minimized");
+
+            const openerWindowElementButton = openerWindow.querySelector(".button_minimize") as HTMLButtonElement;
+            openerWindowElementButton.click();
+        }
+
+        public logicRemove(openerWindow: HTMLElement): void {
+            const openerWindowDataName = openerWindow.getAttribute("data-name") as string;
+
+            const elementTaskbar = document.querySelector(`.footer_component .left_column .taskbar_element[data-name="${openerWindowDataName}"]`) as HTMLElement;
+
+            const elementTaskbarParentNode = elementTaskbar.parentNode as HTMLElement;
+            elementTaskbarParentNode.removeChild(elementTaskbar);
+        }
+    }
 </script>
 
 <style lang="scss">
@@ -105,18 +120,18 @@
         border-bottom: 1px solid #424242;
 
         .left_column {
-            .mainbar_element {
+            .taskbar_element {
                 margin-left: 5px;
             }
         }
 
         .right_column {
-            .mainbar_element {
+            .taskbar_element {
                 margin-right: 5px;
             }
         }
 
-        .mainbar_element {
+        .taskbar_element {
             text-align: center;
             display: inline-block;
             color: #ffffff;

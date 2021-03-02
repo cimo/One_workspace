@@ -1,59 +1,64 @@
 <template>
-    <div class="timeDate_component mainbar_element">
+    <div class="timeDate_component taskbar_element">
         <p class="time"></p>
         <p class="date"></p>
     </div>
 </template>
 
-<script>
-    export default {
-        name: "TimeDateComponent",
-        //components: {},
-        computed: {},
-        methods: {
-            _execute() {
-                if (this.elementTime !== null && this.elementDate !== null) {
-                    const currentDate = new Date();
+<script lang="ts">
+    import { Component, Vue } from "vue-property-decorator";
 
-                    let month = currentDate.getMonth() + 1;
-                    month = month < 10 ? `0${month}` : `${month}`;
+    import * as Helper from "../assets/js/Helper";
 
-                    let day = currentDate.getDate();
-                    day = day < 10 ? `0${day}` : `${day}`;
+    @Component({
+        components: {}
+    })
+    export default class ComponentTimeDate extends Vue {
+        // Variables
+        private elementTime!: HTMLElement;
+        private elementDate!: HTMLElement;
+        private interval!: number;
 
-                    this.elementDate.innerHTML = `${currentDate.getFullYear()}/${month}/${day}`;
+        // Functions
+        protected created(): void {
+            Helper.component.timeDate = this;
 
-                    let minute = currentDate.getMinutes();
-                    minute = minute < 10 ? `0${minute}` : `${minute}`;
-
-                    this.elementTime.innerHTML = `${currentDate.getHours()}:${minute}`;
-                }
-            },
-            init() {
-                this.elementTime = document.querySelector(".timeDate_component .time");
-                this.elementDate = document.querySelector(".timeDate_component .date");
-
-                this._execute();
-
-                this.interval = setInterval(() => {
-                    this._execute();
-                }, 1000);
-            }
-        },
-        data() {
-            return {
-                elementTime: null,
-                elementDate: null,
-                interval: null
-            };
-        },
-        created() {
-            this.$root.$refs.timeDateComponent = this;
-        },
-        beforeDestroy() {
-            clearInterval(this.interval);
+            this.interval = -1;
         }
-    };
+
+        protected beforeDestroy(): void {}
+
+        // Logic
+        private logicExecute(): void {
+            if (this.elementTime && this.elementDate) {
+                const date = new Date();
+
+                const month = date.getMonth() + 1;
+                const monthResult = month < 10 ? `0${month}` : `${month}`;
+
+                const day = date.getDate();
+                const dayResult = day < 10 ? `0${day}` : `${day}`;
+
+                this.elementDate.innerHTML = `${date.getFullYear()}/${monthResult}/${dayResult}`;
+
+                const minute = date.getMinutes();
+                const minuteResult = minute < 10 ? `0${minute}` : `${minute}`;
+
+                this.elementTime.innerHTML = `${date.getHours()}:${minuteResult}`;
+            }
+        }
+
+        public logicInit(): void {
+            this.elementTime = document.querySelector(".timeDate_component .time") as HTMLElement;
+            this.elementDate = document.querySelector(".timeDate_component .date") as HTMLElement;
+
+            this.logicExecute();
+
+            this.interval = setInterval(() => {
+                this.logicExecute();
+            }, 1000);
+        }
+    }
 </script>
 
 <style lang="scss" scoped>

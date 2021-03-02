@@ -4,7 +4,7 @@ import { io } from "socket.io-client";
 
 const socketIo: any = io(Config.setting.websocket.url);
 
-export const sendMessage = (socketTag: string, command: object, time: number): number | null => {
+export const sendMessage = (socketTag: string, command: object, time: number = 0): number | null => {
     if (time > 0) {
         return setInterval(() => {
             socketIo.emit(socketTag, command);
@@ -17,7 +17,7 @@ export const sendMessage = (socketTag: string, command: object, time: number): n
 };
 
 export const readMessage = (socketTag: string, callback: Interface.Callback): void => {
-    socketIo.on(socketTag, (data: any) => {
+    socketIo.on(socketTag, (data: Interface.SocketData) => {
         callback(data);
     });
 };

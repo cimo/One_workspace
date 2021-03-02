@@ -5,80 +5,91 @@
             <p class="button">Terminal</p>
             <p class="button">Data</p>
         </div>
-        <ContainerCommandComponent />
-        <ContainerTerminalComponent />
-        <ContainerDataComponent />
+        <ComponentContainerCommand />
+        <ComponentContainerTerminal />
+        <ComponentContainerData />
     </div>
 </template>
 
-<script>
+<script lang="ts">
+    import { Component, Vue } from "vue-property-decorator";
+
+    import ComponentContainerCommand from "./ContainerCommand.vue";
+    import ComponentContainerTerminal from "./ContainerTerminal.vue";
+    import ComponentContainerData from "./ContainerData.vue";
+
     import * as Helper from "../assets/js/Helper";
-    import ContainerCommandComponent from "./ContainerCommand.vue";
-    import ContainerTerminalComponent from "./ContainerTerminal.vue";
-    import ContainerDataComponent from "./ContainerData.vue";
 
-    export default {
-        name: "ContainerComponent",
+    @Component({
         components: {
-            ContainerCommandComponent,
-            ContainerTerminalComponent,
-            ContainerDataComponent
-        },
-        computed: {},
-        methods: {
-            init(windowComponent) {
-                this.$root.$refs.containerCommandComponent.init(windowComponent);
-            },
-            clickLogic(event) {
-                const menuElement = Helper.findParent(event.target, ["menu_container"]);
+            ComponentContainerCommand,
+            ComponentContainerTerminal,
+            ComponentContainerData
+        }
+    })
+    export default class Container extends Vue {
+        // Variables
 
-                if (menuElement !== null) {
-                    const windowComponent = Helper.findParent(menuElement, ["window_component"]);
+        // Functions
+        protected created(): void {
+            Helper.component.container = this;
+        }
 
-                    if (windowComponent !== null) {
-                        const buttonList = menuElement.querySelectorAll(".button");
+        protected beforeDestroy(): void {}
 
-                        const index = Array.from(buttonList).indexOf(event.target);
+        // Logic
+        public logicInit(componentWindow: HTMLElement): void {
+            Helper.component.containerCommand.logicInit(componentWindow);
+        }
 
-                        if (index >= 0) {
-                            for (const value of buttonList) {
-                                value.classList.remove("focused");
-                            }
+        public logicClick(event: Event): void {
+            const elementEventTarget = event.target as HTMLElement;
 
-                            buttonList[index].classList.add("focused");
+            const elementMenu = Helper.findElement(elementEventTarget, ["menu_container"]);
 
-                            if (index === 0) {
-                                windowComponent.querySelector(".container_component .command_component").style.display = "block";
-                                windowComponent.querySelector(".container_component .terminal_container_component").style.display = "none";
-                                windowComponent.querySelector(".container_component .data_component").style.display = "none";
+            if (elementMenu) {
+                const componentWindow = Helper.findElement(elementMenu, ["window_component"]);
 
-                                this.$root.$refs.containerCommandComponent.init(windowComponent);
-                            } else if (index === 1) {
-                                windowComponent.querySelector(".container_component .command_component").style.display = "none";
-                                windowComponent.querySelector(".container_component .terminal_container_component").style.display = "block";
-                                windowComponent.querySelector(".container_component .data_component").style.display = "none";
+                if (componentWindow) {
+                    const elementButtonList = (elementMenu.querySelectorAll(".button") as any) as HTMLElement[];
 
-                                this.$root.$refs.containerTerminalComponent.init(windowComponent);
-                            } else if (index === 2) {
-                                windowComponent.querySelector(".container_component .command_component").style.display = "none";
-                                windowComponent.querySelector(".container_component .terminal_container_component").style.display = "none";
-                                windowComponent.querySelector(".container_component .data_component").style.display = "block";
+                    const index = Array.from(elementButtonList).indexOf(elementEventTarget);
 
-                                this.$root.$refs.containerDataComponent.init(windowComponent);
-                            }
+                    if (index >= 0) {
+                        for (const value of elementButtonList) {
+                            value.classList.remove("focused");
+                        }
+
+                        elementButtonList[index].classList.add("focused");
+
+                        const elementComponentCommand = componentWindow.querySelector(".container_component .command_component") as HTMLElement;
+                        const elementComponentTerminalContainer = componentWindow.querySelector(".container_component .terminal_container_component") as HTMLElement;
+                        const elementComponentData = componentWindow.querySelector(".container_component .data_component") as HTMLElement;
+
+                        if (index === 0) {
+                            elementComponentCommand.style.display = "block";
+                            elementComponentTerminalContainer.style.display = "none";
+                            elementComponentData.style.display = "none";
+
+                            Helper.component.containerCommand.logicInit(componentWindow);
+                        } else if (index === 1) {
+                            elementComponentCommand.style.display = "none";
+                            elementComponentTerminalContainer.style.display = "block";
+                            elementComponentData.style.display = "none";
+
+                            Helper.component.containerTerminal.logicInit(componentWindow);
+                        } else if (index === 2) {
+                            elementComponentCommand.style.display = "none";
+                            elementComponentTerminalContainer.style.display = "none";
+                            elementComponentData.style.display = "block";
+
+                            Helper.component.containerData.logicInit(componentWindow);
                         }
                     }
                 }
             }
-        },
-        data() {
-            return {};
-        },
-        created() {
-            this.$root.$refs.containerComponent = this;
-        },
-        beforeDestroy() {}
-    };
+        }
+    }
 </script>
 
 <style lang="scss" scoped>

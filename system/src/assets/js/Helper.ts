@@ -1,137 +1,163 @@
 import * as Interface from "./Interface";
 
-let dragTarget: HTMLElement | null = null;
 const dragTagList: string[][] = [];
-let dragActive = false;
-let dragOffsetX = 0;
-let dragOffsetY = 0;
-let dragStartX = 0;
-let dragStartY = 0;
+let dragTarget: HTMLElement | null = null;
+let dragActive: boolean = false;
+let dragOffsetX: number = 0;
+let dragOffsetY: number = 0;
+let dragStartX: number = 0;
+let dragStartY: number = 0;
 
-export const findParent = (element: HTMLElement | null, child: string[], parent?: string[]): HTMLElement | null => {
-    if (element !== null) {
-        if (child.every((child) => element.classList.contains(child)) === true) {
+export const component: Interface.ComponentVue = {
+    body: undefined,
+    container: undefined,
+    containerCommand: undefined,
+    containerData: undefined,
+    containerTerminal: undefined,
+    footer: undefined,
+    menuRoot: undefined,
+    project: undefined,
+    projectExplore: undefined,
+    projectSsh: undefined,
+    prompt: undefined,
+    timeDate: undefined,
+    tool: undefined,
+    toolGit: undefined,
+    toolSass: undefined,
+    toolTerser: undefined,
+    window: undefined
+};
+
+export const findElement = (element: HTMLElement | null, child: string[], parent?: string[]): HTMLElement | null => {
+    if (element) {
+        if (child.every((child) => element.classList.contains(child))) {
             if (parent !== undefined) {
-                return findParent(element.parentElement, parent);
+                return findElement(element.parentElement, parent);
             } else {
                 return element;
             }
         } else {
-            return findParent(element.parentElement, child, parent);
+            return findElement(element.parentElement, child, parent);
         }
     }
 
     return null;
 };
 
-export const currentWindowElement = (element: HTMLElement): Interface.WindowElement | null => {
-    if (element !== null && element.classList.contains("window_component") === true) {
-        const name = element.getAttribute("data-name");
-        const category = element.getAttribute("data-category");
+export const currentWindow = (element: HTMLElement | null): Interface.Window | null => {
+    if (element && element.classList.contains("window_component")) {
+        const dataName = element.getAttribute("data-name") as string;
 
-        if (name !== null) {
-            const windowOpener = document.querySelector(`.window_opener[data-name='${name}']`) as HTMLElement;
-            const containerName = windowOpener.getAttribute("data-container_name");
+        if (dataName) {
+            const dataCategory = element.getAttribute("data-category") as string;
+            const elementOpenerWindow = document.querySelector(`.window_opener[data-name='${dataName}']`) as HTMLElement;
+            const dataContainerName = elementOpenerWindow.getAttribute("data-container_name") as string;
 
             return {
-                name: name,
-                category: category,
-                windowOpener: windowOpener,
-                containerName: containerName
+                name: dataName,
+                category: dataCategory,
+                windowOpener: elementOpenerWindow,
+                containerName: dataContainerName
             };
         }
+
+        return null;
     }
 
     return null;
 };
 
-export const focusCurrentWindow = (windowComponent: HTMLElement | undefined): void => {
-    const focusedComponent = document.querySelector(".window_component.focused") as HTMLElement;
-    const windowComponentList = (document.querySelectorAll<HTMLElement>(".window_component:not(.empty)") as any) as HTMLElement[];
-    const focusedName = focusedComponent !== null ? focusedComponent.getAttribute("data-name") : "";
+export const focusCurrentWindow = (componentWindow?: HTMLElement): void => {
+    const elementFocused = document.querySelector(".window_component.focused") as HTMLElement;
+    const elementComponentWindowList = (document.querySelectorAll<HTMLElement>(".window_component:not(.empty)") as any) as HTMLElement[];
+    const elementFocusedDataName = elementFocused ? (elementFocused.getAttribute("data-name") as string) : "";
 
-    for (const value of windowComponentList) {
+    for (const value of elementComponentWindowList) {
         value.classList.remove("focused");
     }
 
-    if (windowComponent !== undefined) {
-        const name = windowComponent.getAttribute("data-name");
+    if (componentWindow !== undefined) {
+        const componentWindowDataName = componentWindow.getAttribute("data-name") as string;
 
-        windowComponent.style.display = "block";
-        windowComponent.classList.add("focused");
+        componentWindow.style.display = "block";
+        componentWindow.classList.add("focused");
 
-        if (focusedName !== name) {
-            windowComponent.parentNode?.appendChild(windowComponent);
+        if (elementFocusedDataName !== componentWindowDataName) {
+            const componentWindowParentNode = componentWindow.parentNode as HTMLElement;
+            componentWindowParentNode.appendChild(componentWindow);
         }
     }
 };
 
 export const focusNextWindow = (): void => {
-    const windowComponentList = (document.querySelectorAll(".window_component:not(.empty)") as any) as HTMLElement[];
+    const elementComponentWindowList = (document.querySelectorAll(".window_component:not(.empty)") as any) as HTMLElement[];
 
-    for (const value of windowComponentList) {
+    for (const value of elementComponentWindowList) {
         value.classList.remove("focused");
     }
 
-    const windowComponentMinimizedList = (document.querySelectorAll(".window_component:not(.empty):not(.minimized)") as any) as HTMLElement[];
+    const elementComponentWindowMinimizedList = (document.querySelectorAll(".window_component:not(.empty):not(.minimized)") as any) as HTMLElement[];
 
-    if (windowComponentMinimizedList.length > 0) {
-        const windowComponent = windowComponentMinimizedList[windowComponentMinimizedList.length - 1];
+    if (elementComponentWindowMinimizedList.length > 0) {
+        const index = elementComponentWindowMinimizedList.length - 1;
+        const componentWindow = elementComponentWindowMinimizedList[index];
 
-        windowComponent.classList.add("focused");
+        componentWindow.classList.add("focused");
     }
 };
 
-export const focusCurrentMainbarElement = (): void => {
-    const mainbarElementList = (document.querySelectorAll(".footer_component .left_column .mainbar_element:not(.empty)") as any) as HTMLElement[];
+export const focusCurrentTaskbarElement = (): void => {
+    const elementTaskbarList = (document.querySelectorAll(".footer_component .left_column .taskbar_element:not(.empty)") as any) as HTMLElement[];
 
-    for (const value of mainbarElementList) {
+    for (const value of elementTaskbarList) {
         value.classList.remove("focused");
     }
 
-    const focusedComponent = document.querySelector(".window_component:not(.empty):not(.minimized).focused") as HTMLElement;
+    const elementFocused = document.querySelector(".window_component:not(.empty):not(.minimized).focused") as HTMLElement;
 
-    if (focusedComponent !== null) {
-        const name = focusedComponent.getAttribute("data-name");
+    if (elementFocused) {
+        const elementFocusedDataName = elementFocused.getAttribute("data-name") as string;
 
-        const mainbarElement = document.querySelector(`.footer_component .left_column .mainbar_element[data-name='${name}']`) as HTMLElement;
+        const elementTaskbar = document.querySelector(`.footer_component .left_column .taskbar_element[data-name='${elementFocusedDataName}']`) as HTMLElement;
 
-        if (mainbarElement !== null) {
-            mainbarElement.classList.add("focused");
+        if (elementTaskbar) {
+            elementTaskbar.classList.add("focused");
         }
     }
 };
 
 export const unMinimizeElement = (name: string): void => {
-    const windowComponentList = (document.querySelectorAll(".window_component:not(.empty)") as any) as HTMLElement[];
+    const elementComponentWindowList = (document.querySelectorAll(".window_component:not(.empty)") as any) as HTMLElement[];
 
-    for (const value of windowComponentList) {
+    for (const value of elementComponentWindowList) {
         value.classList.remove("focused");
     }
 
-    const windowComponent = document.querySelector(`.window_component[data-name='${name}']`) as HTMLElement;
+    const elementComponentWindow = document.querySelector(`.window_component[data-name='${name}']`) as HTMLElement;
 
-    windowComponent.classList.remove("minimized");
-    windowComponent.classList.add("focused");
-    windowComponent.style.display = "block";
-    windowComponent?.parentNode?.appendChild(windowComponent);
+    elementComponentWindow.classList.remove("minimized");
+    elementComponentWindow.classList.add("focused");
+    elementComponentWindow.style.display = "block";
 
-    const mainbarElementList = (document.querySelectorAll(".footer_component .left_column .mainbar_element:not(.empty)") as any) as HTMLElement[];
+    const elementComponentWindowParentNode = elementComponentWindow.parentNode as HTMLElement;
+    elementComponentWindowParentNode.appendChild(elementComponentWindow);
 
-    for (const value of mainbarElementList) {
+    const elementTaskbarList = (document.querySelectorAll(".footer_component .left_column .taskbar_element:not(.empty)") as any) as HTMLElement[];
+
+    for (const value of elementTaskbarList) {
         value.classList.remove("focused");
     }
 
-    const mainbarElement = document.querySelector(`.footer_component .left_column .mainbar_element[data-name='${name}']`) as HTMLElement;
+    const elementTaskbar = document.querySelector(`.footer_component .left_column .taskbar_element[data-name='${name}']`) as HTMLElement;
 
-    mainbarElement.classList.remove("minimized");
-    mainbarElement.classList.add("focused");
+    elementTaskbar.classList.remove("minimized");
+    elementTaskbar.classList.add("focused");
 };
 
 export const promptLogic = (): boolean => {
-    const promptComponent = document.querySelector(".prompt_component") as HTMLElement;
+    const elementComponentPrompt = document.querySelector(".prompt_component") as HTMLElement;
 
-    if (promptComponent.style.display !== "" && promptComponent.style.display !== "none") {
+    if (elementComponentPrompt && elementComponentPrompt.style.display !== "" && elementComponentPrompt.style.display !== "none") {
         return true;
     }
 
@@ -142,10 +168,10 @@ export const capitalizeFirstLetter = (value: string): string => {
     return value.charAt(0).toUpperCase() + value.slice(1);
 };
 
-export const replaceName = (name: string, rule: string, isLower: boolean): string => {
+export const replaceName = (name: string, rule: RegExp, isLower: boolean): string => {
     const nameReplace = name.replace(rule, "_");
 
-    if (isLower === true) {
+    if (isLower) {
         return nameReplace.toLowerCase();
     }
 
@@ -154,13 +180,13 @@ export const replaceName = (name: string, rule: string, isLower: boolean): strin
 
 const dragStart = (event: Event): void => {
     for (const value of dragTagList) {
-        const element = event.target as HTMLElement;
+        const elementEvenTarget = event.target as HTMLElement;
         const touchEvent = event as TouchEvent;
         const mouseEvent = event as MouseEvent;
 
-        dragTarget = findParent(element, value);
+        dragTarget = findElement(elementEvenTarget, value);
 
-        if (dragTarget !== null && element.classList.contains("drag") === true) {
+        if (dragTarget && elementEvenTarget.classList.contains("drag")) {
             dragOffsetX = dragTarget.offsetLeft;
             dragOffsetY = dragTarget.offsetTop;
 
@@ -175,7 +201,7 @@ const dragStart = (event: Event): void => {
 };
 
 const dragMove = (event: Event): void => {
-    if (dragActive === true && dragTarget !== null) {
+    if (dragTarget && dragActive) {
         const touchEvent = event as TouchEvent;
         const mouseEvent = event as MouseEvent;
 
@@ -194,19 +220,11 @@ const dragEnd = (): void => {
 export const dragInit = (parent: HTMLElement, tagList: string[]) => {
     dragTagList.push(tagList as any);
 
-    document.addEventListener("mousedown", dragStart, {
-        passive: true
-    });
-    document.addEventListener("mousemove", dragMove, {
-        passive: true
-    });
+    document.addEventListener("mousedown", dragStart, { passive: true });
+    document.addEventListener("mousemove", dragMove, { passive: true });
     document.addEventListener("mouseup", dragEnd, { passive: true });
 
-    document.addEventListener("touchstart", dragStart, {
-        passive: true
-    });
-    document.addEventListener("touchmove", dragMove, {
-        passive: true
-    });
+    document.addEventListener("touchstart", dragStart, { passive: true });
+    document.addEventListener("touchmove", dragMove, { passive: true });
     document.addEventListener("touchend", dragEnd, { passive: true });
 };

@@ -1,87 +1,93 @@
 <template>
     <div class="tool_component">
-        <ToolGitComponent />
-        <ToolTerserComponent />
-        <ToolSassComponent />
+        <ComponentToolGit />
+        <ComponentToolTerser />
+        <ComponentToolSass />
     </div>
 </template>
 
-<script>
+<script lang="ts">
+    import { Component, Vue } from "vue-property-decorator";
+
+    import ComponentToolGit from "./ToolGit.vue";
+    import ComponentToolTerser from "./ToolTerser.vue";
+    import ComponentToolSass from "./ToolSass.vue";
+
     import * as Helper from "../assets/js/Helper";
-    import ToolGitComponent from "./ToolGit.vue";
-    import ToolTerserComponent from "./ToolTerser.vue";
-    import ToolSassComponent from "./ToolSass.vue";
+    import * as Interface from "../assets/js/Interface";
 
-    export default {
-        name: "ToolComponent",
+    @Component({
         components: {
-            ToolGitComponent,
-            ToolTerserComponent,
-            ToolSassComponent
-        },
-        computed: {},
-        methods: {
-            _showComponent(windowComponent, currentWindowElement) {
-                if (currentWindowElement.name === "Git") {
-                    const terserComponent = windowComponent.querySelector(".terser_component");
+            ComponentToolGit,
+            ComponentToolTerser,
+            ComponentToolSass
+        }
+    })
+    export default class ComponentTool extends Vue {
+        // Variables
 
-                    if (terserComponent !== null) {
-                        terserComponent.remove();
-                    }
+        // Functions
+        protected created(): void {
+            Helper.component.tool = this;
+        }
 
-                    const sassComponent = windowComponent.querySelector(".sass_component");
+        protected beforeDestroy(): void {}
 
-                    if (sassComponent !== null) {
-                        sassComponent.remove();
-                    }
+        // Logic
+        private logicShowComponent(componentWindow: HTMLElement, currentWindow: Interface.Window): void {
+            if (currentWindow.name === "Git") {
+                const elementComponentTerser = componentWindow.querySelector(".terser_component") as HTMLElement;
 
-                    this.$root.$refs.toolGitComponent.init(windowComponent);
-                } else if (currentWindowElement.name === "Terser") {
-                    const gitComponent = windowComponent.querySelector(".git_component");
-
-                    if (gitComponent !== null) {
-                        gitComponent.remove();
-                    }
-
-                    const sassComponent = windowComponent.querySelector(".sass_component");
-
-                    if (sassComponent !== null) {
-                        sassComponent.remove();
-                    }
-
-                    this.$root.$refs.toolTerserComponent.init(windowComponent);
-                } else if (currentWindowElement.name === "Sass") {
-                    const gitComponent = windowComponent.querySelector(".git_component");
-
-                    if (gitComponent !== null) {
-                        gitComponent.remove();
-                    }
-
-                    const terserComponent = windowComponent.querySelector(".terser_component");
-
-                    if (terserComponent !== null) {
-                        terserComponent.remove();
-                    }
-
-                    this.$root.$refs.toolSassComponent.init(windowComponent);
+                if (elementComponentTerser) {
+                    elementComponentTerser.remove();
                 }
-            },
-            init(windowComponent) {
-                const currentWindowElement = Helper.currentWindowElement(windowComponent);
 
-                if (currentWindowElement !== null) {
-                    this._showComponent(windowComponent, currentWindowElement);
+                const elementComponentSass = componentWindow.querySelector(".sass_component") as HTMLElement;
+
+                if (elementComponentSass) {
+                    elementComponentSass.remove();
                 }
+
+                Helper.component.toolGit.logicInit(componentWindow);
+            } else if (currentWindow.name === "Terser") {
+                const elementComponentGit = componentWindow.querySelector(".git_component") as HTMLElement;
+
+                if (elementComponentGit) {
+                    elementComponentGit.remove();
+                }
+
+                const elementComponentSass = componentWindow.querySelector(".sass_component") as HTMLElement;
+
+                if (elementComponentSass) {
+                    elementComponentSass.remove();
+                }
+
+                Helper.component.toolTerser.logicInit(componentWindow);
+            } else if (currentWindow.name === "Sass") {
+                const elementComponentGit = componentWindow.querySelector(".git_component") as HTMLElement;
+
+                if (elementComponentGit) {
+                    elementComponentGit.remove();
+                }
+
+                const elementComponentTerser = componentWindow.querySelector(".terser_component") as HTMLElement;
+
+                if (elementComponentTerser) {
+                    elementComponentTerser.remove();
+                }
+
+                Helper.component.toolSass.logicInit(componentWindow);
             }
-        },
-        data() {
-            return {};
-        },
-        created() {
-            this.$root.$refs.toolComponent = this;
-        },
-        beforeDestroy() {}
-    };
+        }
+
+        public logicInit(componentWindow: HTMLElement): void {
+            const currentWindow = Helper.currentWindow(componentWindow);
+
+            if (currentWindow) {
+                this.logicShowComponent(componentWindow, currentWindow);
+            }
+        }
+    }
 </script>
 
 <style lang="scss" scoped>

@@ -13,91 +13,91 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+    import { Component, Vue } from "vue-property-decorator";
+
     import * as Helper from "../assets/js/Helper";
+    import * as Interface from "../assets/js/Interface";
 
-    export default {
-        name: "PromptComponent",
-        //components: {},
-        computed: {},
-        methods: {
-            _clickEvent(event) {
-                if (event.target.classList.contains("ok") === true) {
-                    this.clicked = true;
+    @Component({
+        components: {}
+    })
+    export default class ComponentPrompt extends Vue {
+        // Variables
+        private elementComponentWindow!: HTMLElement;
+        private elementComponentPrompt!: HTMLElement;
+        private elementBodyMessage!: HTMLElement;
+        private elementButtonCancel!: EventTarget;
+        private elementButtonOk!: EventTarget;
+        private callback!: Interface.Callback;
+        public isClicked!: boolean;
 
-                    if (this.callback !== null) {
-                        this.callback();
-                    }
-                } else if (event.target.classList.contains("cancel") === true) {
-                    this.clicked = true;
+        // Functions
+        protected created(): void {
+            Helper.component.prompt = this;
+
+            this.isClicked = false;
+        }
+
+        protected beforeDestroy(): void {}
+
+        // Logic
+        private logicClickEvent(event: Event): void {
+            const elementEventTarget = event.target as HTMLElement;
+
+            if (elementEventTarget.classList.contains("ok")) {
+                this.isClicked = true;
+
+                if (this.callback) {
+                    this.callback();
                 }
+            } else if (elementEventTarget.classList.contains("cancel")) {
+                this.isClicked = true;
+            }
 
-                if (this.clicked === true) {
-                    this.buttonCancel.removeEventListener("click", this._clickEvent, false);
-                    this.buttonOk.removeEventListener("click", this._clickEvent, false);
+            if (this.elementComponentPrompt && this.isClicked) {
+                this.elementButtonCancel.removeEventListener("click", this.logicClickEvent, false);
+                this.elementButtonOk.removeEventListener("click", this.logicClickEvent, false);
 
-                    this.promptComponent.style.display = "none";
+                this.elementComponentPrompt.style.display = "none";
 
-                    if (this.windowComponent !== null) {
-                        Helper.focusCurrentWindow(this.windowComponent);
+                if (this.elementComponentWindow) {
+                    Helper.focusCurrentWindow(this.elementComponentWindow);
 
-                        Helper.focusCurrentMainbarElement();
-                    }
+                    Helper.focusCurrentTaskbarElement();
                 }
-            },
-            init() {
-                this.promptComponent = document.querySelector(".prompt_component");
-                this.elementBodyMessage = this.promptComponent.querySelector(".body .message");
-                this.buttonCancel = this.promptComponent.querySelector(".button_cmd_window.cancel");
-                this.buttonOk = this.promptComponent.querySelector(".button_cmd_window.ok");
+            }
+        }
 
-                if (this.promptComponent !== null) {
-                    Helper.dragInit(this.promptComponent, ["prompt_component"]);
-                }
-            },
-            show(windowComponent, message, callback) {
+        public logicInit(): void {
+            this.elementComponentPrompt = document.querySelector(".prompt_component") as HTMLElement;
+
+            if (this.elementComponentPrompt) {
+                this.elementBodyMessage = this.elementComponentPrompt.querySelector(".body .message") as HTMLElement;
+                this.elementButtonCancel = this.elementComponentPrompt.querySelector(".button_cmd_window.cancel") as HTMLElement;
+                this.elementButtonOk = this.elementComponentPrompt.querySelector(".button_cmd_window.ok") as HTMLElement;
+
+                Helper.dragInit(this.elementComponentPrompt, ["prompt_component"]);
+            }
+        }
+
+        public logicShow(componentWindow: HTMLElement | null, message: string, callback: Interface.Callback): void {
+            if (componentWindow) {
                 Helper.focusCurrentWindow();
 
-                Helper.focusCurrentMainbarElement();
+                Helper.focusCurrentTaskbarElement();
 
-                this.promptComponent.style.display = "block";
+                this.elementComponentPrompt.style.display = "block";
 
-                if (windowComponent !== undefined) {
-                    this.windowComponent = windowComponent;
-                }
+                this.elementComponentWindow = componentWindow;
+                this.elementBodyMessage.innerHTML = message;
+                this.callback = callback;
 
-                if (message !== undefined) {
-                    this.elementBodyMessage.innerHTML = message;
-                }
-
-                if (callback !== undefined) {
-                    this.callback = callback;
-                }
-
-                this.buttonCancel.addEventListener("click", this._clickEvent, {
-                    passive: true
-                });
-                this.buttonOk.addEventListener("click", this._clickEvent, {
-                    passive: true
-                });
+                this.elementButtonCancel.addEventListener("click", this.logicClickEvent, { passive: true });
+                this.elementButtonOk.addEventListener("click", this.logicClickEvent, { passive: true });
             }
-        },
-        data() {
-            return {
-                promptComponent: null,
-                elementBodyMessage: null,
-                buttonCancel: null,
-                buttonOk: null,
-                clicked: false,
-                windowComponent: null,
-                callback: null
-            };
-        },
-        created() {
-            this.$root.$refs.promptComponent = this;
-        },
-        beforeDestroy() {}
-    };
+        }
+    }
 </script>
 
 <style lang="scss" scoped>

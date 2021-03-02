@@ -31,128 +31,146 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+    import { Component, Vue } from "vue-property-decorator";
+
     import * as Helper from "../assets/js/Helper";
+    import * as Interface from "../assets/js/Interface";
     import * as Sio from "../assets/js/Sio";
 
-    export default {
-        name: "ContainerCommandComponent",
-        //components: {},
-        computed: {},
-        methods: {
-            _checkStatus(containerName) {
-                if (Object.keys(this.windowComponentList).length > 0) {
-                    this.intervalStatusList[containerName] = setInterval(() => {
+    @Component({
+        components: {}
+    })
+    export default class ContainerCommand extends Vue {
+        // Variables
+        private componentWindowList!: HTMLElement[];
+        private elementCommandList!: HTMLElement[][];
+        private elementStatusList!: HTMLElement[];
+        private intervalStatusList!: number[];
+        private commandStatusList!: number[];
+
+        // Functions
+        protected created(): void {
+            Helper.component.containerCommand = this;
+
+            this.componentWindowList = [];
+            this.elementCommandList = [[]];
+            this.elementStatusList = [];
+            this.intervalStatusList = [];
+            this.commandStatusList = [];
+        }
+
+        protected beforeDestroy(): void {}
+
+        // Logic
+        private logicCheckStatus(containerName: string): void {
+            if (Object.keys(this.componentWindowList).length > 0) {
+                this.intervalStatusList[containerName as any] = setInterval((): void => {
+                    Sio.sendMessage("t_exec_i", {
+                        closeEnabled: false,
+                        tag: `${containerName}_status`,
+                        cmd: `docker ps --filter "name=${containerName}" --format "{{.Status}}"`
+                    });
+                }, 1000);
+
+                Sio.readMessage(`t_exec_o_${containerName}_status`, (data: Interface.SocketData): void => {
+                    if (this.commandStatusList[containerName as any] < 0) {
+                        const result = data.out !== undefined ? data.out : data.err;
+
+                        if (result !== undefined && result.indexOf("Up ") !== -1) {
+                            this.elementStatusList[containerName as any].innerHTML = "Running...";
+                        }
+                    }
+                });
+            }
+        }
+
+        public logicInit(componentWindow: HTMLElement): void {
+            const currentWindow = Helper.currentWindow(componentWindow);
+
+            if (currentWindow) {
+                this.componentWindowList[currentWindow.containerName as any] = componentWindow;
+
+                const buttonCmdList = (this.componentWindowList[currentWindow.containerName as any].querySelectorAll(".command_component .right .cmd") as any) as HTMLElement[];
+                const elementStatus = this.componentWindowList[currentWindow.containerName as any].querySelector(".command_component .status") as HTMLElement;
+
+                this.elementCommandList[currentWindow.containerName as any] = buttonCmdList;
+                this.elementStatusList[currentWindow.containerName as any] = elementStatus;
+                this.commandStatusList[currentWindow.containerName as any] = -1;
+
+                this.logicCheckStatus(currentWindow.containerName);
+            }
+        }
+
+        public logicClick(event: Event): void {
+            const elementEventTarget = event.target as HTMLElement;
+
+            const componentWindow = Helper.findElement(elementEventTarget, ["command_component"], ["window_component"]);
+            const currentWindow = Helper.currentWindow(componentWindow);
+
+            if (componentWindow && currentWindow) {
+                this.componentWindowList[currentWindow.containerName as any] = componentWindow;
+
+                if (elementEventTarget.classList.contains("cmd")) {
+                    let index = Array.from(this.elementCommandList[currentWindow.containerName as any]).indexOf(elementEventTarget);
+
+                    if (index === 0) {
                         Sio.sendMessage("t_exec_i", {
-                            closeEnabled: false,
-                            tag: `${containerName}_status`,
-                            cmd: `docker ps --filter "name=${containerName}" --format "{{.Status}}"`
+                            tag: `${currentWindow.containerName}_command`,
+                            cmd: `docker start ${currentWindow.containerName}`
                         });
-                    }, 1000);
 
-                    Sio.readMessage(`t_exec_o_${containerName}_status`, (data) => {
-                        if (this.commandStatusList[containerName] < 0) {
-                            const result = data.out !== undefined ? data.out : data.err;
+                        this.elementStatusList[currentWindow.containerName as any].innerHTML = "Starting...";
+                        this.commandStatusList[currentWindow.containerName as any] = index;
+                    } else if (index === 1) {
+                        Sio.sendMessage("t_exec_i", {
+                            tag: `${currentWindow.containerName}_command`,
+                            cmd: `docker restart ${currentWindow.containerName}`
+                        });
 
-                            if (result !== undefined && result.indexOf("Up ") !== -1) {
-                                this.elementStatusList[containerName].innerHTML = "Running...";
+                        this.elementStatusList[currentWindow.containerName as any].innerHTML = "Restarting...";
+                        this.commandStatusList[currentWindow.containerName as any] = index;
+                    } else if (index === 2) {
+                        Sio.sendMessage("t_exec_i", {
+                            tag: `${currentWindow.containerName}_command`,
+                            cmd: `docker stop ${currentWindow.containerName}`
+                        });
+
+                        this.elementStatusList[currentWindow.containerName as any].innerHTML = "Stopping...";
+                        this.commandStatusList[currentWindow.containerName as any] = index;
+                    }
+
+                    Sio.readMessage(`t_exec_o_${currentWindow.containerName}_command`, (data: Interface.SocketData): void => {
+                        if (data.close !== undefined) {
+                            Sio.stopRead(`t_exec_o_${currentWindow.containerName}_command`);
+
+                            if (this.commandStatusList[currentWindow.containerName as any] === 2) {
+                                this.elementStatusList[currentWindow.containerName as any].innerHTML = "Stopped.";
                             }
+
+                            this.commandStatusList[currentWindow.containerName as any] = -1;
                         }
                     });
                 }
-            },
-            init(windowComponent) {
-                const currentWindowElement = Helper.currentWindowElement(windowComponent);
-
-                if (currentWindowElement !== null) {
-                    this.windowComponentList[currentWindowElement.containerName] = windowComponent;
-                    this.buttonCommandList[currentWindowElement.containerName] = this.windowComponentList[currentWindowElement.containerName].querySelectorAll(".command_component .right .cmd");
-                    this.elementStatusList[currentWindowElement.containerName] = this.windowComponentList[currentWindowElement.containerName].querySelector(".command_component .status");
-                    this.commandStatusList[currentWindowElement.containerName] = -1;
-
-                    this._checkStatus(currentWindowElement.containerName);
-                }
-            },
-            clickLogic(event) {
-                const windowComponent = Helper.findParent(event.target, ["command_component"], ["window_component"]);
-                const currentWindowElement = Helper.currentWindowElement(windowComponent);
-
-                if (currentWindowElement !== null) {
-                    this.windowComponentList[currentWindowElement.containerName] = windowComponent;
-
-                    if (event.target.classList.contains("cmd") === true) {
-                        const index = Array.from(this.buttonCommandList[currentWindowElement.containerName]).indexOf(event.target);
-
-                        if (index === 0) {
-                            Sio.sendMessage("t_exec_i", {
-                                tag: `${currentWindowElement.containerName}_command`,
-                                cmd: `docker start ${currentWindowElement.containerName}`
-                            });
-
-                            this.elementStatusList[currentWindowElement.containerName].innerHTML = "Starting...";
-                            this.commandStatusList[currentWindowElement.containerName] = index;
-                        } else if (index === 1) {
-                            Sio.sendMessage("t_exec_i", {
-                                tag: `${currentWindowElement.containerName}_command`,
-                                cmd: `docker restart ${currentWindowElement.containerName}`
-                            });
-
-                            this.elementStatusList[currentWindowElement.containerName].innerHTML = "Restarting...";
-                            this.commandStatusList[currentWindowElement.containerName] = index;
-                        } else if (index === 2) {
-                            Sio.sendMessage("t_exec_i", {
-                                tag: `${currentWindowElement.containerName}_command`,
-                                cmd: `docker stop ${currentWindowElement.containerName}`
-                            });
-
-                            this.elementStatusList[currentWindowElement.containerName].innerHTML = "Stopping...";
-                            this.commandStatusList[currentWindowElement.containerName] = index;
-                        }
-
-                        Sio.readMessage(`t_exec_o_${currentWindowElement.containerName}_command`, (data) => {
-                            if (data.close !== undefined) {
-                                Sio.stopRead(`t_exec_o_${currentWindowElement.containerName}_command`);
-
-                                if (this.commandStatusList[currentWindowElement.containerName] === 2) {
-                                    this.elementStatusList[currentWindowElement.containerName].innerHTML = "Stopped.";
-                                }
-
-                                this.commandStatusList[currentWindowElement.containerName] = -1;
-                            }
-                        });
-                    }
-                }
-            },
-            close(windowComponent) {
-                const currentWindowElement = Helper.currentWindowElement(windowComponent);
-
-                if (currentWindowElement !== null && currentWindowElement.containerName !== null) {
-                    Sio.stopRead(`t_exec_o_${currentWindowElement.containerName}_status`);
-
-                    clearInterval(this.intervalStatusList[currentWindowElement.containerName]);
-
-                    delete this.windowComponentList[currentWindowElement.containerName];
-                    delete this.buttonCommandList[currentWindowElement.containerName];
-                    delete this.intervalStatusList[currentWindowElement.containerName];
-                    delete this.elementStatusList[currentWindowElement.containerName];
-                    delete this.commandStatusList[currentWindowElement.containerName];
-                }
             }
-        },
-        data() {
-            return {
-                windowComponentList: [],
-                buttonCommandList: [],
-                intervalStatusList: [],
-                elementStatusList: [],
-                commandStatusList: []
-            };
-        },
-        created() {
-            this.$root.$refs.containerCommandComponent = this;
-        },
-        beforeDestroy() {}
-    };
+        }
+
+        public logicClose(componentWindow: HTMLElement): void {
+            const currentWindow = Helper.currentWindow(componentWindow);
+
+            if (currentWindow && currentWindow.containerName) {
+                Sio.stopRead(`t_exec_o_${currentWindow.containerName}_status`);
+
+                clearInterval(this.intervalStatusList[currentWindow.containerName as any]);
+
+                delete this.componentWindowList[currentWindow.containerName as any];
+                delete this.elementCommandList[currentWindow.containerName as any];
+                delete this.intervalStatusList[currentWindow.containerName as any];
+                delete this.elementStatusList[currentWindow.containerName as any];
+                delete this.commandStatusList[currentWindow.containerName as any];
+            }
+        }
+    }
 </script>
 
 <style lang="scss" scoped>

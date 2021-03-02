@@ -39,300 +39,312 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+    import { Component, Vue } from "vue-property-decorator";
+
     import * as Config from "../assets/js/Config";
     import * as Helper from "../assets/js/Helper";
+    import * as Interface from "../assets/js/Interface";
     import * as Sio from "../assets/js/Sio";
 
-    export default {
-        name: "ProjectExploreComponent",
-        //components: {},
-        computed: {},
-        methods: {
-            _deleteFileSetting(extension) {
-                Sio.sendMessage("t_exec_i", {
-                    closeEnabled: false,
-                    tag: "exploreDeleteToolFileSetting",
-                    cmd: `rm "${Config.setting.systemData.pathSetting}/${this.inputNameReplace}${extension}"`
-                });
-            },
-            init(windowComponent) {
-                const currentWindowElement = Helper.currentWindowElement(windowComponent);
+    @Component({
+        components: {}
+    })
+    export default class ComponentProjectExplore extends Vue {
+        // Variables
+        private selectEdit!: HTMLSelectElement;
+        private inputName!: HTMLInputElement;
+        private inputFolderName!: HTMLInputElement;
+        private textareaDescription!: HTMLTextAreaElement;
+        private checkboxGit!: HTMLInputElement;
+        private checkboxTerser!: HTMLInputElement;
+        private checkboxSass!: HTMLInputElement;
+        private buttonSave!: HTMLButtonElement;
+        private buttonDelete!: HTMLButtonElement;
+        private inputNameReplace!: string;
 
-                if (currentWindowElement !== null) {
-                    this.selectEdit = windowComponent.querySelector("select[name='edit']");
-                    this.inputName = windowComponent.querySelector("input[name='name']");
-                    this.inputFolderName = windowComponent.querySelector("input[name='folder_name']");
-                    this.textareaDescription = windowComponent.querySelector("textarea[name='description']");
-                    this.checkboxGit = windowComponent.querySelector("input[name='git']");
-                    this.checkboxTerser = windowComponent.querySelector("input[name='terser']");
-                    this.checkboxSass = windowComponent.querySelector("input[name='sass']");
-                    this.buttonDelete = windowComponent.querySelector(".button_cmd_window.delete");
-                    this.buttonSave = windowComponent.querySelector(".button_cmd_window.save");
+        // Functions
+        protected created(): void {
+            Helper.component.projectExplore = this;
 
-                    if (this.selectEdit !== null) {
-                        Sio.sendMessage("t_exec_i", {
-                            tag: "exploreInit",
-                            cmd: `ls "${Config.setting.systemData.pathSetting}"/*${Config.setting.systemData.extensionProject} | sed 's#.*/##'`
-                        });
+            this.inputNameReplace = "";
+        }
 
-                        Sio.readMessage("t_exec_o_exploreInit", (data) => {
-                            const result = data.out !== undefined ? data.out : data.err;
+        protected beforeDestroy(): void {}
 
-                            if (result !== undefined) {
-                                const outSplit = result.split("\n");
+        // Logic
+        private logicDeleteFileSetting(extension: string): void {
+            Sio.sendMessage("t_exec_i", {
+                closeEnabled: false,
+                tag: "exploreDeleteToolFileSetting",
+                cmd: `rm "${Config.setting.systemData.pathSetting}/${this.inputNameReplace}${extension}"`
+            });
+        }
 
-                                for (const value of outSplit) {
-                                    if (value !== "" && value.indexOf("ls: ") === -1) {
-                                        const option = document.createElement("option");
-                                        option.value = value;
-                                        option.text = value.replace(Config.setting.systemData.extensionProject, "");
-                                        this.selectEdit.appendChild(option);
-                                    }
+        public logicInit(componentWindow: HTMLElement): void {
+            const currentWindow = Helper.currentWindow(componentWindow);
+
+            if (currentWindow) {
+                this.selectEdit = componentWindow.querySelector("select[name='edit']") as HTMLSelectElement;
+                this.inputName = componentWindow.querySelector("input[name='name']") as HTMLInputElement;
+                this.inputFolderName = componentWindow.querySelector("input[name='folder_name']") as HTMLInputElement;
+                this.textareaDescription = componentWindow.querySelector("textarea[name='description']") as HTMLTextAreaElement;
+                this.checkboxGit = componentWindow.querySelector("input[name='git']") as HTMLInputElement;
+                this.checkboxTerser = componentWindow.querySelector("input[name='terser']") as HTMLInputElement;
+                this.checkboxSass = componentWindow.querySelector("input[name='sass']") as HTMLInputElement;
+                this.buttonDelete = componentWindow.querySelector(".button_cmd_window.delete") as HTMLButtonElement;
+                this.buttonSave = componentWindow.querySelector(".button_cmd_window.save") as HTMLButtonElement;
+
+                if (this.selectEdit) {
+                    Sio.sendMessage("t_exec_i", {
+                        tag: "exploreInit",
+                        cmd: `ls "${Config.setting.systemData.pathSetting}"/*${Config.setting.systemData.extensionProject} | sed 's#.*/##'`
+                    });
+
+                    Sio.readMessage("t_exec_o_exploreInit", (data: Interface.SocketData): void => {
+                        const result = data.out !== undefined ? data.out : data.err;
+
+                        if (result !== undefined) {
+                            const outSplit = result.split("\n");
+
+                            for (const value of outSplit) {
+                                if (value !== "" && value.indexOf("ls: ") === -1) {
+                                    const option = document.createElement("option");
+                                    option.value = value;
+                                    option.text = value.replace(Config.setting.systemData.extensionProject, "");
+                                    this.selectEdit.appendChild(option);
                                 }
                             }
+                        }
 
-                            if (data.close !== undefined) {
-                                Sio.stopRead("t_exec_o_exploreInit");
-                            }
+                        if (data.close !== undefined) {
+                            Sio.stopRead("t_exec_o_exploreInit");
+                        }
+                    });
+                }
+            }
+        }
+
+        public logicClick(event: Event): void {
+            const elementEventTarget = event.target as HTMLElement;
+
+            const componentWindow = Helper.findElement(elementEventTarget, ["explore_component"], ["window_component"]);
+            const currentWindow = Helper.currentWindow(componentWindow);
+
+            if (currentWindow) {
+                this.selectEdit.style.borderColor = "transparent";
+                this.inputName.style.borderColor = "transparent";
+                this.inputFolderName.style.borderColor = "transparent";
+
+                if (elementEventTarget.classList.contains("save")) {
+                    const inputNameCheck = /^[A-Za-z0-9-_ ]+$/.test(this.inputName.value);
+                    const folderNameCheck = /^[A-Za-z0-9-_]+$/.test(this.inputFolderName.value);
+
+                    if (inputNameCheck && folderNameCheck && this.inputName.value !== "" && this.inputFolderName.value !== "") {
+                        this.inputNameReplace = Helper.replaceName(this.inputName.value, /\s/g, true);
+
+                        const content = {
+                            name: this.inputName.value,
+                            folderName: this.inputFolderName.value,
+                            description: this.textareaDescription.value,
+                            git: this.checkboxGit.checked,
+                            terser: this.checkboxTerser.checked,
+                            sass: this.checkboxSass.checked
+                        };
+
+                        // Create setting file
+                        Sio.sendMessage("t_exec_stream_i", {
+                            tag: "exploreClickLogicSave",
+                            cmd: "write",
+                            path: `${Config.setting.systemData.pathSetting}/${this.inputNameReplace}${Config.setting.systemData.extensionProject}`,
+                            content: JSON.stringify(content)
                         });
-                    }
-                }
-            },
-            clickLogic(event) {
-                const windowComponent = Helper.findParent(event.target, ["explore_component"], ["window_component"]);
-                const currentWindowElement = Helper.currentWindowElement(windowComponent);
 
-                if (currentWindowElement !== null) {
-                    this.selectEdit.style.borderColor = "transparent";
-                    this.inputName.style.borderColor = "transparent";
-                    this.inputFolderName.style.borderColor = "transparent";
+                        Sio.readMessage("t_exec_stream_o_exploreClickLogicSave", (data: Interface.SocketData): void => {
+                            if (data.chunk === "end") {
+                                Sio.stopRead("t_exec_stream_o_exploreClickLogicSave");
 
-                    if (event.target.classList.contains("save") === true) {
-                        const inputNameCheck = /^[A-Za-z0-9-_ ]+$/.test(this.inputName.value);
-                        const folderNameCheck = /^[A-Za-z0-9-_]+$/.test(this.inputFolderName.value);
+                                const optionValue = `${this.inputNameReplace}${Config.setting.systemData.extensionProject}`;
+                                const elementOption = this.selectEdit.querySelector(`option[value="${optionValue}"`) as HTMLOptionElement;
 
-                        if (inputNameCheck === true && folderNameCheck === true && this.inputName.value !== "" && this.inputFolderName.value !== "") {
-                            this.inputNameReplace = Helper.replaceName(this.inputName.value, /\s/g, true);
-
-                            const content = {
-                                name: this.inputName.value,
-                                folderName: this.inputFolderName.value,
-                                description: this.textareaDescription.value,
-                                git: this.checkboxGit.checked === true ? true : false,
-                                terser: this.checkboxTerser.checked === true ? true : false,
-                                sass: this.checkboxSass.checked === true ? true : false
-                            };
-
-                            // Create setting file
-                            Sio.sendMessage("t_exec_stream_i", {
-                                tag: "exploreClickLogicSave",
-                                cmd: "write",
-                                path: `${Config.setting.systemData.pathSetting}/${this.inputNameReplace}${Config.setting.systemData.extensionProject}`,
-                                content: JSON.stringify(content)
-                            });
-
-                            Sio.readMessage("t_exec_stream_o_exploreClickLogicSave", (data) => {
-                                if (data.chunk === "end") {
-                                    Sio.stopRead("t_exec_stream_o_exploreClickLogicSave");
-
-                                    const optionValue = `${this.inputNameReplace}${Config.setting.systemData.extensionProject}`;
-
-                                    if (this.selectEdit.querySelector(`option[value='${optionValue}'`) === null) {
-                                        const option = document.createElement("option");
-                                        option.value = optionValue;
-                                        option.text = this.inputNameReplace;
-                                        this.selectEdit.appendChild(option);
-
-                                        this.selectEdit.querySelector(`option[value='${optionValue}'`).selected = true;
-
-                                        this.buttonDelete.style.display = "inline-block";
-                                    }
-
-                                    // Create folder root
-                                    Sio.sendMessage("t_exec_i", {
-                                        tag: "exploreClickLogicFolder",
-                                        cmd: `mkdir -p "${Config.setting.systemData.pathProject}/${this.inputFolderName.value}/root"`
-                                    });
-
-                                    // Create git setting file
-                                    if (this.checkboxGit.checked === true) {
-                                        Sio.sendMessage("t_exec_i", {
-                                            tag: "exploreGitClickLogicSetting",
-                                            cmd: `test -f "${Config.setting.systemData.pathSetting}/${this.inputNameReplace}${Config.setting.systemData.extensionGit}"`
-                                        });
-
-                                        Sio.readMessage("t_exec_o_exploreGitClickLogicSetting", (data) => {
-                                            if (data.close === 1) {
-                                                this.$root.$refs.toolGitComponent.createFile(this.inputNameReplace, `${Config.setting.systemData.pathProject}/${this.inputFolderName.value}/root`);
-                                            } else {
-                                                Sio.stopRead("t_exec_o_exploreGitClickLogicSetting");
-                                            }
-                                        });
-                                    } else {
-                                        this._deleteFileSetting(Config.setting.systemData.extensionGit);
-
-                                        this.$root.$refs.toolGitComponent.deleteOption();
-                                    }
-
-                                    // Create terser setting file
-                                    if (this.checkboxTerser.checked === true) {
-                                        Sio.sendMessage("t_exec_i", {
-                                            tag: "exploreTerserClickLogicSetting",
-                                            cmd: `test -f "${Config.setting.systemData.pathSetting}/${this.inputNameReplace}${Config.setting.systemData.extensionTerser}"`
-                                        });
-
-                                        Sio.readMessage("t_exec_o_exploreTerserClickLogicSetting", (data) => {
-                                            if (data.close === 1) {
-                                                this.$root.$refs.toolTerserComponent.createFile(this.inputNameReplace, `${Config.setting.systemData.pathProject}/${this.inputFolderName.value}/root`);
-                                            } else {
-                                                Sio.stopRead("t_exec_o_exploreTerserClickLogicSetting");
-                                            }
-                                        });
-                                    } else {
-                                        this._deleteFileSetting(Config.setting.systemData.extensionTerser);
-
-                                        this.$root.$refs.toolTerserComponent.deleteOption();
-                                    }
-
-                                    // Create sass setting file
-                                    if (this.checkboxSass.checked === true) {
-                                        Sio.sendMessage("t_exec_i", {
-                                            tag: "exploreSassClickLogicSetting",
-                                            cmd: `test -f "${Config.setting.systemData.pathSetting}/${this.inputNameReplace}${Config.setting.systemData.extensionSass}"`
-                                        });
-
-                                        Sio.readMessage("t_exec_o_exploreSassClickLogicSetting", (data) => {
-                                            if (data.close === 1) {
-                                                this.$root.$refs.toolSassComponent.createFile(this.inputNameReplace, `${Config.setting.systemData.pathProject}/${this.inputFolderName.value}/root`);
-                                            } else {
-                                                Sio.stopRead("t_exec_o_exploreSassClickLogicSetting");
-                                            }
-                                        });
-                                    } else {
-                                        this._deleteFileSetting(Config.setting.systemData.extensionSass);
-
-                                        this.$root.$refs.toolSassComponent.deleteOption();
-                                    }
-                                }
-                            });
-                        } else {
-                            if (this.inputName.value === "" || inputNameCheck === false) {
-                                this.inputName.style.borderColor = "#ff0000";
-                            }
-                            if (this.inputFolderName.value === "" || folderNameCheck === false) {
-                                this.inputFolderName.style.borderColor = "#ff0000";
-                            }
-                        }
-                    } else if (event.target.classList.contains("delete") === true) {
-                        if (this.selectEdit.selectedIndex > 0) {
-                            this.$root.$refs.promptComponent.show(windowComponent, "You really want to delete this project?<br>(The root folder will be preserved).", () => {
-                                Sio.sendMessage("t_exec_i", {
-                                    tag: "exploreClickLogicDelete",
-                                    cmd: `rm "${Config.setting.systemData.pathSetting}/${this.inputNameReplace}${Config.setting.systemData.extensionProject}"`
-                                });
-
-                                Sio.readMessage("t_exec_o_exploreClickLogicDelete", (data) => {
-                                    if (data.close !== undefined && this.selectEdit.selectedIndex > 0 && this.selectEdit.options[this.selectEdit.selectedIndex].value !== null) {
-                                        Sio.stopRead("t_exec_o_exploreClickLogicDelete");
-
-                                        this._deleteFileSetting(Config.setting.systemData.extensionGit);
-                                        this._deleteFileSetting(Config.setting.systemData.extensionTerser);
-                                        this._deleteFileSetting(Config.setting.systemData.extensionSass);
-
-                                        this.$root.$refs.toolGitComponent.deleteOption();
-                                        this.$root.$refs.toolTerserComponent.deleteOption();
-                                        this.$root.$refs.toolSassComponent.deleteOption();
-
-                                        this.selectEdit.options[this.selectEdit.selectedIndex].remove();
-                                        this.selectEdit.selectedIndex = 0;
-
-                                        this.inputName.value = "";
-                                        this.inputNameReplace = "";
-                                        this.inputFolderName.value = "";
-                                        this.textareaDescription.value = "";
-                                        this.checkboxGit.checked = false;
-                                        this.checkboxTerser.checked = false;
-                                        this.checkboxSass.checked = false;
-
-                                        this.buttonDelete.style.display = "none";
-                                    }
-                                });
-                            });
-                        }
-                    }
-                }
-            },
-            changeLogic(event) {
-                const windowComponent = Helper.findParent(event.target, ["explore_component"], ["window_component"]);
-                const currentWindowElement = Helper.currentWindowElement(windowComponent);
-
-                if (currentWindowElement !== null) {
-                    if (event.target.classList.contains("edit") === true) {
-                        if (this.selectEdit.selectedIndex > 0) {
-                            const optionValue = this.selectEdit.options[this.selectEdit.selectedIndex].value;
-
-                            Sio.sendMessage("t_exec_stream_i", {
-                                tag: "exploreChangeLogicEdit",
-                                cmd: "read",
-                                path: `${Config.setting.systemData.pathSetting}/${optionValue}`
-                            });
-
-                            let buffer = "";
-
-                            Sio.readMessage("t_exec_stream_o_exploreChangeLogicEdit", (data) => {
-                                if (data.chunk !== "end") {
-                                    buffer += data.chunk;
-                                } else {
-                                    Sio.stopRead("t_exec_stream_o_exploreChangeLogicEdit");
-
-                                    const result = JSON.parse(buffer);
-
-                                    this.inputName.value = result.name;
-                                    this.inputNameReplace = Helper.replaceName(result.name, /\s/g, true);
-                                    this.inputFolderName.value = result.folderName;
-                                    this.textareaDescription.value = result.description;
-                                    this.checkboxGit.checked = result.git;
-                                    this.checkboxTerser.checked = result.terser;
-                                    this.checkboxSass.checked = result.sass;
+                                if (!elementOption) {
+                                    const option = document.createElement("option");
+                                    option.value = optionValue;
+                                    option.text = this.inputNameReplace;
+                                    option.selected = true;
+                                    this.selectEdit.appendChild(option);
 
                                     this.buttonDelete.style.display = "inline-block";
                                 }
-                            });
-                        } else {
-                            this.inputName.value = "";
-                            this.inputNameReplace = "";
-                            this.inputFolderName.value = "";
-                            this.textareaDescription.value = "";
-                            this.checkboxGit.checked = false;
-                            this.checkboxTerser.checked = false;
-                            this.checkboxSass.checked = false;
 
-                            this.buttonDelete.style.display = "none";
+                                // Create folder root
+                                Sio.sendMessage("t_exec_i", {
+                                    tag: "exploreClickLogicFolder",
+                                    cmd: `mkdir -p "${Config.setting.systemData.pathProject}/${this.inputFolderName.value}/root"`
+                                });
+
+                                // Create git setting file
+                                if (this.checkboxGit.checked) {
+                                    Sio.sendMessage("t_exec_i", {
+                                        tag: "exploreGitClickLogicSetting",
+                                        cmd: `test -f "${Config.setting.systemData.pathSetting}/${this.inputNameReplace}${Config.setting.systemData.extensionGit}"`
+                                    });
+
+                                    Sio.readMessage("t_exec_o_exploreGitClickLogicSetting", (data: Interface.SocketData): void => {
+                                        if (data.close === 1) {
+                                            Helper.component.toolGit.logicCreateFile(this.inputNameReplace, `${Config.setting.systemData.pathProject}/${this.inputFolderName.value}/root`);
+                                        } else {
+                                            Sio.stopRead("t_exec_o_exploreGitClickLogicSetting");
+                                        }
+                                    });
+                                } else {
+                                    this.logicDeleteFileSetting(Config.setting.systemData.extensionGit);
+
+                                    Helper.component.toolGit.logicDeleteOption();
+                                }
+
+                                // Create terser setting file
+                                if (this.checkboxTerser.checked) {
+                                    Sio.sendMessage("t_exec_i", {
+                                        tag: "exploreTerserClickLogicSetting",
+                                        cmd: `test -f "${Config.setting.systemData.pathSetting}/${this.inputNameReplace}${Config.setting.systemData.extensionTerser}"`
+                                    });
+
+                                    Sio.readMessage("t_exec_o_exploreTerserClickLogicSetting", (data: Interface.SocketData): void => {
+                                        if (data.close === 1) {
+                                            Helper.component.toolTerser.logicCreateFile(this.inputNameReplace, `${Config.setting.systemData.pathProject}/${this.inputFolderName.value}/root`);
+                                        } else {
+                                            Sio.stopRead("t_exec_o_exploreTerserClickLogicSetting");
+                                        }
+                                    });
+                                } else {
+                                    this.logicDeleteFileSetting(Config.setting.systemData.extensionTerser);
+
+                                    Helper.component.toolTerser.logicDeleteOption();
+                                }
+
+                                // Create sass setting file
+                                if (this.checkboxSass.checked) {
+                                    Sio.sendMessage("t_exec_i", {
+                                        tag: "exploreSassClickLogicSetting",
+                                        cmd: `test -f "${Config.setting.systemData.pathSetting}/${this.inputNameReplace}${Config.setting.systemData.extensionSass}"`
+                                    });
+
+                                    Sio.readMessage("t_exec_o_exploreSassClickLogicSetting", (data: Interface.SocketData): void => {
+                                        if (data.close === 1) {
+                                            Helper.component.toolSass.logicCreateFile(this.inputNameReplace, `${Config.setting.systemData.pathProject}/${this.inputFolderName.value}/root`);
+                                        } else {
+                                            Sio.stopRead("t_exec_o_exploreSassClickLogicSetting");
+                                        }
+                                    });
+                                } else {
+                                    this.logicDeleteFileSetting(Config.setting.systemData.extensionSass);
+
+                                    Helper.component.toolSass.logicDeleteOption();
+                                }
+                            }
+                        });
+                    } else {
+                        if (this.inputName.value === "" || !inputNameCheck) {
+                            this.inputName.style.borderColor = "#ff0000";
                         }
+                        if (this.inputFolderName.value === "" || !folderNameCheck) {
+                            this.inputFolderName.style.borderColor = "#ff0000";
+                        }
+                    }
+                } else if (elementEventTarget.classList.contains("delete")) {
+                    if (this.selectEdit.selectedIndex > 0) {
+                        Helper.component.prompt.logicShow(componentWindow, "You really want to delete this project?<br>(The root folder will be preserved).", (): void => {
+                            Sio.sendMessage("t_exec_i", {
+                                tag: "exploreClickLogicDelete",
+                                cmd: `rm "${Config.setting.systemData.pathSetting}/${this.inputNameReplace}${Config.setting.systemData.extensionProject}"`
+                            });
+
+                            Sio.readMessage("t_exec_o_exploreClickLogicDelete", (data: Interface.SocketData): void => {
+                                if (data.close !== undefined && this.selectEdit.selectedIndex > 0 && this.selectEdit.options[this.selectEdit.selectedIndex].value) {
+                                    Sio.stopRead("t_exec_o_exploreClickLogicDelete");
+
+                                    this.logicDeleteFileSetting(Config.setting.systemData.extensionGit);
+                                    this.logicDeleteFileSetting(Config.setting.systemData.extensionTerser);
+                                    this.logicDeleteFileSetting(Config.setting.systemData.extensionSass);
+
+                                    Helper.component.toolGit.logicDeleteOption();
+                                    Helper.component.toolTerser.logicDeleteOption();
+                                    Helper.component.toolSass.logicDeleteOption();
+
+                                    this.selectEdit.options[this.selectEdit.selectedIndex].remove();
+                                    this.selectEdit.selectedIndex = 0;
+
+                                    this.inputName.value = "";
+                                    this.inputNameReplace = "";
+                                    this.inputFolderName.value = "";
+                                    this.textareaDescription.value = "";
+                                    this.checkboxGit.checked = false;
+                                    this.checkboxTerser.checked = false;
+                                    this.checkboxSass.checked = false;
+
+                                    this.buttonDelete.style.display = "none";
+                                }
+                            });
+                        });
                     }
                 }
             }
-        },
-        data() {
-            return {
-                inputName: null,
-                inputNameReplace: "",
-                inputFolderName: null,
-                textareaDescription: null,
-                checkboxGit: null,
-                checkboxTerser: null,
-                checkboxSass: null,
-                selectEdit: null,
-                buttonSave: null,
-                buttonDelete: null
-            };
-        },
-        created() {
-            this.$root.$refs.projectExploreComponent = this;
-        },
-        beforeDestroy() {}
-    };
+        }
+
+        public logicChange(event: Event): void {
+            const elementEventTarget = event.target as HTMLElement;
+
+            const componentWindow = Helper.findElement(elementEventTarget, ["explore_component"], ["window_component"]);
+            const currentWindow = Helper.currentWindow(componentWindow);
+
+            if (currentWindow) {
+                if (elementEventTarget.classList.contains("edit")) {
+                    if (this.selectEdit.selectedIndex > 0) {
+                        const optionValue = this.selectEdit.options[this.selectEdit.selectedIndex].value;
+
+                        Sio.sendMessage("t_exec_stream_i", {
+                            tag: "exploreChangeLogicEdit",
+                            cmd: "read",
+                            path: `${Config.setting.systemData.pathSetting}/${optionValue}`
+                        });
+
+                        let buffer = "";
+
+                        Sio.readMessage("t_exec_stream_o_exploreChangeLogicEdit", (data: Interface.SocketData): void => {
+                            if (data.chunk !== "end") {
+                                buffer += data.chunk;
+                            } else {
+                                Sio.stopRead("t_exec_stream_o_exploreChangeLogicEdit");
+
+                                const result = JSON.parse(buffer);
+
+                                this.inputName.value = result.name;
+                                this.inputNameReplace = Helper.replaceName(result.name, /\s/g, true);
+                                this.inputFolderName.value = result.folderName;
+                                this.textareaDescription.value = result.description;
+                                this.checkboxGit.checked = result.git;
+                                this.checkboxTerser.checked = result.terser;
+                                this.checkboxSass.checked = result.sass;
+
+                                this.buttonDelete.style.display = "inline-block";
+                            }
+                        });
+                    } else {
+                        this.inputName.value = "";
+                        this.inputNameReplace = "";
+                        this.inputFolderName.value = "";
+                        this.textareaDescription.value = "";
+                        this.checkboxGit.checked = false;
+                        this.checkboxTerser.checked = false;
+                        this.checkboxSass.checked = false;
+
+                        this.buttonDelete.style.display = "none";
+                    }
+                }
+            }
+        }
+    }
 </script>
 
 <style lang="scss" scoped>

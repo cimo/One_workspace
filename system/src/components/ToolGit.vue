@@ -78,123 +78,151 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+    import { Component, Vue } from "vue-property-decorator";
+
     import * as Config from "../assets/js/Config";
+    import * as Interface from "../assets/js/Interface";
     import * as Helper from "../assets/js/Helper";
     import * as Sio from "../assets/js/Sio";
 
-    export default {
-        name: "ToolGitComponent",
-        //components: {},
-        computed: {},
-        methods: {
-            init(windowComponent) {
-                const currentWindowElement = Helper.currentWindowElement(windowComponent);
+    @Component({
+        components: {}
+    })
+    export default class ComponentToolGit extends Vue {
+        // Variables
+        private elementPart1Container!: HTMLElement;
+        private elementPart2Container!: HTMLElement;
+        private selectEdit!: HTMLSelectElement;
+        private elementProjectLabel!: HTMLElement;
+        private inputUrl!: HTMLInputElement;
+        private inputUsername!: HTMLInputElement;
+        private inputPassword!: HTMLInputElement;
+        private inputBranchName1!: HTMLInputElement;
+        private inputBranchName2!: HTMLInputElement;
+        private inputCommitDescription!: HTMLInputElement;
+        private elementOutput1!: HTMLElement;
+        private elementOutput2!: HTMLElement;
+        private buttonSave!: HTMLButtonElement;
+        private projectName!: string;
+        private projectPath!: string;
 
-                if (currentWindowElement !== null) {
-                    this.elementPart1Container = windowComponent.querySelector(".part_1_container");
-                    this.elementPart2Container = windowComponent.querySelector(".part_2_container");
-                    this.selectEdit = windowComponent.querySelector(".part_1_container select[name='edit']");
-                    this.elementProjectLabel = windowComponent.querySelector(".part_2_container .project_label");
-                    this.inputUrl = windowComponent.querySelector(".part_1_container input[name='url']");
-                    this.inputUsername = windowComponent.querySelector(".part_1_container input[name='username']");
-                    this.inputPassword = windowComponent.querySelector(".part_1_container input[name='password']");
-                    this.inputBranchName1 = windowComponent.querySelector(".part_1_container input[name='branchName']");
-                    this.inputBranchName2 = windowComponent.querySelector(".part_2_container input[name='branchName']");
-                    this.inputCommitDescription = windowComponent.querySelector(".part_2_container input[name='commitDescription']");
-                    this.elementOutput1 = windowComponent.querySelector(".part_1_container .output");
-                    this.elementOutput2 = windowComponent.querySelector(".part_2_container .output");
-                    this.buttonSave = windowComponent.querySelector(".button_cmd_window.save");
+        // Functions
+        protected created(): void {
+            Helper.component.toolGit = this;
 
-                    if (this.selectEdit !== null) {
-                        Sio.sendMessage("t_exec_i", {
-                            tag: "gitInit",
-                            cmd: `ls "${Config.setting.systemData.pathSetting}"/*${Config.setting.systemData.extensionGit} | sed 's#.*/##'`
-                        });
+            this.projectName = "";
+            this.projectPath = "";
+        }
 
-                        Sio.readMessage("t_exec_o_gitInit", (data) => {
-                            const result = data.out !== undefined ? data.out : data.err;
+        protected beforeDestroy(): void {}
 
-                            if (result !== undefined) {
-                                const outSplit = result.split("\n");
+        // Logic
+        public logicInit(componentWindow: HTMLElement): void {
+            const currentWindow = Helper.currentWindow(componentWindow);
 
-                                for (const value of outSplit) {
-                                    if (value !== "" && value.indexOf("ls: ") === -1) {
-                                        const option = document.createElement("option");
-                                        option.value = value;
-                                        option.text = value.replace(Config.setting.systemData.extensionGit, "");
-                                        this.selectEdit.appendChild(option);
-                                    }
+            if (currentWindow) {
+                this.elementPart1Container = componentWindow.querySelector(".part_1_container") as HTMLElement;
+                this.elementPart2Container = componentWindow.querySelector(".part_2_container") as HTMLElement;
+                this.selectEdit = componentWindow.querySelector(".part_1_container select[name='edit']") as HTMLSelectElement;
+                this.elementProjectLabel = componentWindow.querySelector(".part_2_container .project_label") as HTMLElement;
+                this.inputUrl = componentWindow.querySelector(".part_1_container input[name='url']") as HTMLInputElement;
+                this.inputUsername = componentWindow.querySelector(".part_1_container input[name='username']") as HTMLInputElement;
+                this.inputPassword = componentWindow.querySelector(".part_1_container input[name='password']") as HTMLInputElement;
+                this.inputBranchName1 = componentWindow.querySelector(".part_1_container input[name='branchName']") as HTMLInputElement;
+                this.inputBranchName2 = componentWindow.querySelector(".part_2_container input[name='branchName']") as HTMLInputElement;
+                this.inputCommitDescription = componentWindow.querySelector(".part_2_container input[name='commitDescription']") as HTMLInputElement;
+                this.elementOutput1 = componentWindow.querySelector(".part_1_container .output") as HTMLElement;
+                this.elementOutput2 = componentWindow.querySelector(".part_2_container .output") as HTMLElement;
+                this.buttonSave = componentWindow.querySelector(".button_cmd_window.save") as HTMLButtonElement;
+
+                if (this.selectEdit) {
+                    Sio.sendMessage("t_exec_i", {
+                        tag: "gitInit",
+                        cmd: `ls "${Config.setting.systemData.pathSetting}"/*${Config.setting.systemData.extensionGit} | sed 's#.*/##'`
+                    });
+
+                    Sio.readMessage("t_exec_o_gitInit", (data: Interface.SocketData): void => {
+                        const result = data.out !== undefined ? data.out : data.err;
+
+                        if (result !== undefined) {
+                            const outSplit = result.split("\n");
+
+                            for (const value of outSplit) {
+                                if (value !== "" && value.indexOf("ls: ") === -1) {
+                                    const option = document.createElement("option");
+                                    option.value = value;
+                                    option.text = value.replace(Config.setting.systemData.extensionGit, "");
+                                    this.selectEdit.appendChild(option);
                                 }
                             }
+                        }
 
-                            if (data.close !== undefined) {
-                                Sio.stopRead("t_exec_o_gitInit");
-                            }
-                        });
+                        if (data.close !== undefined) {
+                            Sio.stopRead("t_exec_o_gitInit");
+                        }
+                    });
+                }
+            }
+        }
+
+        public logicClick(event: Event): void {
+            const elementEventTarget = event.target as HTMLElement;
+
+            const componentWindow = Helper.findElement(elementEventTarget, ["git_component"], ["window_component"]);
+            const currentWindow = Helper.currentWindow(componentWindow);
+
+            if (currentWindow) {
+                const elementMenu = Helper.findElement(elementEventTarget, ["menu_git"]);
+
+                if (elementMenu) {
+                    const elementButtonList = (elementMenu.querySelectorAll(".button") as any) as HTMLElement[];
+
+                    const index = Array.from(elementButtonList).indexOf(elementEventTarget);
+
+                    if (index >= 0) {
+                        for (const value of elementButtonList) {
+                            value.classList.remove("focused");
+                        }
+
+                        elementButtonList[index].classList.add("focused");
+
+                        if (index === 0) {
+                            this.elementPart1Container.style.display = "block";
+                            this.elementPart2Container.style.display = "none";
+                        } else if (index === 1) {
+                            this.elementPart1Container.style.display = "none";
+                            this.elementPart2Container.style.display = "block";
+                        }
                     }
                 }
-            },
-            clickLogic(event) {
-                const windowComponent = Helper.findParent(event.target, ["git_component"], ["window_component"]);
-                const currentWindowElement = Helper.currentWindowElement(windowComponent);
 
-                if (currentWindowElement !== null) {
-                    const menuElement = Helper.findParent(event.target, ["menu_git"]);
+                this.selectEdit.style.borderColor = "transparent";
+                this.inputUrl.style.borderColor = "transparent";
+                this.inputUsername.style.borderColor = "transparent";
+                this.inputPassword.style.borderColor = "transparent";
+                this.inputBranchName1.style.borderColor = "transparent";
+                this.inputBranchName2.style.borderColor = "transparent";
+                this.inputCommitDescription.style.borderColor = "transparent";
 
-                    if (menuElement !== null) {
-                        const buttonList = menuElement.querySelectorAll(".button");
-
-                        const index = Array.from(buttonList).indexOf(event.target);
-
-                        if (index >= 0) {
-                            for (const value of buttonList) {
-                                value.classList.remove("focused");
-                            }
-
-                            buttonList[index].classList.add("focused");
-
-                            if (index === 0) {
-                                this.elementPart1Container.style.display = "block";
-                                this.elementPart2Container.style.display = "none";
-                            } else if (index === 1) {
-                                this.elementPart1Container.style.display = "none";
-                                this.elementPart2Container.style.display = "block";
-                            }
+                if (elementEventTarget.classList.contains("save")) {
+                    if (this.projectName !== "" && this.inputUrl.value !== "" && this.inputUsername.value !== "" && this.inputPassword.value !== "") {
+                        this.logicCreateFile();
+                    } else {
+                        if (this.inputUrl.value === "") {
+                            this.inputUrl.style.borderColor = "#ff0000";
+                        }
+                        if (this.inputUsername.value === "") {
+                            this.inputUsername.style.borderColor = "#ff0000";
+                        }
+                        if (this.inputPassword.value === "") {
+                            this.inputPassword.style.borderColor = "#ff0000";
                         }
                     }
+                }
 
-                    this.selectEdit.style.borderColor = "transparent";
-                    this.inputUrl.style.borderColor = "transparent";
-                    this.inputUsername.style.borderColor = "transparent";
-                    this.inputPassword.style.borderColor = "transparent";
-                    this.inputBranchName1.style.borderColor = "transparent";
-                    this.inputBranchName2.style.borderColor = "transparent";
-                    this.inputCommitDescription.style.borderColor = "transparent";
-
-                    if (event.target.classList.contains("save") === true) {
-                        if (this.projectName !== "" && this.inputUrl.value !== "" && this.inputUsername !== "" && this.inputPassword.value !== "") {
-                            this.createFile();
-                        } else {
-                            if (this.inputUrl.value === "") {
-                                this.inputUrl.style.borderColor = "#ff0000";
-                            }
-                            if (this.inputUsername.value === "") {
-                                this.inputUsername.style.borderColor = "#ff0000";
-                            }
-                            if (this.inputPassword.value === "") {
-                                this.inputPassword.style.borderColor = "#ff0000";
-                            }
-                        }
-                    }
-
-                    if (event.target.classList.contains("button_cmd_window") === true) {
-                        if (this.projectName === "") {
-                            this.selectEdit.style.borderColor = "#ff0000";
-
-                            return false;
-                        }
-
+                if (elementEventTarget.classList.contains("button_cmd_window")) {
+                    if (this.projectName !== "") {
                         this.elementOutput1.innerHTML = "";
                         this.elementOutput2.innerHTML = "";
 
@@ -209,28 +237,28 @@
                             url = this.inputUrl.value;
                         }
 
-                        const branchNameMatch1 = /^[A-Za-z0-9-_/ ]+$/.test(this.inputBranchName1.value);
-                        const branchNameMatch2 = /^[A-Za-z0-9-_/ ]+$/.test(this.inputBranchName2.value);
+                        const branchNameMatch1 = /^[A-Za-z0-9-_/ ]+$/.test(this.inputBranchName1.value as string);
+                        const branchNameMatch2 = /^[A-Za-z0-9-_/ ]+$/.test(this.inputBranchName2.value as string);
 
-                        if (event.target.classList.contains("clone") === true) {
+                        if (elementEventTarget.classList.contains("clone")) {
                             command = `mkdir -p "${this.projectPath}" && cd "${this.projectPath}" && git clone ${url} .`;
-                        } else if (event.target.classList.contains("pull") === true) {
-                            if (branchNameMatch1 === true) {
+                        } else if (elementEventTarget.classList.contains("pull")) {
+                            if (branchNameMatch1) {
                                 command = `cd "${this.projectPath}" && git pull ${url} ${this.inputBranchName1.value}`;
                             } else {
                                 this.inputBranchName1.style.borderColor = "#ff0000";
                             }
-                        } else if (event.target.classList.contains("fetch") === true) {
+                        } else if (elementEventTarget.classList.contains("fetch")) {
                             command = `cd "${this.projectPath}" && git fetch --all`;
-                        } else if (event.target.classList.contains("reset") === true) {
-                            if (branchNameMatch1 === true) {
+                        } else if (elementEventTarget.classList.contains("reset")) {
+                            if (branchNameMatch1) {
                                 command = `cd "${this.projectPath}" && git reset --hard ${this.inputBranchName1.value}`;
                             } else {
                                 this.inputBranchName1.style.borderColor = "#ff0000";
                             }
-                        } else if (event.target.classList.contains("status") === true) {
+                        } else if (elementEventTarget.classList.contains("status")) {
                             command = `cd "${this.projectPath}" && git status`;
-                        } else if (event.target.classList.contains("commit") === true) {
+                        } else if (elementEventTarget.classList.contains("commit")) {
                             if (this.inputCommitDescription.value !== "") {
                                 this.inputBranchName2.value = "";
 
@@ -238,8 +266,8 @@
                             } else {
                                 this.inputCommitDescription.style.borderColor = "#ff0000";
                             }
-                        } else if (event.target.classList.contains("push") === true) {
-                            if (branchNameMatch2 === true) {
+                        } else if (elementEventTarget.classList.contains("push")) {
+                            if (branchNameMatch2) {
                                 this.inputCommitDescription.value = "";
 
                                 command = `cd "${this.projectPath}" && git remote set-url origin ${url} && git push ${this.inputBranchName2.value}`;
@@ -248,214 +276,198 @@
                             }
                         }
 
-                        if (command === "") {
-                            return false;
-                        }
-
-                        Sio.sendMessage("t_exec_i", {
-                            tag: "gitCommand",
-                            cmd: command
-                        });
-
-                        let buffer = "";
-
-                        Sio.readMessage("t_exec_o_gitCommand", (data) => {
-                            const result = data.out !== undefined ? data.out : data.err;
-
-                            if (result !== undefined && event.target.classList.contains("clone") === true) {
-                                buffer = result;
-                                this.elementOutput1.innerHTML = buffer;
-                            } else if (result !== undefined && event.target.classList.contains("fetch") === true) {
-                                buffer = result;
-                                this.elementOutput1.innerHTML = buffer;
-                            } else if (result !== undefined && event.target.classList.contains("clone") === false) {
-                                buffer += result;
-                            }
-
-                            if (data.close !== undefined) {
-                                Sio.stopRead("t_exec_o_gitCommand");
-
-                                if (getComputedStyle(this.elementPart1Container, null).display === "block") {
-                                    this.elementOutput1.innerHTML = buffer;
-                                } else {
-                                    this.elementOutput2.innerHTML = buffer;
-                                }
-
-                                if (event.target.classList.contains("clone") === true && data.close !== 128) {
-                                    this.elementOutput1.innerHTML = "";
-                                } else if (event.target.classList.contains("fetch") === true && data.close === 0) {
-                                    this.elementOutput1.innerHTML = "";
-                                }
-                            }
-                        });
-                    }
-                }
-            },
-            changeLogic(event) {
-                const windowComponent = Helper.findParent(event.target, ["git_component"], ["window_component"]);
-                const currentWindowElement = Helper.currentWindowElement(windowComponent);
-
-                if (currentWindowElement !== null) {
-                    if (event.target.classList.contains("edit") === true) {
-                        if (this.selectEdit.selectedIndex > 0) {
-                            const optionValue = this.selectEdit.options[this.selectEdit.selectedIndex].value;
-
-                            Sio.sendMessage("t_exec_stream_i", {
-                                tag: "gitChangeLogicEdit",
-                                cmd: "read",
-                                path: `${Config.setting.systemData.pathSetting}/${optionValue}`
+                        if (command !== "") {
+                            Sio.sendMessage("t_exec_i", {
+                                tag: "gitCommand",
+                                cmd: command
                             });
 
                             let buffer = "";
 
-                            Sio.readMessage("t_exec_stream_o_gitChangeLogicEdit", (data) => {
-                                if (data.chunk !== "end") {
-                                    buffer += data.chunk;
-                                } else {
-                                    Sio.stopRead("t_exec_stream_o_gitChangeLogicEdit");
+                            Sio.readMessage("t_exec_o_gitCommand", (data: Interface.SocketData): void => {
+                                const result = data.out !== undefined ? data.out : data.err;
 
-                                    const result = JSON.parse(buffer);
+                                if (result !== undefined && elementEventTarget.classList.contains("clone")) {
+                                    buffer = result;
+                                    this.elementOutput1.innerHTML = buffer;
+                                } else if (result !== undefined && elementEventTarget.classList.contains("fetch")) {
+                                    buffer = result;
+                                    this.elementOutput1.innerHTML = buffer;
+                                } else if (result !== undefined && !elementEventTarget.classList.contains("clone")) {
+                                    buffer += result;
+                                }
 
-                                    this.projectName = result.name;
-                                    this.projectPath = result.path;
-                                    this.elementProjectLabel.innerHTML = result.name;
-                                    this.inputUrl.value = result.url;
-                                    this.inputUsername.value = result.username;
-                                    this.inputBranchName1.value = "";
-                                    this.inputBranchName2.value = "";
-                                    this.inputCommitDescription.value = "";
-                                    this.elementOutput1.innerHTML = "";
-                                    this.elementOutput2.innerHTML = "";
+                                if (data.close !== undefined) {
+                                    Sio.stopRead("t_exec_o_gitCommand");
 
-                                    Sio.sendMessage("t_crypt_decrypt_i", {
-                                        tag: "gitSetting",
-                                        hex: result.password
-                                    });
+                                    const computedStyle = window.getComputedStyle(this.elementPart1Container);
 
-                                    Sio.readMessage("t_crypt_decrypt_o_gitSetting", (data) => {
-                                        Sio.stopRead("t_crypt_decrypt_o_gitSetting");
+                                    if (computedStyle.display === "block") {
+                                        this.elementOutput1.innerHTML = buffer;
+                                    } else {
+                                        this.elementOutput2.innerHTML = buffer;
+                                    }
 
-                                        this.inputPassword.value = data.out;
-                                    });
+                                    if (elementEventTarget.classList.contains("clone") && data.close !== "128") {
+                                        this.elementOutput1.innerHTML = "";
+                                    } else if (elementEventTarget.classList.contains("fetch") && data.close === "0") {
+                                        this.elementOutput1.innerHTML = "";
+                                    }
                                 }
                             });
-                        } else {
-                            this.projectName = "";
-                            this.projectPath = "";
-                            this.elementProjectLabel.innerHTML = "";
-                            this.inputUrl.value = "";
-                            this.inputUsername.value = "";
-                            this.inputPassword.value = "";
-                            this.inputBranchName1.value = "";
-                            this.inputBranchName2.value = "";
-                            this.inputCommitDescription.value = "";
-                            this.elementOutput1.innerHTML = "";
-                            this.elementOutput2.innerHTML = "";
                         }
-                    }
-                }
-            },
-            createFile(name, path) {
-                if (name !== undefined) {
-                    this.projectName = name;
-                }
-
-                if (path !== undefined) {
-                    this.projectPath = path;
-                }
-
-                Sio.sendMessage("t_crypt_encrypt_i", {
-                    tag: "gitSetting",
-                    text: this.inputPassword !== null ? this.inputPassword.value : ""
-                });
-
-                Sio.readMessage("t_crypt_encrypt_o_gitSetting", (data) => {
-                    Sio.stopRead("t_crypt_encrypt_o_gitSetting");
-
-                    const content = {
-                        url: this.inputUrl !== null ? this.inputUrl.value : "",
-                        username: this.inputUsername !== null ? this.inputUsername.value : "",
-                        password: data.out,
-                        name: this.projectName,
-                        path: this.projectPath
-                    };
-
-                    Sio.sendMessage("t_exec_stream_i", {
-                        tag: "gitClickLogicSave",
-                        cmd: "write",
-                        path: `${Config.setting.systemData.pathSetting}/${this.projectName}${Config.setting.systemData.extensionGit}`,
-                        content: JSON.stringify(content)
-                    });
-
-                    if (this.selectEdit !== null) {
-                        Sio.readMessage("t_exec_stream_o_gitClickLogicSave", (data) => {
-                            if (data.chunk === "end") {
-                                Sio.stopRead("t_exec_stream_o_gitClickLogicSave");
-
-                                const optionValue = `${this.projectName}${Config.setting.systemData.extensionGit}`;
-
-                                if (this.selectEdit.querySelector(`option[value='${optionValue}'`) === null) {
-                                    const option = document.createElement("option");
-                                    option.value = optionValue;
-                                    option.text = this.projectName;
-                                    this.selectEdit.appendChild(option);
-
-                                    this.selectEdit.querySelector(`option[value='${optionValue}'`).selected = true;
-                                }
-                            }
-                        });
-                    }
-                });
-            },
-            deleteOption() {
-                if (this.selectEdit !== null) {
-                    for (const option of this.selectEdit.options) {
-                        if (option.value === `${this.projectName}${Config.setting.systemData.extensionGit}`) {
-                            option.remove();
-                            this.selectEdit.selectedIndex = 0;
-
-                            this.projectName = "";
-                            this.projectPath = "";
-                            this.elementProjectLabel.innerHTML = "";
-                            this.inputUrl.value = "";
-                            this.inputUsername.value = "";
-                            this.inputPassword.value = "";
-                            this.inputBranchName1.value = "";
-                            this.inputBranchName2.value = "";
-                            this.inputCommitDescription.value = "";
-                            this.elementOutput1.innerHTML = "";
-                            this.elementOutput2.innerHTML = "";
-
-                            break;
-                        }
+                    } else {
+                        this.selectEdit.style.borderColor = "#ff0000";
                     }
                 }
             }
-        },
-        data() {
-            return {
-                projectName: "",
-                projectPath: "",
-                elementPart1Container: null,
-                elementPart2Container: null,
-                selectEdit: null,
-                elementProjectLabel: null,
-                inputUrl: null,
-                inputUsername: null,
-                inputPassword: null,
-                inputBranchName1: null,
-                inputBranchName2: null,
-                inputCommitDescription: null,
-                elementOutput1: null,
-                elementOutput2: null,
-                buttonSave: null
-            };
-        },
-        created() {
-            this.$root.$refs.toolGitComponent = this;
-        },
-        beforeDestroy() {}
-    };
+        }
+
+        public logicChange(event: Event): void {
+            const elementEventTarget = event.target as HTMLElement;
+
+            const componentWindow = Helper.findElement(elementEventTarget, ["git_component"], ["window_component"]);
+            const currentWindow = Helper.currentWindow(componentWindow);
+
+            if (currentWindow) {
+                if (elementEventTarget.classList.contains("edit")) {
+                    if (this.selectEdit.selectedIndex > 0) {
+                        const optionValue = this.selectEdit.options[this.selectEdit.selectedIndex].value;
+
+                        Sio.sendMessage("t_exec_stream_i", {
+                            tag: "gitChangeLogicEdit",
+                            cmd: "read",
+                            path: `${Config.setting.systemData.pathSetting}/${optionValue}`
+                        });
+
+                        let buffer = "";
+
+                        Sio.readMessage("t_exec_stream_o_gitChangeLogicEdit", (data: Interface.SocketData): void => {
+                            if (data.chunk !== "end") {
+                                buffer += data.chunk;
+                            } else {
+                                Sio.stopRead("t_exec_stream_o_gitChangeLogicEdit");
+
+                                const result = JSON.parse(buffer);
+
+                                this.projectName = result.name;
+                                this.projectPath = result.path;
+                                this.elementProjectLabel.innerHTML = result.name;
+                                this.inputUrl.value = result.url;
+                                this.inputUsername.value = result.username;
+                                this.inputBranchName1.value = "";
+                                this.inputBranchName2.value = "";
+                                this.inputCommitDescription.value = "";
+                                this.elementOutput1.innerHTML = "";
+                                this.elementOutput2.innerHTML = "";
+
+                                Sio.sendMessage("t_crypt_decrypt_i", {
+                                    tag: "gitSetting",
+                                    hex: result.password
+                                });
+
+                                Sio.readMessage("t_crypt_decrypt_o_gitSetting", (data: Interface.SocketData): void => {
+                                    Sio.stopRead("t_crypt_decrypt_o_gitSetting");
+
+                                    this.inputPassword.value = data.out !== undefined ? data.out : "";
+                                });
+                            }
+                        });
+                    } else {
+                        this.projectName = "";
+                        this.projectPath = "";
+                        this.elementProjectLabel.innerHTML = "";
+                        this.inputUrl.value = "";
+                        this.inputUsername.value = "";
+                        this.inputPassword.value = "";
+                        this.inputBranchName1.value = "";
+                        this.inputBranchName2.value = "";
+                        this.inputCommitDescription.value = "";
+                        this.elementOutput1.innerHTML = "";
+                        this.elementOutput2.innerHTML = "";
+                    }
+                }
+            }
+        }
+
+        public logicCreateFile(name?: string, path?: string): void {
+            if (name !== undefined) {
+                this.projectName = name;
+            }
+
+            if (path !== undefined) {
+                this.projectPath = path;
+            }
+
+            Sio.sendMessage("t_crypt_encrypt_i", {
+                tag: "gitSetting",
+                text: this.inputPassword ? this.inputPassword.value : ""
+            });
+
+            Sio.readMessage("t_crypt_encrypt_o_gitSetting", (data: Interface.SocketData): void => {
+                Sio.stopRead("t_crypt_encrypt_o_gitSetting");
+
+                const content = {
+                    url: this.inputUrl ? this.inputUrl.value : "",
+                    username: this.inputUsername ? this.inputUsername.value : "",
+                    password: data.out !== undefined ? data.out : "",
+                    name: this.projectName,
+                    path: this.projectPath
+                };
+
+                Sio.sendMessage("t_exec_stream_i", {
+                    tag: "gitClickLogicSave",
+                    cmd: "write",
+                    path: `${Config.setting.systemData.pathSetting}/${this.projectName}${Config.setting.systemData.extensionGit}`,
+                    content: JSON.stringify(content)
+                });
+
+                if (this.selectEdit) {
+                    Sio.readMessage("t_exec_stream_o_gitClickLogicSave", (data: Interface.SocketData): void => {
+                        if (data.chunk === "end") {
+                            Sio.stopRead("t_exec_stream_o_gitClickLogicSave");
+
+                            const optionValue = `${this.projectName}${Config.setting.systemData.extensionGit}`;
+                            const elementOption = this.selectEdit.querySelector(`option[value="${optionValue}"`) as HTMLOptionElement;
+
+                            if (!elementOption) {
+                                const option = document.createElement("option");
+                                option.value = optionValue;
+                                option.text = this.projectName;
+                                option.selected = true;
+                                this.selectEdit.appendChild(option);
+                            }
+                        }
+                    });
+                }
+            });
+        }
+
+        public logicDeleteOption(): void {
+            if (this.selectEdit) {
+                for (const option of this.selectEdit.options) {
+                    if (option.value === `${this.projectName}${Config.setting.systemData.extensionGit}`) {
+                        option.remove();
+                        this.selectEdit.selectedIndex = 0;
+
+                        this.projectName = "";
+                        this.projectPath = "";
+                        this.elementProjectLabel.innerHTML = "";
+                        this.inputUrl.value = "";
+                        this.inputUsername.value = "";
+                        this.inputPassword.value = "";
+                        this.inputBranchName1.value = "";
+                        this.inputBranchName2.value = "";
+                        this.inputCommitDescription.value = "";
+                        this.elementOutput1.innerHTML = "";
+                        this.elementOutput2.innerHTML = "";
+
+                        break;
+                    }
+                }
+            }
+        }
+    }
 </script>
 
 <style lang="scss" scoped>

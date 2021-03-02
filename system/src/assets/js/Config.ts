@@ -91,13 +91,6 @@ export const setting: Interface.Setting = {
             },
             {
                 category: "container",
-                name: "Php 5",
-                containerName: "Php_5.6-fpm",
-                imagePath: Image.php,
-                imageName: "php.svg"
-            },
-            {
-                category: "container",
                 name: "Php 7",
                 containerName: "Php_7.4-fpm",
                 imagePath: Image.php,
@@ -105,15 +98,22 @@ export const setting: Interface.Setting = {
             },
             {
                 category: "container",
-                name: "MySql 5.6",
-                containerName: "MySql_5.6",
-                imagePath: Image.mySql,
-                imageName: "mysql.svg"
+                name: "Php 5",
+                containerName: "Php_5.6-fpm",
+                imagePath: Image.php,
+                imageName: "php.svg"
             },
             {
                 category: "container",
                 name: "MySql 5.7",
                 containerName: "MySql_5.7",
+                imagePath: Image.mySql,
+                imageName: "mysql.svg"
+            },
+            {
+                category: "container",
+                name: "MySql 5.6",
+                containerName: "MySql_5.6",
                 imagePath: Image.mySql,
                 imageName: "mysql.svg"
             },

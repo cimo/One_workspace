@@ -1,6 +1,7 @@
 module.exports = {
     root: true,
     env: {
+        browser: true,
         node: true
     },
     extends: ["plugin:vue/essential", "eslint:recommended", "@vue/typescript", "@vue/prettier", "@vue/prettier/@typescript-eslint"],
@@ -24,7 +25,7 @@ module.exports = {
                 insertPragma: false,
                 jsxBracketSameLine: false,
                 jsxSingleQuote: false,
-                printWidth: 220,
+                printWidth: 300,
                 proseWrap: "preserve",
                 quoteProps: "as-needed",
                 requirePragma: false,

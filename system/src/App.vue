@@ -1,28 +1,32 @@
 <template>
     <div id="app">
-        <BodyComponent />
-        <FooterComponent />
+        <ComponentBody />
+        <ComponentFooter />
     </div>
 </template>
 
-<script>
-    import BodyComponent from "./components/Body.vue";
-    import FooterComponent from "./components/Footer.vue";
+<script lang="ts">
+    import { Component, Vue } from "vue-property-decorator";
 
-    export default {
-        name: "App",
+    import ComponentBody from "./components/Body.vue";
+    import ComponentFooter from "./components/Footer.vue";
+
+    @Component({
         components: {
-            BodyComponent,
-            FooterComponent
-        },
-        data() {
-            return {};
-        },
-        computed: {},
-        created() {},
-        beforeDestroy() {},
-        methods: {}
-    };
+            ComponentBody,
+            ComponentFooter
+        }
+    })
+    export default class ComponentApp extends Vue {
+        // Variables
+
+        // Functions
+        protected created(): void {}
+
+        protected beforeDestroy(): void {}
+
+        // Logic
+    }
 </script>
 
 <style lang="scss">

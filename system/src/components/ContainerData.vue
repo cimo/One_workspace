@@ -19,76 +19,89 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+    import { Component, Vue } from "vue-property-decorator";
+
     import * as Helper from "../assets/js/Helper";
+    import * as Interface from "../assets/js/Interface";
     import * as Sio from "../assets/js/Sio";
 
-    export default {
-        name: "ContainerDataComponent",
-        //components: {},
-        computed: {},
-        methods: {
-            _checkStatus(containerName) {
-                if (Object.keys(this.windowComponentList).length > 0) {
-                    this.intervalStatusList[containerName] = setInterval(() => {
-                        Sio.sendMessage("t_exec_i", {
-                            closeEnabled: false,
-                            tag: `${containerName}_data`,
-                            cmd: `docker stats ${containerName} --no-stream --format "{{.CPUPerc}}[-]{{.MemUsage}}[-]{{.BlockIO}}[-]{{.NetIO}}"`
-                        });
-                    }, 1000);
+    @Component({
+        components: {}
+    })
+    export default class ContainerData extends Vue {
+        // Variables
+        private componentWindowList!: HTMLElement[];
+        private intervalStatusList!: number[];
 
-                    Sio.readMessage(`t_exec_o_${containerName}_data`, (data) => {
-                        if (this.windowComponentList[containerName] !== undefined) {
-                            let result = data.out !== undefined ? data.out : data.err;
+        // Functions
+        protected created(): void {
+            Helper.component.containerData = this;
 
-                            if (result !== undefined) {
-                                result = result.split("[-]");
+            this.componentWindowList = [];
+            this.intervalStatusList = [];
+        }
 
-                                if (result.length > 1) {
-                                    this.windowComponentList[containerName].querySelector(".data_component .square_1 .value").innerHTML = result[0];
-                                    this.windowComponentList[containerName].querySelector(".data_component .square_2 .value").innerHTML = result[1];
-                                    this.windowComponentList[containerName].querySelector(".data_component .square_3 .value").innerHTML = result[2];
-                                    this.windowComponentList[containerName].querySelector(".data_component .square_4 .value").innerHTML = result[3];
-                                }
+        protected beforeDestroy(): void {}
+
+        // Logic
+        private logicCheckStatus(containerName: string): void {
+            if (Object.keys(this.componentWindowList).length > 0) {
+                this.intervalStatusList[containerName as any] = setInterval((): void => {
+                    Sio.sendMessage("t_exec_i", {
+                        closeEnabled: false,
+                        tag: `${containerName}_data`,
+                        cmd: `docker stats ${containerName} --no-stream --format "{{.CPUPerc}}[-]{{.MemUsage}}[-]{{.BlockIO}}[-]{{.NetIO}}"`
+                    });
+                }, 1000);
+
+                Sio.readMessage(`t_exec_o_${containerName}_data`, (data: Interface.SocketData): void => {
+                    if (this.componentWindowList[containerName as any] !== undefined) {
+                        let result = data.out !== undefined ? data.out : data.err;
+
+                        if (result !== undefined) {
+                            const resultList = result.split("[-]");
+
+                            if (resultList.length > 1) {
+                                const squareValue1 = this.componentWindowList[containerName as any].querySelector(".data_component .square_1 .value") as HTMLElement;
+                                const squareValue2 = this.componentWindowList[containerName as any].querySelector(".data_component .square_2 .value") as HTMLElement;
+                                const squareValue3 = this.componentWindowList[containerName as any].querySelector(".data_component .square_3 .value") as HTMLElement;
+                                const squareValue4 = this.componentWindowList[containerName as any].querySelector(".data_component .square_4 .value") as HTMLElement;
+
+                                squareValue1.innerHTML = resultList[0];
+                                squareValue2.innerHTML = resultList[1];
+                                squareValue3.innerHTML = resultList[2];
+                                squareValue4.innerHTML = resultList[3];
                             }
                         }
-                    });
-                }
-            },
-            init(windowComponent) {
-                const currentWindowElement = Helper.currentWindowElement(windowComponent);
-
-                if (currentWindowElement !== null) {
-                    this.windowComponentList[currentWindowElement.containerName] = windowComponent;
-
-                    this._checkStatus(currentWindowElement.containerName);
-                }
-            },
-            close(windowComponent) {
-                const currentWindowElement = Helper.currentWindowElement(windowComponent);
-
-                if (currentWindowElement !== null && currentWindowElement.containerName !== null) {
-                    Sio.stopRead(`t_exec_o_${currentWindowElement.containerName}_data`);
-
-                    clearInterval(this.intervalStatusList[currentWindowElement.containerName]);
-
-                    delete this.windowComponentList[currentWindowElement.containerName];
-                    delete this.intervalStatusList[currentWindowElement.containerName];
-                }
+                    }
+                });
             }
-        },
-        data() {
-            return {
-                windowComponentList: [],
-                intervalStatusList: []
-            };
-        },
-        created() {
-            this.$root.$refs.containerDataComponent = this;
-        },
-        beforeDestroy() {}
-    };
+        }
+
+        public logicInit(componentWindow: HTMLElement): void {
+            const currentWindow = Helper.currentWindow(componentWindow);
+
+            if (currentWindow) {
+                this.componentWindowList[currentWindow.containerName as any] = componentWindow;
+
+                this.logicCheckStatus(currentWindow.containerName);
+            }
+        }
+
+        public logicClose(componentWindow: HTMLElement): void {
+            const currentWindow = Helper.currentWindow(componentWindow);
+
+            if (currentWindow && currentWindow.containerName) {
+                Sio.stopRead(`t_exec_o_${currentWindow.containerName}_data`);
+
+                clearInterval(this.intervalStatusList[currentWindow.containerName as any]);
+
+                delete this.componentWindowList[currentWindow.containerName as any];
+                delete this.intervalStatusList[currentWindow.containerName as any];
+            }
+        }
+    }
 </script>
 
 <style lang="scss" scoped>

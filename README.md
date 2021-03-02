@@ -22,11 +22,11 @@ Is a docker service container for have, in one space, a large and complete devel
 
 | Conatiner: |
 |:---|
-| Php 5.6-fpm |
 | Php 7.4-fpm |
+| Php 5.6-fpm |
 | Apache 2.4 |
-| MySql 5.6 |
 | MySql 5.7 |
+| MySql 5.6 |
 | PostgreSql 10.13 |
 | NodeJs 12.18.1 |
 | Redis 6.0.9 |

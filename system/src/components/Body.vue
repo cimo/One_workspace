@@ -1,80 +1,84 @@
 <template>
     <div class="body_component">
-        <WindowComponent />
-        <PromptComponent />
+        <ComponentWindow />
+        <ComponentPrompt />
     </div>
 </template>
 
-<script>
-    import WindowComponent from "./Window.vue";
-    import PromptComponent from "./Prompt.vue";
+<script lang="ts">
+    import { Component, Vue } from "vue-property-decorator";
 
-    export default {
-        name: "BodyComponent",
+    import ComponentWindow from "./Window.vue";
+    import ComponentPrompt from "./Prompt.vue";
+
+    import * as Helper from "../assets/js/Helper";
+
+    @Component({
         components: {
-            WindowComponent,
-            PromptComponent
-        },
-        computed: {},
-        methods: {
-            _loadEvent() {
-                document.addEventListener("click", this._clickEvent, {
-                    passive: true
-                });
-                document.addEventListener("dblclick", this._doubleClickEvent, {
-                    passive: true
-                });
-                document.addEventListener("change", this._changeEvent, {
-                    passive: true
-                });
-
-                this.$root.$refs.timeDateComponent.init();
-                this.$root.$refs.promptComponent.init();
-            },
-            _clickEvent(event) {
-                this.$root.$refs.menuRootComponent.clickLogic(event);
-                this.$root.$refs.footerComponent.clickLogic(event);
-                this.$root.$refs.windowComponent.clickLogic(event);
-                this.$root.$refs.projectExploreComponent.clickLogic(event);
-                this.$root.$refs.projectSshComponent.clickLogic(event);
-                this.$root.$refs.toolGitComponent.clickLogic(event);
-                this.$root.$refs.toolTerserComponent.clickLogic(event);
-                this.$root.$refs.toolSassComponent.clickLogic(event);
-                this.$root.$refs.containerComponent.clickLogic(event);
-                this.$root.$refs.containerCommandComponent.clickLogic(event);
-                this.$root.$refs.containerTerminalComponent.clickLogic(event);
-            },
-            _doubleClickEvent(event) {
-                this.$root.$refs.windowComponent.doubleClickLogic(event);
-            },
-            _changeEvent(event) {
-                this.$root.$refs.projectExploreComponent.changeLogic(event);
-                this.$root.$refs.projectSshComponent.changeLogic(event);
-                this.$root.$refs.toolGitComponent.changeLogic(event);
-                this.$root.$refs.toolTerserComponent.changeLogic(event);
-                this.$root.$refs.toolSassComponent.changeLogic(event);
-            },
-            _resizeEvent() {
-                this.$root.$refs.windowComponent.resizeLogic();
-            }
-        },
-        data() {
-            return {};
-        },
-        created() {
-            this.$root.$refs.bodyComponent = this;
-
-            window.addEventListener("load", this._loadEvent, { passive: true });
-            window.addEventListener("resize", this._resizeEvent, { passive: true });
-        },
-        beforeDestroy() {
-            window.removeEventListener("load", this._loadEvent, false);
-            window.removeEventListener("resize", this._resizeEvent, false);
-
-            document.removeEventListener("click", this._clickEvent, false);
-            document.removeEventListener("dblclick", this._doubleClickEvent, false);
+            ComponentWindow,
+            ComponentPrompt
         }
-    };
+    })
+    export default class ComponentBody extends Vue {
+        // Variables
+
+        // Functions
+        protected created(): void {
+            Helper.component.body = this;
+
+            window.addEventListener("load", this.loadEvent, { passive: true });
+            window.addEventListener("resize", this.resizeEvent, { passive: true });
+        }
+
+        protected beforeDestroy(): void {
+            window.removeEventListener("load", this.loadEvent, false);
+            window.removeEventListener("resize", this.resizeEvent, false);
+
+            document.removeEventListener("click", this.clickEvent, false);
+            document.removeEventListener("dblclick", this.doubleClickEvent, false);
+            document.removeEventListener("change", this.changeEvent, false);
+        }
+
+        // Logic
+        private loadEvent(): void {
+            document.addEventListener("click", this.clickEvent, { passive: true });
+            document.addEventListener("dblclick", this.doubleClickEvent, { passive: true });
+            document.addEventListener("change", this.changeEvent, { passive: true });
+
+            Helper.component.timeDate.logicInit();
+            Helper.component.prompt.logicInit();
+        }
+
+        private resizeEvent(): void {
+            Helper.component.window.resizeLogic();
+        }
+
+        private clickEvent(event: Event): void {
+            Helper.component.menuRoot.logicClick(event);
+            Helper.component.footer.logicClick(event);
+            Helper.component.window.logicClick(event);
+            Helper.component.projectExplore.logicClick(event);
+            Helper.component.projectSsh.logicClick(event);
+            Helper.component.toolGit.logicClick(event);
+            Helper.component.toolTerser.logicClick(event);
+            Helper.component.toolSass.logicClick(event);
+            Helper.component.container.logicClick(event);
+            Helper.component.containerCommand.logicClick(event);
+            Helper.component.containerTerminal.logicClick(event);
+        }
+
+        private doubleClickEvent(event: Event): void {
+            Helper.component.window.logicDoubleClick(event);
+        }
+
+        private changeEvent(event: Event): void {
+            Helper.component.projectExplore.logicChange(event);
+            Helper.component.projectSsh.logicChange(event);
+            Helper.component.toolGit.logicChange(event);
+            Helper.component.toolTerser.logicChange(event);
+            Helper.component.toolSass.logicChange(event);
+        }
+    }
 </script>
 
 <style lang="scss" scoped>
