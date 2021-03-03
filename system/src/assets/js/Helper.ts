@@ -8,25 +8,7 @@ let dragOffsetY: number = 0;
 let dragStartX: number = 0;
 let dragStartY: number = 0;
 
-export const component: Interface.ComponentVue = {
-    body: undefined,
-    container: undefined,
-    containerCommand: undefined,
-    containerData: undefined,
-    containerTerminal: undefined,
-    footer: undefined,
-    menuRoot: undefined,
-    project: undefined,
-    projectExplore: undefined,
-    projectSsh: undefined,
-    prompt: undefined,
-    timeDate: undefined,
-    tool: undefined,
-    toolGit: undefined,
-    toolSass: undefined,
-    toolTerser: undefined,
-    window: undefined
-};
+export const component: any = {};
 
 export const findElement = (element: HTMLElement | null, child: string[], parent?: string[]): HTMLElement | null => {
     if (element) {

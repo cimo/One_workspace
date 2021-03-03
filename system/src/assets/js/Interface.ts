@@ -2,26 +2,6 @@ export interface Callback {
     (data?: any): void;
 }
 
-export interface ComponentVue {
-    body: any;
-    container: any;
-    containerCommand: any;
-    containerData: any;
-    containerTerminal: any;
-    footer: any;
-    menuRoot: any;
-    project: any;
-    projectExplore: any;
-    projectSsh: any;
-    prompt: any;
-    timeDate: any;
-    tool: any;
-    toolGit: any;
-    toolSass: any;
-    toolTerser: any;
-    window: any;
-}
-
 export interface SocketData {
     tag?: string;
     cmd?: string;
