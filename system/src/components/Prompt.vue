@@ -16,50 +16,59 @@
 <script lang="ts">
     import { Component, Vue } from "vue-property-decorator";
 
-    import * as Helper from "../assets/js/Helper";
     import * as Interface from "../assets/js/Interface";
+    import * as Helper from "../assets/js/Helper";
 
     @Component({
         components: {}
     })
     export default class ComponentPrompt extends Vue {
         // Variables
+        private callback!: Interface.Callback;
         private elementComponentWindow!: HTMLElement;
-        private elementComponentPrompt!: HTMLElement;
+        private element!: HTMLElement;
         private elementBodyMessage!: HTMLElement;
         private elementButtonCancel!: EventTarget;
         private elementButtonOk!: EventTarget;
-        private callback!: Interface.Callback;
-        public isClicked!: boolean;
 
-        // Functions
+        // Hooks
         protected created(): void {
-            Helper.component.prompt = this;
-
-            this.isClicked = false;
+            this.callback = (): void => {};
         }
 
-        protected beforeDestroy(): void {}
+        protected destroyed(): void {}
 
         // Logic
+        private logicFindWindowElement(): void {
+            this.element = document.querySelector(".prompt_component") as HTMLElement;
+
+            if (this.element) {
+                this.elementBodyMessage = this.element.querySelector(".body .message") as HTMLElement;
+                this.elementButtonCancel = this.element.querySelector(".button_cmd_window.cancel") as HTMLElement;
+                this.elementButtonOk = this.element.querySelector(".button_cmd_window.ok") as HTMLElement;
+            }
+        }
+
         private logicClickEvent(event: Event): void {
             const elementEventTarget = event.target as HTMLElement;
 
+            let isClicked = false;
+
             if (elementEventTarget.classList.contains("ok")) {
-                this.isClicked = true;
+                isClicked = true;
 
                 if (this.callback) {
                     this.callback();
                 }
             } else if (elementEventTarget.classList.contains("cancel")) {
-                this.isClicked = true;
+                isClicked = true;
             }
 
-            if (this.elementComponentPrompt && this.isClicked) {
+            if (this.element && isClicked) {
                 this.elementButtonCancel.removeEventListener("click", this.logicClickEvent, false);
                 this.elementButtonOk.removeEventListener("click", this.logicClickEvent, false);
 
-                this.elementComponentPrompt.style.display = "none";
+                this.element.style.display = "none";
 
                 if (this.elementComponentWindow) {
                     Helper.focusCurrentWindow(this.elementComponentWindow);
@@ -70,32 +79,40 @@
         }
 
         public logicInit(): void {
-            this.elementComponentPrompt = document.querySelector(".prompt_component") as HTMLElement;
+            this.logicFindWindowElement();
 
-            if (this.elementComponentPrompt) {
-                this.elementBodyMessage = this.elementComponentPrompt.querySelector(".body .message") as HTMLElement;
-                this.elementButtonCancel = this.elementComponentPrompt.querySelector(".button_cmd_window.cancel") as HTMLElement;
-                this.elementButtonOk = this.elementComponentPrompt.querySelector(".button_cmd_window.ok") as HTMLElement;
-
-                Helper.dragInit(this.elementComponentPrompt, ["prompt_component"]);
+            if (this.element) {
+                Helper.dragInit(this.element, ["prompt_component"]);
             }
         }
 
-        public logicShow(componentWindow: HTMLElement | null, message: string, callback: Interface.Callback): void {
+        public logicShow(componentWindow: HTMLElement | null, message: string, logicCallback: Interface.Callback): void {
+            this.logicFindWindowElement();
+
             if (componentWindow) {
                 Helper.focusCurrentWindow();
 
                 Helper.focusCurrentTaskbarElement();
 
-                this.elementComponentPrompt.style.display = "block";
+                this.element.style.display = "block";
 
                 this.elementComponentWindow = componentWindow;
                 this.elementBodyMessage.innerHTML = message;
-                this.callback = callback;
-
                 this.elementButtonCancel.addEventListener("click", this.logicClickEvent, { passive: true });
                 this.elementButtonOk.addEventListener("click", this.logicClickEvent, { passive: true });
+
+                this.callback = logicCallback;
             }
+        }
+
+        public logicCheck(): boolean {
+            this.logicFindWindowElement();
+
+            if (this.element && this.element.style.display !== "" && this.element.style.display !== "none") {
+                return true;
+            }
+
+            return false;
         }
     }
 </script>

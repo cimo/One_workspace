@@ -5,50 +5,46 @@
 <script lang="ts">
     import { Component, Vue } from "vue-property-decorator";
 
-    import * as Helper from "../assets/js/Helper";
     import * as Interface from "../assets/js/Interface";
+    import * as Helper from "../assets/js/Helper";
     import * as Sio from "../assets/js/Sio";
 
     import { Terminal } from "xterm";
     import { FitAddon } from "xterm-addon-fit";
     import "xterm/css/xterm.css";
 
+    let xtermList: any[] = [];
+    let fitAddonList: any[] = [];
+
     @Component({
         components: {}
     })
-    export default class ContainerTerminal extends Vue {
+    export default class ComponentContainerTerminal extends Vue {
         // Variables
-        private xtermList!: any[];
-        private fitAddonList!: any[];
 
-        // Functions
-        protected created(): void {
-            Helper.component.containerTerminal = this;
+        // Hooks
+        protected created(): void {}
 
-            this.xtermList = [];
-            this.fitAddonList = [];
-        }
-
-        protected beforeDestroy(): void {}
+        protected destroyed(): void {}
 
         // Logic
         private logicCreateXterm(componentWindow: HTMLElement, currentWindow: Interface.Window): void {
             const componentTerminal = componentWindow.querySelector(".terminal_container_component") as HTMLElement;
 
-            this.xtermList[currentWindow.containerName as any] = new Terminal({
+            xtermList[currentWindow.containerName as any] = new Terminal({
                 cursorBlink: true
             });
-            this.fitAddonList[currentWindow.containerName as any] = new FitAddon();
-            this.xtermList[currentWindow.containerName as any].loadAddon(this.fitAddonList[currentWindow.containerName as any]);
-            this.xtermList[currentWindow.containerName as any].open(componentTerminal);
-            this.xtermList[currentWindow.containerName as any].focus();
+            fitAddonList[currentWindow.containerName as any] = new FitAddon();
+            xtermList[currentWindow.containerName as any].loadAddon(fitAddonList[currentWindow.containerName as any]);
+            xtermList[currentWindow.containerName as any].open(componentTerminal);
+            xtermList[currentWindow.containerName as any].focus();
 
             const computedStyle = window.getComputedStyle(componentTerminal);
             const elementTerminal = componentTerminal.querySelector(".terminal.xterm") as HTMLElement;
             elementTerminal.style.height = computedStyle.height;
 
-            this.fitAddonList[currentWindow.containerName as any].fit();
-            const size = this.fitAddonList[currentWindow.containerName as any].proposeDimensions();
+            fitAddonList[currentWindow.containerName as any].fit();
+            const size = fitAddonList[currentWindow.containerName as any].proposeDimensions();
 
             Sio.sendMessage("t_pty_start", {
                 tag: currentWindow.containerName,
@@ -67,7 +63,7 @@
                 cmd: `history -c && history -w && clear\r`
             });
 
-            this.xtermList[currentWindow.containerName as any].onData((data: any): void => {
+            xtermList[currentWindow.containerName as any].onData((data: any): void => {
                 Sio.sendMessage("t_pty_i", {
                     tag: currentWindow.containerName,
                     cmd: data
@@ -75,7 +71,7 @@
             });
 
             Sio.readMessage(`t_pty_o_${currentWindow.containerName}`, (data: Interface.SocketData): void => {
-                if (data.cmd !== undefined && elementTerminal) {
+                if (data.cmd && elementTerminal) {
                     if (data.cmd.indexOf(" is not running") !== -1) {
                         this.logicRemoveXterm(elementTerminal, currentWindow);
 
@@ -89,8 +85,8 @@
 
                         this.logicCreateXterm(componentWindow, currentWindow);
                     } else {
-                        if (this.xtermList[data.tag as any] !== undefined && data.tag !== undefined) {
-                            this.xtermList[data.tag as any].write(data.cmd);
+                        if (data.tag && xtermList[data.tag as any]) {
+                            xtermList[data.tag as any].write(data.cmd);
                         }
                     }
                 }
@@ -105,8 +101,8 @@
                     tag: currentWindow.containerName
                 });
 
-                delete this.xtermList[currentWindow.containerName as any];
-                delete this.fitAddonList[currentWindow.containerName as any];
+                delete xtermList[currentWindow.containerName as any];
+                delete fitAddonList[currentWindow.containerName as any];
 
                 elementTerminal.remove();
             }
@@ -130,8 +126,8 @@
             const componentWindow = Helper.findElement(elementEventTarget, ["terminal_container_component"], ["window_component"]);
             const currentWindow = Helper.currentWindow(componentWindow);
 
-            if (currentWindow && this.xtermList[currentWindow.containerName as any] !== undefined) {
-                this.xtermList[currentWindow.containerName as any].focus();
+            if (currentWindow && xtermList[currentWindow.containerName as any]) {
+                xtermList[currentWindow.containerName as any].focus();
             }
         }
 
@@ -145,13 +141,13 @@
                 if (currentWindow) {
                     const elementTerminal = value.querySelector(".terminal.xterm") as HTMLElement;
 
-                    if (elementTerminal && this.fitAddonList[currentWindow.containerName as any] !== undefined) {
+                    if (elementTerminal && fitAddonList[currentWindow.containerName as any]) {
                         const computedStyle = window.getComputedStyle(value);
                         elementTerminal.style.height = computedStyle.height;
 
-                        this.fitAddonList[currentWindow.containerName as any].fit();
+                        fitAddonList[currentWindow.containerName as any].fit();
 
-                        const size = this.fitAddonList[currentWindow.containerName as any].proposeDimensions();
+                        const size = fitAddonList[currentWindow.containerName as any].proposeDimensions();
 
                         Sio.sendMessage("t_pty_resize", {
                             tag: currentWindow.containerName,
@@ -172,8 +168,8 @@
                     tag: currentWindow.containerName
                 });
 
-                delete this.xtermList[currentWindow.containerName as any];
-                delete this.fitAddonList[currentWindow.containerName as any];
+                delete xtermList[currentWindow.containerName as any];
+                delete fitAddonList[currentWindow.containerName as any];
             }
         }
     }

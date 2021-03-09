@@ -34,38 +34,45 @@
 <script lang="ts">
     import { Component, Vue } from "vue-property-decorator";
 
-    import * as Helper from "../assets/js/Helper";
     import * as Interface from "../assets/js/Interface";
+    import * as Helper from "../assets/js/Helper";
     import * as Sio from "../assets/js/Sio";
+
+    let intervalStatusList: number[] = [];
+    let commandStatusList: number[] = [];
 
     @Component({
         components: {}
     })
-    export default class ContainerCommand extends Vue {
+    export default class ComponentContainerCommand extends Vue {
         // Variables
         private componentWindowList!: HTMLElement[];
         private elementCommandList!: HTMLElement[][];
         private elementStatusList!: HTMLElement[];
-        private intervalStatusList!: number[];
-        private commandStatusList!: number[];
 
-        // Functions
+        // Hooks
         protected created(): void {
-            Helper.component.containerCommand = this;
-
             this.componentWindowList = [];
-            this.elementCommandList = [[]];
+            this.elementCommandList = [];
             this.elementStatusList = [];
-            this.intervalStatusList = [];
-            this.commandStatusList = [];
         }
 
-        protected beforeDestroy(): void {}
+        protected destroyed(): void {}
 
         // Logic
+        private logicFindWindowElement(componentWindow: HTMLElement, currentWindow: Interface.Window): void {
+            this.componentWindowList[currentWindow.containerName as any] = componentWindow;
+
+            const buttonCmdList = (this.componentWindowList[currentWindow.containerName as any].querySelectorAll(".command_component .right .cmd") as any) as HTMLElement[];
+            const elementStatus = this.componentWindowList[currentWindow.containerName as any].querySelector(".command_component .status") as HTMLElement;
+
+            this.elementCommandList[currentWindow.containerName as any] = buttonCmdList;
+            this.elementStatusList[currentWindow.containerName as any] = elementStatus;
+        }
+
         private logicCheckStatus(containerName: string): void {
             if (Object.keys(this.componentWindowList).length > 0) {
-                this.intervalStatusList[containerName as any] = setInterval((): void => {
+                intervalStatusList[containerName as any] = setInterval((): void => {
                     Sio.sendMessage("t_exec_i", {
                         closeEnabled: false,
                         tag: `${containerName}_status`,
@@ -74,12 +81,8 @@
                 }, 1000);
 
                 Sio.readMessage(`t_exec_o_${containerName}_status`, (data: Interface.SocketData): void => {
-                    if (this.commandStatusList[containerName as any] < 0) {
-                        const result = data.out !== undefined ? data.out : data.err;
-
-                        if (result !== undefined && result.indexOf("Up ") !== -1) {
-                            this.elementStatusList[containerName as any].innerHTML = "Running...";
-                        }
+                    if (data.out && commandStatusList[containerName as any] === -1) {
+                        this.elementStatusList[containerName as any].innerHTML = data.out;
                     }
                 });
             }
@@ -89,14 +92,9 @@
             const currentWindow = Helper.currentWindow(componentWindow);
 
             if (currentWindow) {
-                this.componentWindowList[currentWindow.containerName as any] = componentWindow;
+                this.logicFindWindowElement(componentWindow, currentWindow);
 
-                const buttonCmdList = (this.componentWindowList[currentWindow.containerName as any].querySelectorAll(".command_component .right .cmd") as any) as HTMLElement[];
-                const elementStatus = this.componentWindowList[currentWindow.containerName as any].querySelector(".command_component .status") as HTMLElement;
-
-                this.elementCommandList[currentWindow.containerName as any] = buttonCmdList;
-                this.elementStatusList[currentWindow.containerName as any] = elementStatus;
-                this.commandStatusList[currentWindow.containerName as any] = -1;
+                commandStatusList[currentWindow.containerName as any] = -1;
 
                 this.logicCheckStatus(currentWindow.containerName);
             }
@@ -109,7 +107,7 @@
             const currentWindow = Helper.currentWindow(componentWindow);
 
             if (componentWindow && currentWindow) {
-                this.componentWindowList[currentWindow.containerName as any] = componentWindow;
+                this.logicFindWindowElement(componentWindow, currentWindow);
 
                 if (elementEventTarget.classList.contains("cmd")) {
                     let index = Array.from(this.elementCommandList[currentWindow.containerName as any]).indexOf(elementEventTarget);
@@ -121,7 +119,7 @@
                         });
 
                         this.elementStatusList[currentWindow.containerName as any].innerHTML = "Starting...";
-                        this.commandStatusList[currentWindow.containerName as any] = index;
+                        commandStatusList[currentWindow.containerName as any] = index;
                     } else if (index === 1) {
                         Sio.sendMessage("t_exec_i", {
                             tag: `${currentWindow.containerName}_command`,
@@ -129,7 +127,7 @@
                         });
 
                         this.elementStatusList[currentWindow.containerName as any].innerHTML = "Restarting...";
-                        this.commandStatusList[currentWindow.containerName as any] = index;
+                        commandStatusList[currentWindow.containerName as any] = index;
                     } else if (index === 2) {
                         Sio.sendMessage("t_exec_i", {
                             tag: `${currentWindow.containerName}_command`,
@@ -137,18 +135,18 @@
                         });
 
                         this.elementStatusList[currentWindow.containerName as any].innerHTML = "Stopping...";
-                        this.commandStatusList[currentWindow.containerName as any] = index;
+                        commandStatusList[currentWindow.containerName as any] = index;
                     }
 
                     Sio.readMessage(`t_exec_o_${currentWindow.containerName}_command`, (data: Interface.SocketData): void => {
-                        if (data.close !== undefined) {
+                        if (data.close === 0) {
                             Sio.stopRead(`t_exec_o_${currentWindow.containerName}_command`);
 
-                            if (this.commandStatusList[currentWindow.containerName as any] === 2) {
+                            if (commandStatusList[currentWindow.containerName as any] === 2) {
                                 this.elementStatusList[currentWindow.containerName as any].innerHTML = "Stopped.";
                             }
 
-                            this.commandStatusList[currentWindow.containerName as any] = -1;
+                            commandStatusList[currentWindow.containerName as any] = -1;
                         }
                     });
                 }
@@ -161,13 +159,13 @@
             if (currentWindow && currentWindow.containerName) {
                 Sio.stopRead(`t_exec_o_${currentWindow.containerName}_status`);
 
-                clearInterval(this.intervalStatusList[currentWindow.containerName as any]);
+                clearInterval(intervalStatusList[currentWindow.containerName as any]);
 
+                delete intervalStatusList[currentWindow.containerName as any];
+                delete commandStatusList[currentWindow.containerName as any];
                 delete this.componentWindowList[currentWindow.containerName as any];
                 delete this.elementCommandList[currentWindow.containerName as any];
-                delete this.intervalStatusList[currentWindow.containerName as any];
                 delete this.elementStatusList[currentWindow.containerName as any];
-                delete this.commandStatusList[currentWindow.containerName as any];
             }
         }
     }

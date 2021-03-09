@@ -1,82 +1,116 @@
 <template>
     <div class="body_component">
-        <ComponentWindow />
         <ComponentPrompt />
+        <ComponentWindow />
     </div>
 </template>
 
 <script lang="ts">
     import { Component, Vue } from "vue-property-decorator";
 
-    import ComponentWindow from "./Window.vue";
+    import ComponentContainer from "./Container.vue";
+    import ComponentContainerCommand from "./ContainerCommand.vue";
+    import ComponentContainerTerminal from "./ContainerTerminal.vue";
+    import ComponentFooter from "./Footer.vue";
+    import ComponentProjectExplore from "./ProjectExplore.vue";
+    import ComponentProjectSsh from "./ProjectSsh.vue";
     import ComponentPrompt from "./Prompt.vue";
-
-    import * as Helper from "../assets/js/Helper";
+    import ComponentTimeDate from "./TimeDate.vue";
+    import ComponentToolGit from "./ToolGit.vue";
+    import ComponentToolSass from "./ToolSass.vue";
+    import ComponentToolTerser from "./ToolTerser.vue";
+    import ComponentWindow from "./Window.vue";
+    import ComponentMenuRoot from "./MenuRoot.vue";
 
     @Component({
         components: {
-            ComponentWindow,
-            ComponentPrompt
+            ComponentPrompt,
+            ComponentWindow
         }
     })
     export default class ComponentBody extends Vue {
         // Variables
+        private componentContainer!: ComponentContainer;
+        private componentContainerCommand!: ComponentContainerCommand;
+        private componentContainerTerminal!: ComponentContainerTerminal;
+        private componentFooter!: ComponentFooter;
+        private componentMenuRoot!: ComponentMenuRoot;
+        private componentProjectExplore!: ComponentProjectExplore;
+        private componentProjectSsh!: ComponentProjectSsh;
+        private componentPrompt!: ComponentPrompt;
+        private componentTimeDate!: ComponentTimeDate;
+        private componentToolGit!: ComponentToolGit;
+        private componentToolSass!: ComponentToolSass;
+        private componentToolTerser!: ComponentToolTerser;
+        private componentWindow!: ComponentWindow;
 
-        // Functions
+        // Hooks
         protected created(): void {
-            Helper.component.body = this;
+            this.componentContainer = new ComponentContainer();
+            this.componentContainerCommand = new ComponentContainerCommand();
+            this.componentContainerTerminal = new ComponentContainerTerminal();
+            this.componentFooter = new ComponentFooter();
+            this.componentMenuRoot = new ComponentMenuRoot();
+            this.componentProjectExplore = new ComponentProjectExplore();
+            this.componentProjectSsh = new ComponentProjectSsh();
+            this.componentPrompt = new ComponentPrompt();
+            this.componentTimeDate = new ComponentTimeDate();
+            this.componentToolGit = new ComponentToolGit();
+            this.componentToolSass = new ComponentToolSass();
+            this.componentToolTerser = new ComponentToolTerser();
+            this.componentWindow = new ComponentWindow();
 
-            window.addEventListener("load", this.loadEvent, { passive: true });
-            window.addEventListener("resize", this.resizeEvent, { passive: true });
+            window.addEventListener("load", this.logicLoadEvent, { passive: true });
+            window.addEventListener("resize", this.logicResizeEvent, { passive: true });
         }
 
-        protected beforeDestroy(): void {
-            window.removeEventListener("load", this.loadEvent, false);
-            window.removeEventListener("resize", this.resizeEvent, false);
+        protected destroyed(): void {
+            window.removeEventListener("load", this.logicLoadEvent, false);
+            window.removeEventListener("resize", this.logicResizeEvent, false);
 
-            document.removeEventListener("click", this.clickEvent, false);
-            document.removeEventListener("dblclick", this.doubleClickEvent, false);
-            document.removeEventListener("change", this.changeEvent, false);
+            document.removeEventListener("click", this.logicClickEvent, false);
+            document.removeEventListener("dblclick", this.logicDoubleClickEvent, false);
+            document.removeEventListener("change", this.logicChangeEvent, false);
         }
 
         // Logic
-        private loadEvent(): void {
-            document.addEventListener("click", this.clickEvent, { passive: true });
-            document.addEventListener("dblclick", this.doubleClickEvent, { passive: true });
-            document.addEventListener("change", this.changeEvent, { passive: true });
+        private logicLoadEvent(): void {
+            document.addEventListener("click", this.logicClickEvent, { passive: true });
+            document.addEventListener("dblclick", this.logicDoubleClickEvent, { passive: true });
+            document.addEventListener("change", this.logicChangeEvent, { passive: true });
 
-            Helper.component.timeDate.logicInit();
-            Helper.component.prompt.logicInit();
+            this.componentTimeDate.logicInit();
+            this.componentPrompt.logicInit();
         }
 
-        private resizeEvent(): void {
-            Helper.component.window.resizeLogic();
+        private logicResizeEvent(): void {
+            this.componentWindow.resizeLogic();
         }
 
-        private clickEvent(event: Event): void {
-            Helper.component.menuRoot.logicClick(event);
-            Helper.component.footer.logicClick(event);
-            Helper.component.window.logicClick(event);
-            Helper.component.projectExplore.logicClick(event);
-            Helper.component.projectSsh.logicClick(event);
-            Helper.component.toolGit.logicClick(event);
-            Helper.component.toolTerser.logicClick(event);
-            Helper.component.toolSass.logicClick(event);
-            Helper.component.container.logicClick(event);
-            Helper.component.containerCommand.logicClick(event);
-            Helper.component.containerTerminal.logicClick(event);
+        private logicClickEvent(event: Event): void {
+            this.componentContainer.logicClick(event);
+            this.componentContainerCommand.logicClick(event);
+            this.componentContainerTerminal.logicClick(event);
+            this.componentFooter.logicClick(event);
+            this.componentMenuRoot.logicClick(event);
+            this.componentProjectExplore.logicClick(event);
+            this.componentProjectSsh.logicClick(event);
+            this.componentToolGit.logicClick(event);
+            this.componentToolSass.logicClick(event);
+            this.componentToolTerser.logicClick(event);
+            this.componentWindow.logicClick(event);
         }
 
-        private doubleClickEvent(event: Event): void {
-            Helper.component.window.logicDoubleClick(event);
+        private logicDoubleClickEvent(event: Event): void {
+            this.componentWindow.logicDoubleClick(event);
         }
 
-        private changeEvent(event: Event): void {
-            Helper.component.projectExplore.logicChange(event);
-            Helper.component.projectSsh.logicChange(event);
-            Helper.component.toolGit.logicChange(event);
-            Helper.component.toolTerser.logicChange(event);
-            Helper.component.toolSass.logicChange(event);
+        private logicChangeEvent(event: Event): void {
+            this.componentProjectExplore.logicChange(event);
+            this.componentProjectSsh.logicChange(event);
+            this.componentToolGit.logicChange(event);
+            this.componentToolSass.logicChange(event);
+            this.componentToolTerser.logicChange(event);
         }
     }
 </script>

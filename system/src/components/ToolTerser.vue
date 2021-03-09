@@ -18,7 +18,7 @@
         </div>
         <div class="right">
             <div class="section">
-                <div class="button_cmd_window terser_command execute">
+                <div class="button_cmd_window execute">
                     Execute
                 </div>
             </div>
@@ -41,6 +41,9 @@
     import * as Helper from "../assets/js/Helper";
     import * as Sio from "../assets/js/Sio";
 
+    let projectName: string = "";
+    let projectPath: string = "";
+
     @Component({
         components: {}
     })
@@ -50,126 +53,102 @@
         private inputFolderInput!: HTMLInputElement;
         private inputFolderOutput!: HTMLInputElement;
         private elementOutput!: HTMLElement;
-        private buttonSave!: HTMLButtonElement;
-        private projectName!: string;
-        private projectPath!: string;
 
-        // Functions
-        protected created(): void {
-            Helper.component.toolTerser = this;
+        // Hooks
+        protected created(): void {}
 
-            this.projectName = "";
-            this.projectPath = "";
-        }
-
-        protected beforeDestroy(): void {}
+        protected destroyed(): void {}
 
         // Logic
-        public logicInit(componentWindow: HTMLElement): void {
-            const currentWindow = Helper.currentWindow(componentWindow);
-
-            if (currentWindow) {
+        private logicFindWindowElement(componentWindow?: HTMLElement): void {
+            if (componentWindow) {
                 this.selectEdit = componentWindow.querySelector("select[name='edit']") as HTMLSelectElement;
                 this.inputFolderInput = componentWindow.querySelector("input[name='folder_input']") as HTMLInputElement;
                 this.inputFolderOutput = componentWindow.querySelector("input[name='folder_output']") as HTMLInputElement;
                 this.elementOutput = componentWindow.querySelector(".output") as HTMLElement;
-                this.buttonSave = componentWindow.querySelector(".button_cmd_window.save") as HTMLButtonElement;
+            } else {
+                this.selectEdit = document.querySelector(".window_component:not(.empty) .terser_component select[name='edit']") as HTMLSelectElement;
+                this.inputFolderInput = document.querySelector(".window_component:not(.empty) .terser_component input[name='folder_input']") as HTMLInputElement;
+                this.inputFolderOutput = document.querySelector(".window_component:not(.empty) .terser_component input[name='folder_output']") as HTMLInputElement;
+                this.elementOutput = document.querySelector(".window_component:not(.empty) .terser_component .output") as HTMLElement;
+            }
+        }
 
-                if (this.selectEdit) {
-                    Sio.sendMessage("t_exec_i", {
-                        tag: "terserInit",
-                        cmd: `ls "${Config.setting.systemData.pathSetting}"/*${Config.setting.systemData.extensionTerser} | sed 's#.*/##'`
-                    });
+        public logicInit(componentWindow: HTMLElement): void {
+            this.logicFindWindowElement(componentWindow);
 
-                    Sio.readMessage("t_exec_o_terserInit", (data: Interface.SocketData): void => {
-                        const result = data.out !== undefined ? data.out : data.err;
+            Sio.sendMessage("t_exec_i", {
+                tag: "terserInit",
+                cmd: `ls "${Config.setting.systemData.pathSetting}"/*${Config.setting.systemData.extensionTerser} | sed 's#.*/##'`
+            });
 
-                        if (result !== undefined) {
-                            const outSplit = result.split("\n");
+            Sio.readMessage("t_exec_o_terserInit", (data: Interface.SocketData): void => {
+                if (data.out) {
+                    Sio.stopRead("t_exec_o_terserInit");
 
-                            for (const value of outSplit) {
-                                if (value !== "" && value.indexOf("ls: ") === -1) {
-                                    const option = document.createElement("option");
-                                    option.value = value;
-                                    option.text = value.replace(Config.setting.systemData.extensionTerser, "");
-                                    this.selectEdit.appendChild(option);
-                                }
+                    if (this.selectEdit) {
+                        const outSplit = data.out.split("\n");
+
+                        for (const value of outSplit) {
+                            if (value !== "" && value.indexOf("ls: ") === -1) {
+                                const option = document.createElement("option");
+                                option.value = value;
+                                option.text = value.replace(Config.setting.systemData.extensionTerser, "");
+                                this.selectEdit.appendChild(option);
                             }
                         }
-
-                        if (data.close !== undefined) {
-                            Sio.stopRead("t_exec_o_terserInit");
-                        }
-                    });
+                    }
                 }
-            }
+            });
         }
 
         public logicClick(event: Event): void {
             const elementEventTarget = event.target as HTMLElement;
 
             const componentWindow = Helper.findElement(elementEventTarget, ["terser_component"], ["window_component"]);
-            const currentWindow = Helper.currentWindow(componentWindow);
 
-            if (currentWindow) {
+            if (componentWindow) {
+                this.logicFindWindowElement(componentWindow);
+
                 this.selectEdit.style.borderColor = "transparent";
                 this.inputFolderInput.style.borderColor = "transparent";
                 this.inputFolderOutput.style.borderColor = "transparent";
 
-                if (elementEventTarget.classList.contains("save")) {
-                    if (this.projectName !== "" && this.inputFolderInput.value !== "" && this.inputFolderOutput.value !== "") {
-                        this.logicCreateFile();
-                    } else {
-                        if (this.inputFolderInput.value === "") {
-                            this.inputFolderInput.style.borderColor = "#ff0000";
-                        }
-                        if (this.inputFolderOutput.value === "") {
-                            this.inputFolderOutput.style.borderColor = "#ff0000";
-                        }
-                    }
-                }
+                if (this.selectEdit.selectedIndex > 0 && projectName !== "") {
+                    if (this.inputFolderInput.value !== "" && this.inputFolderOutput.value !== "") {
+                        if (elementEventTarget.classList.contains("save")) {
+                            this.logicCreateFile();
+                        } else if (elementEventTarget.classList.contains("execute")) {
+                            this.elementOutput.innerHTML = "";
 
-                if (elementEventTarget.classList.contains("button_cmd_window")) {
-                    if (this.projectName !== "") {
-                        this.elementOutput.innerHTML = "";
+                            const input = `${projectPath}${this.inputFolderInput.value}`;
+                            const output = `${projectPath}${this.inputFolderOutput.value}`;
 
-                        const input = `${this.projectPath}${this.inputFolderInput.value}`;
-                        const output = `${this.projectPath}${this.inputFolderOutput.value}`;
+                            const command = `find "${input}" -name '*.min.js' -delete\
+                                && echo "$(find "${input}" -name '*.js')" | while read fileName; do terser "$fileName" --compress --mangle --output "${output}/$(basename \${fileName%%.*}).min.js"; done\
+                                && ls "${output}"/*.min.js | sed 's#.*/##'`;
 
-                        let command = "";
-
-                        if (elementEventTarget.classList.contains("execute")) {
-                            command = `find "${input}" -name '*.min.js' -delete`;
-                            command += '&& echo "$(find "' + input + '" -name \'*.js\')" | while read fileName; do terser "$fileName" --compress --mangle --output "' + output + '/$(basename ${fileName%%.*}).min.js"; done';
-                            command += `&& ls "${output}"/*.min.js | sed 's#.*/##'`;
-                        }
-
-                        if (this.selectEdit.selectedIndex > 0 && input !== "" && output !== "" && command !== "") {
                             Sio.sendMessage("t_exec_i", {
                                 tag: "terserCommand",
                                 cmd: command
                             });
 
-                            let buffer = "";
-
                             Sio.readMessage("t_exec_o_terserCommand", (data: Interface.SocketData): void => {
-                                const result = data.out !== undefined ? data.out : data.err;
+                                const result = data.out ? data.out : data.err;
 
-                                if (result !== undefined && elementEventTarget.classList.contains("execute")) {
-                                    buffer = result;
-                                    this.elementOutput.innerHTML = buffer;
-                                }
-
-                                if (data.close !== undefined) {
+                                if (result) {
                                     Sio.stopRead("t_exec_o_terserCommand");
 
-                                    this.elementOutput.innerHTML = buffer;
+                                    this.elementOutput.innerHTML = result;
                                 }
                             });
                         }
                     } else {
-                        this.selectEdit.style.borderColor = "#ff0000";
+                        this.inputFolderInput.style.borderColor = "#ff0000";
+                        this.inputFolderOutput.style.borderColor = "#ff0000";
                     }
+                } else {
+                    this.selectEdit.style.borderColor = "#ff0000";
                 }
             }
         }
@@ -178,9 +157,10 @@
             const elementEventTarget = event.target as HTMLElement;
 
             const componentWindow = Helper.findElement(elementEventTarget, ["terser_component"], ["window_component"]);
-            const currentWindow = Helper.currentWindow(componentWindow);
 
-            if (currentWindow) {
+            if (componentWindow) {
+                this.logicFindWindowElement(componentWindow);
+
                 if (elementEventTarget.classList.contains("edit")) {
                     if (this.selectEdit.selectedIndex > 0) {
                         const optionValue = this.selectEdit.options[this.selectEdit.selectedIndex].value;
@@ -194,23 +174,25 @@
                         let buffer = "";
 
                         Sio.readMessage("t_exec_stream_o_terserChangeLogicEdit", (data: Interface.SocketData): void => {
-                            if (data.chunk !== "end") {
-                                buffer += data.chunk;
-                            } else {
+                            if (data.chunk === "end") {
                                 Sio.stopRead("t_exec_stream_o_terserChangeLogicEdit");
 
-                                const result = JSON.parse(buffer);
+                                if (buffer !== "") {
+                                    const result = JSON.parse(buffer);
 
-                                this.projectName = result.name;
-                                this.projectPath = result.path;
-                                this.inputFolderInput.value = result.input;
-                                this.inputFolderOutput.value = result.output;
-                                this.elementOutput.innerHTML = "";
+                                    projectName = result.name;
+                                    projectPath = result.path;
+                                    this.inputFolderInput.value = result.input;
+                                    this.inputFolderOutput.value = result.output;
+                                    this.elementOutput.innerHTML = "";
+                                }
+                            } else {
+                                buffer += data.chunk;
                             }
                         });
                     } else {
-                        this.projectName = "";
-                        this.projectPath = "";
+                        projectName = "";
+                        projectPath = "";
                         this.inputFolderInput.value = "";
                         this.inputFolderOutput.value = "";
                         this.elementOutput.innerHTML = "";
@@ -220,56 +202,63 @@
         }
 
         public logicCreateFile(name?: string, path?: string): void {
-            if (name !== undefined) {
-                this.projectName = name;
-            }
+            this.logicFindWindowElement();
 
-            if (path !== undefined) {
-                this.projectPath = path;
+            if (name) {
+                projectName = name;
+            }
+            if (path) {
+                projectPath = path;
             }
 
             const content = {
                 input: this.inputFolderInput ? this.inputFolderInput.value : "",
                 output: this.inputFolderOutput ? this.inputFolderOutput.value : "",
-                name: this.projectName,
-                path: this.projectPath
+                name: projectName,
+                path: projectPath
             };
 
             Sio.sendMessage("t_exec_stream_i", {
                 tag: "terserClickLogicSave",
                 cmd: "write",
-                path: `${Config.setting.systemData.pathSetting}/${this.projectName}${Config.setting.systemData.extensionTerser}`,
+                path: `${Config.setting.systemData.pathSetting}/${projectName}${Config.setting.systemData.extensionTerser}`,
                 content: JSON.stringify(content)
             });
 
-            if (this.selectEdit) {
-                Sio.readMessage("t_exec_stream_o_terserClickLogicSave", (data: Interface.SocketData): void => {
-                    if (data.chunk === "end") {
-                        Sio.stopRead("t_exec_stream_o_terserClickLogicSave");
+            Sio.readMessage("t_exec_stream_o_terserClickLogicSave", (data: Interface.SocketData): void => {
+                if (data.chunk === "end") {
+                    Sio.stopRead("t_exec_stream_o_terserClickLogicSave");
 
-                        const optionValue = `${this.projectName}${Config.setting.systemData.extensionTerser}`;
+                    if (this.selectEdit) {
+                        const optionValue = `${projectName}${Config.setting.systemData.extensionTerser}`;
                         const elementOption = this.selectEdit.querySelector(`option[value="${optionValue}"`) as HTMLOptionElement;
 
                         if (!elementOption) {
                             const option = document.createElement("option");
                             option.value = optionValue;
-                            option.text = this.projectName;
+                            option.text = projectName;
                             option.selected = true;
                             this.selectEdit.appendChild(option);
+
+                            this.inputFolderInput.value = "";
+                            this.inputFolderOutput.value = "";
+                            this.elementOutput.innerHTML = "";
                         }
                     }
-                });
-            }
+                }
+            });
         }
 
         public logicDeleteOption(): void {
+            this.logicFindWindowElement();
+
             if (this.selectEdit) {
                 for (const option of this.selectEdit.options) {
-                    if (option.value === `${this.projectName}${Config.setting.systemData.extensionTerser}`) {
+                    if (option.value === `${projectName}${Config.setting.systemData.extensionTerser}`) {
                         option.remove();
 
-                        this.projectName = "";
-                        this.projectPath = "";
+                        projectName = "";
+                        projectPath = "";
                         this.selectEdit.selectedIndex = 0;
                         this.inputFolderInput.value = "";
                         this.inputFolderOutput.value = "";
@@ -314,7 +303,7 @@
                 text-align: center;
 
                 .button_cmd_window {
-                    &.terser_command {
+                    &.execute {
                         display: inline-block;
                         margin: 5px;
                     }

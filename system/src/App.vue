@@ -20,10 +20,10 @@
     export default class ComponentApp extends Vue {
         // Variables
 
-        // Functions
+        // Hooks
         protected created(): void {}
 
-        protected beforeDestroy(): void {}
+        protected destroyed(): void {}
 
         // Logic
     }

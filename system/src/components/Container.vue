@@ -6,8 +6,8 @@
             <p class="button">Data</p>
         </div>
         <ComponentContainerCommand />
-        <ComponentContainerTerminal />
         <ComponentContainerData />
+        <ComponentContainerTerminal />
     </div>
 </template>
 
@@ -15,31 +15,36 @@
     import { Component, Vue } from "vue-property-decorator";
 
     import ComponentContainerCommand from "./ContainerCommand.vue";
-    import ComponentContainerTerminal from "./ContainerTerminal.vue";
     import ComponentContainerData from "./ContainerData.vue";
+    import ComponentContainerTerminal from "./ContainerTerminal.vue";
 
     import * as Helper from "../assets/js/Helper";
 
     @Component({
         components: {
             ComponentContainerCommand,
-            ComponentContainerTerminal,
-            ComponentContainerData
+            ComponentContainerData,
+            ComponentContainerTerminal
         }
     })
-    export default class Container extends Vue {
+    export default class ComponentContainer extends Vue {
         // Variables
+        private componentContainerCommand!: ComponentContainerCommand;
+        private componentContainerData!: ComponentContainerData;
+        private componentContainerTerminal!: ComponentContainerTerminal;
 
-        // Functions
+        // Hooks
         protected created(): void {
-            Helper.component.container = this;
+            this.componentContainerCommand = new ComponentContainerCommand();
+            this.componentContainerData = new ComponentContainerData();
+            this.componentContainerTerminal = new ComponentContainerTerminal();
         }
 
-        protected beforeDestroy(): void {}
+        protected destroyed(): void {}
 
         // Logic
         public logicInit(componentWindow: HTMLElement): void {
-            Helper.component.containerCommand.logicInit(componentWindow);
+            this.componentContainerCommand.logicInit(componentWindow);
         }
 
         public logicClick(event: Event): void {
@@ -63,27 +68,27 @@
                         elementButtonList[index].classList.add("focused");
 
                         const elementComponentCommand = componentWindow.querySelector(".container_component .command_component") as HTMLElement;
-                        const elementComponentTerminalContainer = componentWindow.querySelector(".container_component .terminal_container_component") as HTMLElement;
                         const elementComponentData = componentWindow.querySelector(".container_component .data_component") as HTMLElement;
+                        const elementComponentTerminalContainer = componentWindow.querySelector(".container_component .terminal_container_component") as HTMLElement;
 
                         if (index === 0) {
                             elementComponentCommand.style.display = "block";
                             elementComponentTerminalContainer.style.display = "none";
                             elementComponentData.style.display = "none";
 
-                            Helper.component.containerCommand.logicInit(componentWindow);
+                            this.componentContainerCommand.logicInit(componentWindow);
                         } else if (index === 1) {
                             elementComponentCommand.style.display = "none";
                             elementComponentTerminalContainer.style.display = "block";
                             elementComponentData.style.display = "none";
 
-                            Helper.component.containerTerminal.logicInit(componentWindow);
+                            this.componentContainerTerminal.logicInit(componentWindow);
                         } else if (index === 2) {
                             elementComponentCommand.style.display = "none";
                             elementComponentTerminalContainer.style.display = "none";
                             elementComponentData.style.display = "block";
 
-                            Helper.component.containerData.logicInit(componentWindow);
+                            this.componentContainerData.logicInit(componentWindow);
                         }
                     }
                 }

@@ -4,7 +4,7 @@ module.exports = {
         browser: true,
         node: true
     },
-    extends: ["plugin:vue/essential", "eslint:recommended", "@vue/typescript", "@vue/prettier", "@vue/prettier/@typescript-eslint"],
+    extends: ["eslint:recommended", "plugin:vue/essential", "@vue/typescript", "@vue/prettier", "@vue/prettier/@typescript-eslint"],
     parserOptions: {
         ecmaVersion: 2020
     },
@@ -12,7 +12,9 @@ module.exports = {
         "no-console": process.env.NODE_ENV === "production" ? "warn" : "off",
         "no-debugger": process.env.NODE_ENV === "production" ? "warn" : "off",
         curly: "error",
+        "sort-imports": "off",
         "no-empty-function": "off",
+        "object-curly-spacing": "off",
         "@typescript-eslint/no-explicit-any": "off",
         "@typescript-eslint/no-empty-function": "off",
         "prettier/prettier": [

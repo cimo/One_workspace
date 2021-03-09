@@ -1,6 +1,6 @@
 import * as Interface from "./Interface";
 
-const dragTagList: string[][] = [];
+let dragTagList: string[][] = [];
 let dragTarget: HTMLElement | null = null;
 let dragActive: boolean = false;
 let dragOffsetX: number = 0;
@@ -136,16 +136,6 @@ export const unMinimizeElement = (name: string): void => {
     elementTaskbar.classList.add("focused");
 };
 
-export const promptLogic = (): boolean => {
-    const elementComponentPrompt = document.querySelector(".prompt_component") as HTMLElement;
-
-    if (elementComponentPrompt && elementComponentPrompt.style.display !== "" && elementComponentPrompt.style.display !== "none") {
-        return true;
-    }
-
-    return false;
-};
-
 export const capitalizeFirstLetter = (value: string): string => {
     return value.charAt(0).toUpperCase() + value.slice(1);
 };
@@ -199,7 +189,7 @@ const dragEnd = (): void => {
     dragActive = false;
 };
 
-export const dragInit = (parent: HTMLElement, tagList: string[]) => {
+export const dragInit = (parent: HTMLElement, tagList: string[]): void => {
     dragTagList.push(tagList as any);
 
     document.addEventListener("mousedown", dragStart, { passive: true });

@@ -3,7 +3,7 @@
         <div class="left_column">
             <ComponentMenuRoot />
             <div class="taskbar_element program empty">
-                <img class="icon_window" src="" alt="" />
+                <img class="icon_window" src="" alt="icon_window" />
             </div>
         </div>
         <div class="right_column">
@@ -15,10 +15,11 @@
 <script lang="ts">
     import { Component, Vue } from "vue-property-decorator";
 
-    import ComponentMenuRoot from "./MenuRoot.vue";
-    import ComponentTimeDate from "./TimeDate.vue";
-
     import * as Helper from "../assets/js/Helper";
+
+    import ComponentMenuRoot from "./MenuRoot.vue";
+    import ComponentPrompt from "./Prompt.vue";
+    import ComponentTimeDate from "./TimeDate.vue";
 
     @Component({
         components: {
@@ -28,13 +29,14 @@
     })
     export default class ComponentFooter extends Vue {
         // Variables
+        private componentPrompt!: ComponentPrompt;
 
-        // Functions
+        // Hooks
         protected created(): void {
-            Helper.component.footer = this;
+            this.componentPrompt = new ComponentPrompt();
         }
 
-        protected beforeDestroy(): void {}
+        protected destroyed(): void {}
 
         // Logic
         public logicInit(openerWindow: HTMLElement): void {
@@ -62,7 +64,7 @@
         public logicClick(event: Event): boolean {
             const elementEventTarget = event.target as HTMLElement;
 
-            if (Helper.promptLogic()) {
+            if (this.componentPrompt.logicCheck()) {
                 return false;
             }
 

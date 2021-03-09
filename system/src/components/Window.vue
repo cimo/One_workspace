@@ -13,9 +13,9 @@
             <div class="overlay drag"></div>
         </div>
         <div class="body">
+            <ComponentContainer />
             <ComponentProject />
             <ComponentTool />
-            <ComponentContainer />
             <div class="overlay"></div>
         </div>
         <div class="footer"></div>
@@ -25,35 +25,56 @@
 <script lang="ts">
     import { Component, Vue } from "vue-property-decorator";
 
-    import ComponentProject from "./Project.vue";
-    import ComponentTool from "./Tool.vue";
-    import ComponentContainer from "./Container.vue";
-
     import * as Config from "../assets/js/Config";
     import * as Interface from "../assets/js/Interface";
     import * as Helper from "../assets/js/Helper";
 
+    import ComponentContainer from "./Container.vue";
+    import ComponentContainerCommand from "./ContainerCommand.vue";
+    import ComponentContainerData from "./ContainerData.vue";
+    import ComponentContainerTerminal from "./ContainerTerminal.vue";
+    import ComponentFooter from "./Footer.vue";
+    import ComponentProject from "./Project.vue";
+    import ComponentProjectSsh from "./ProjectSsh.vue";
+    import ComponentPrompt from "./Prompt.vue";
+    import ComponentTool from "./Tool.vue";
+
+    let windowPositionList: Interface.Position[] = [];
+    let windowSizeList: Interface.Size[] = [];
+
     @Component({
         components: {
+            ComponentContainer,
             ComponentProject,
-            ComponentTool,
-            ComponentContainer
+            ComponentTool
         }
     })
     export default class ComponentWindow extends Vue {
         // Variables
-        private windowPositionList!: Interface.Position[];
-        private windowSizeList!: Interface.Size[];
+        private componentContainer!: ComponentContainer;
+        private componentContainerCommand!: ComponentContainerCommand;
+        private componentContainerData!: ComponentContainerData;
+        private componentContainerTerminal!: ComponentContainerTerminal;
+        private componentFooter!: ComponentFooter;
+        private componentProject!: ComponentProject;
+        private componentProjectSsh!: ComponentProjectSsh;
+        private componentPrompt!: ComponentPrompt;
+        private componentTool!: ComponentTool;
 
-        // Functions
+        // Hooks
         protected created(): void {
-            Helper.component.window = this;
-
-            this.windowPositionList = [];
-            this.windowSizeList = [];
+            this.componentContainer = new ComponentContainer();
+            this.componentContainerCommand = new ComponentContainerCommand();
+            this.componentContainerData = new ComponentContainerData();
+            this.componentContainerTerminal = new ComponentContainerTerminal();
+            this.componentFooter = new ComponentFooter();
+            this.componentProject = new ComponentProject();
+            this.componentProjectSsh = new ComponentProjectSsh();
+            this.componentPrompt = new ComponentPrompt();
+            this.componentTool = new ComponentTool();
         }
 
-        protected beforeDestroy(): void {}
+        protected destroyed(): void {}
 
         // Logic
         private logicChangeAppearance(componentWindow: HTMLElement): void {
@@ -65,8 +86,8 @@
                 if (!componentWindow.classList.contains("maximized")) {
                     const computedStyle = window.getComputedStyle(componentWindow);
 
-                    this.windowPositionList[currentWindow.name as any].left = computedStyle.left;
-                    this.windowPositionList[currentWindow.name as any].top = computedStyle.top;
+                    windowPositionList[currentWindow.name as any].left = computedStyle.left;
+                    windowPositionList[currentWindow.name as any].top = computedStyle.top;
 
                     componentWindow.style.left = "0";
                     componentWindow.style.top = "0";
@@ -76,11 +97,11 @@
 
                     elementOverlay.classList.remove("drag");
                 } else {
-                    componentWindow.style.left = this.windowPositionList[currentWindow.name as any].left;
-                    componentWindow.style.top = this.windowPositionList[currentWindow.name as any].top;
+                    componentWindow.style.left = windowPositionList[currentWindow.name as any].left;
+                    componentWindow.style.top = windowPositionList[currentWindow.name as any].top;
 
-                    componentWindow.style.width = this.windowSizeList[currentWindow.name as any].width;
-                    componentWindow.style.height = this.windowSizeList[currentWindow.name as any].height;
+                    componentWindow.style.width = windowSizeList[currentWindow.name as any].width;
+                    componentWindow.style.height = windowSizeList[currentWindow.name as any].height;
 
                     elementOverlay.classList.add("drag");
                 }
@@ -95,8 +116,8 @@
             const currentWindow = Helper.currentWindow(componentWindow);
 
             if (currentWindow) {
-                delete this.windowPositionList[currentWindow.name as any];
-                delete this.windowSizeList[currentWindow.name as any];
+                delete windowPositionList[currentWindow.name as any];
+                delete windowSizeList[currentWindow.name as any];
             }
         }
 
@@ -123,18 +144,12 @@
                 if (openerWindowDataCategory === "project") {
                     elementComponentTool.remove();
                     elementComponentContainer.remove();
-
-                    Helper.component.project.logicInit(elementComponentWindowNew);
                 } else if (openerWindowDataCategory === "tool") {
                     elementComponentProject.remove();
                     elementComponentContainer.remove();
-
-                    Helper.component.tool.logicInit(elementComponentWindowNew);
                 } else if (openerWindowDataCategory === "container") {
                     elementComponentProject.remove();
                     elementComponentTool.remove();
-
-                    Helper.component.container.logicInit(elementComponentWindowNew);
                 } else {
                     elementComponentProject.remove();
                     elementComponentTool.remove();
@@ -152,17 +167,25 @@
 
                 const computedStyle = window.getComputedStyle(elementComponentWindowNew);
 
-                this.windowPositionList[openerWindowDataName as any] = { left: "0", top: "0" };
-                this.windowSizeList[openerWindowDataName as any] = { width: computedStyle.width, height: computedStyle.height };
+                windowPositionList[openerWindowDataName as any] = { left: "0", top: "0" };
+                windowSizeList[openerWindowDataName as any] = { width: computedStyle.width, height: computedStyle.height };
 
                 const elementComponentBody = document.querySelector(".body_component") as HTMLElement;
                 elementComponentBody.appendChild(elementComponentWindowNew);
+
+                if (openerWindowDataCategory === "project") {
+                    this.componentProject.logicInit(elementComponentWindowNew);
+                } else if (openerWindowDataCategory === "tool") {
+                    this.componentTool.logicInit(elementComponentWindowNew);
+                } else if (openerWindowDataCategory === "container") {
+                    this.componentContainer.logicInit(elementComponentWindowNew);
+                }
 
                 elementComponentWindow = elementComponentWindowNew;
 
                 Helper.dragInit(elementComponentWindowNew, ["window_component", "focused"]);
 
-                Helper.component.footer.logicInit(openerWindow);
+                this.componentFooter.logicInit(openerWindow);
             } else {
                 Helper.unMinimizeElement(openerWindowDataName);
             }
@@ -173,7 +196,7 @@
         }
 
         public logicClick(event: Event): void {
-            if (!Helper.promptLogic()) {
+            if (!this.componentPrompt.logicCheck()) {
                 const elementEventTarget = event.target as HTMLElement;
 
                 const componentWindow = Helper.findElement(elementEventTarget, ["window_component"]);
@@ -192,23 +215,23 @@
 
                             Helper.focusNextWindow();
 
-                            Helper.component.footer.logicMinimize(componentWindow);
+                            this.componentFooter.logicMinimize(componentWindow);
 
                             Helper.focusCurrentTaskbarElement();
                         } else if (elementEventTarget.classList.contains("button_maximize")) {
                             this.logicChangeAppearance(componentWindow);
                         } else if (elementEventTarget.classList.contains("button_close")) {
-                            Helper.component.projectSsh.logicClose(componentWindow);
-                            Helper.component.containerCommand.logicClose(componentWindow);
-                            Helper.component.containerTerminal.logicClose(componentWindow);
-                            Helper.component.containerData.logicClose(componentWindow);
+                            this.componentProjectSsh.logicClose(componentWindow);
+                            this.componentContainerCommand.logicClose(componentWindow);
+                            this.componentContainerTerminal.logicClose(componentWindow);
+                            this.componentContainerData.logicClose(componentWindow);
 
                             const componentWindowParentNode = componentWindow.parentNode as HTMLElement;
                             componentWindowParentNode.removeChild(componentWindow);
 
                             Helper.focusNextWindow();
 
-                            Helper.component.footer.logicRemove(componentWindow);
+                            this.componentFooter.logicRemove(componentWindow);
 
                             Helper.focusCurrentTaskbarElement();
 
@@ -216,24 +239,20 @@
                         }
                     }
                 } else {
-                    if (Helper.component.prompt.isClicked) {
-                        Helper.component.prompt.isClicked = false;
-                    } else {
-                        const openerWindow = Helper.findElement(elementEventTarget, ["window_opener"]);
-                        const taskbar = Helper.findElement(elementEventTarget, ["taskbar_element", "program"]);
+                    const openerWindow = Helper.findElement(elementEventTarget, ["window_opener"]);
+                    const taskbar = Helper.findElement(elementEventTarget, ["taskbar_element", "program"]);
 
-                        if (openerWindow && taskbar) {
-                            Helper.focusCurrentWindow();
+                    if (openerWindow && taskbar) {
+                        Helper.focusCurrentWindow();
 
-                            Helper.focusCurrentTaskbarElement();
-                        }
+                        Helper.focusCurrentTaskbarElement();
                     }
                 }
             }
         }
 
         public logicDoubleClick(event: Event): void {
-            if (!Helper.promptLogic()) {
+            if (!this.componentPrompt.logicCheck()) {
                 const elementEventTarget = event.target as HTMLElement;
 
                 const componentWindow = Helper.findElement(elementEventTarget, ["window_component"]);
@@ -255,8 +274,8 @@
                 }
             }
 
-            Helper.component.projectSsh.logicResize();
-            Helper.component.containerTerminal.logicResize();
+            this.componentProjectSsh.logicResize();
+            this.componentContainerTerminal.logicResize();
         }
     }
 </script>

@@ -8,29 +8,26 @@
 <script lang="ts">
     import { Component, Vue } from "vue-property-decorator";
 
-    import * as Helper from "../assets/js/Helper";
-
     @Component({
         components: {}
     })
     export default class ComponentTimeDate extends Vue {
         // Variables
+        private interval!: number;
         private elementTime!: HTMLElement;
         private elementDate!: HTMLElement;
-        private interval!: number;
 
-        // Functions
+        // Hooks
         protected created(): void {
-            Helper.component.timeDate = this;
-
             this.interval = -1;
         }
 
-        protected beforeDestroy(): void {}
+        protected destroyed(): void {}
 
         // Logic
         private logicExecute(): void {
             if (this.elementTime && this.elementDate) {
+                // Date
                 const date = new Date();
 
                 const month = date.getMonth() + 1;
@@ -41,6 +38,7 @@
 
                 this.elementDate.innerHTML = `${date.getFullYear()}/${monthResult}/${dayResult}`;
 
+                // Time
                 const minute = date.getMinutes();
                 const minuteResult = minute < 10 ? `0${minute}` : `${minute}`;
 
@@ -54,7 +52,7 @@
 
             this.logicExecute();
 
-            this.interval = setInterval(() => {
+            this.interval = setInterval((): void => {
                 this.logicExecute();
             }, 1000);
         }

@@ -22,32 +22,31 @@
 <script lang="ts">
     import { Component, Vue } from "vue-property-decorator";
 
-    import * as Helper from "../assets/js/Helper";
     import * as Interface from "../assets/js/Interface";
+    import * as Helper from "../assets/js/Helper";
     import * as Sio from "../assets/js/Sio";
+
+    let intervalStatusList: number[] = [];
 
     @Component({
         components: {}
     })
-    export default class ContainerData extends Vue {
+    export default class ComponentContainerData extends Vue {
         // Variables
+
         private componentWindowList!: HTMLElement[];
-        private intervalStatusList!: number[];
 
-        // Functions
+        // Hooks
         protected created(): void {
-            Helper.component.containerData = this;
-
             this.componentWindowList = [];
-            this.intervalStatusList = [];
         }
 
-        protected beforeDestroy(): void {}
+        protected destroyed(): void {}
 
         // Logic
         private logicCheckStatus(containerName: string): void {
             if (Object.keys(this.componentWindowList).length > 0) {
-                this.intervalStatusList[containerName as any] = setInterval((): void => {
+                intervalStatusList[containerName as any] = setInterval((): void => {
                     Sio.sendMessage("t_exec_i", {
                         closeEnabled: false,
                         tag: `${containerName}_data`,
@@ -56,11 +55,9 @@
                 }, 1000);
 
                 Sio.readMessage(`t_exec_o_${containerName}_data`, (data: Interface.SocketData): void => {
-                    if (this.componentWindowList[containerName as any] !== undefined) {
-                        let result = data.out !== undefined ? data.out : data.err;
-
-                        if (result !== undefined) {
-                            const resultList = result.split("[-]");
+                    if (this.componentWindowList[containerName as any]) {
+                        if (data.out) {
+                            const resultList = data.out.split("[-]");
 
                             if (resultList.length > 1) {
                                 const squareValue1 = this.componentWindowList[containerName as any].querySelector(".data_component .square_1 .value") as HTMLElement;
@@ -95,10 +92,10 @@
             if (currentWindow && currentWindow.containerName) {
                 Sio.stopRead(`t_exec_o_${currentWindow.containerName}_data`);
 
-                clearInterval(this.intervalStatusList[currentWindow.containerName as any]);
+                clearInterval(intervalStatusList[currentWindow.containerName as any]);
 
+                delete intervalStatusList[currentWindow.containerName as any];
                 delete this.componentWindowList[currentWindow.containerName as any];
-                delete this.intervalStatusList[currentWindow.containerName as any];
             }
         }
     }

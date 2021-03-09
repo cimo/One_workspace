@@ -1,7 +1,6 @@
 <template>
     <div class="menuRoot_component taskbar_element">
         <img class="menuRoot_image" src="../assets/images/menu_root.svg" alt="menu_root.svg" />
-
         <div class="menuRoot_container">
             <div class="menuRoot_side">
                 <div class="menuRoot_side_container">
@@ -46,69 +45,70 @@
     import * as Interface from "../assets/js/Interface";
     import * as Helper from "../assets/js/Helper";
 
+    import ComponentPrompt from "./Prompt.vue";
+    import ComponentWindow from "./Window.vue";
+
     @Component({
         components: {}
     })
     export default class ComponentMenuRoot extends Vue {
         // Variables
-        private menuRootContainer!: HTMLElement;
+        private componentPrompt!: ComponentPrompt;
+        private componentWindow!: ComponentWindow;
         private interfaceSetting!: Interface.Setting;
+        private elementMenuRootContainer!: HTMLElement;
 
-        // Functions
+        // Hooks
         protected created(): void {
-            Helper.component.menuRoot = this;
-
+            this.componentPrompt = new ComponentPrompt();
+            this.componentWindow = new ComponentWindow();
             this.interfaceSetting = Config.setting;
         }
 
-        protected beforeDestroy(): void {}
+        protected destroyed(): void {}
 
         // Logic
         public logicClick(event: Event): boolean {
             const elementEventTarget = event.target as HTMLElement;
 
-            const menuRootComponent = Helper.findElement(elementEventTarget, ["menuRoot_component"]);
+            const elementMenuRootComponent = Helper.findElement(elementEventTarget, ["menuRoot_component"]);
 
-            if (menuRootComponent) {
-                this.menuRootContainer = menuRootComponent.querySelector(".menuRoot_container") as HTMLElement;
+            if (elementMenuRootComponent) {
+                this.elementMenuRootContainer = elementMenuRootComponent.querySelector(".menuRoot_container") as HTMLElement;
 
-                if (!menuRootComponent) {
-                    this.menuRootContainer.style.display = "none";
+                if (!elementMenuRootComponent || this.componentPrompt.logicCheck()) {
+                    this.elementMenuRootContainer.style.display = "none";
 
                     return false;
                 }
 
                 if (elementEventTarget.classList.contains("menuRoot_component") || elementEventTarget.classList.contains("menuRoot_image")) {
-                    if (this.menuRootContainer.style.display === "" || this.menuRootContainer.style.display === "none") {
-                        this.menuRootContainer.style.display = "block";
+                    if (this.elementMenuRootContainer.style.display === "" || this.elementMenuRootContainer.style.display === "none") {
+                        this.elementMenuRootContainer.style.display = "block";
                     } else {
-                        this.menuRootContainer.style.display = "none";
+                        this.elementMenuRootContainer.style.display = "none";
                     }
                 }
 
-                const openerWindow = Helper.findElement(elementEventTarget, ["window_opener"]);
+                const elementWindowOpener = Helper.findElement(elementEventTarget, ["window_opener"]);
 
-                if (openerWindow) {
-                    const openerWindowDataName = openerWindow.getAttribute("data-name") as string;
+                if (elementWindowOpener) {
+                    const elementWindowOpenerDataName = elementWindowOpener.getAttribute("data-name") as string;
 
-                    if (openerWindowDataName === "VueJs") {
+                    if (elementWindowOpenerDataName === "VueJs") {
                         const tab = window.open(`http://localhost:${Config.setting.vueJs.uiPort}`, "_blank");
 
                         if (tab) {
                             tab.focus();
                         }
                     } else {
-                        if (Helper.promptLogic()) {
-                            return false;
-                        }
-
-                        Helper.component.window.logicInit(openerWindow);
+                        this.componentWindow.logicInit(elementWindowOpener);
                     }
 
-                    this.menuRootContainer.style.display = "none";
+                    this.elementMenuRootContainer.style.display = "none";
                 }
-            } else if (this.menuRootContainer) {
-                this.menuRootContainer.style.display = "none";
+            } else if (this.elementMenuRootContainer) {
+                this.elementMenuRootContainer.style.display = "none";
             }
 
             return true;
