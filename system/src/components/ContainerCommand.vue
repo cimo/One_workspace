@@ -38,6 +38,8 @@
     import * as Helper from "../assets/js/Helper";
     import * as Sio from "../assets/js/Sio";
 
+    import ComponentContainerConsole from "./ContainerConsole.vue";
+
     let intervalStatusList: number[] = [];
     let commandStatusList: number[] = [];
 
@@ -46,12 +48,14 @@
     })
     export default class ComponentContainerCommand extends Vue {
         // Variables
+        private componentContainerConsole!: ComponentContainerConsole;
         private componentWindowList!: HTMLElement[];
         private elementCommandList!: HTMLElement[][];
         private elementStatusList!: HTMLElement[];
 
         // Hooks
         protected created(): void {
+            this.componentContainerConsole = new ComponentContainerConsole();
             this.componentWindowList = [];
             this.elementCommandList = [];
             this.elementStatusList = [];
@@ -110,6 +114,14 @@
                 this.logicFindWindowElement(componentWindow, currentWindow);
 
                 if (elementEventTarget.classList.contains("cmd")) {
+                    const elementButtonConsole = componentWindow.querySelector(".container_component .menu_container .button:nth-child(2)") as HTMLElement;
+                    const elementButtonData = componentWindow.querySelector(".container_component .menu_container .button:nth-child(3)") as HTMLElement;
+
+                    elementButtonConsole.classList.add("disabled");
+                    elementButtonData.classList.add("disabled");
+
+                    this.componentContainerConsole.logicClose(componentWindow);
+
                     let index = Array.from(this.elementCommandList[currentWindow.containerName as any]).indexOf(elementEventTarget);
 
                     if (index === 0) {
@@ -147,6 +159,9 @@
                             }
 
                             commandStatusList[currentWindow.containerName as any] = -1;
+
+                            elementButtonConsole.classList.remove("disabled");
+                            elementButtonData.classList.remove("disabled");
                         }
                     });
                 }

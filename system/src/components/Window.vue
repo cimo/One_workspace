@@ -32,7 +32,7 @@
     import ComponentContainer from "./Container.vue";
     import ComponentContainerCommand from "./ContainerCommand.vue";
     import ComponentContainerData from "./ContainerData.vue";
-    import ComponentContainerTerminal from "./ContainerTerminal.vue";
+    import ComponentContainerConsole from "./ContainerConsole.vue";
     import ComponentFooter from "./Footer.vue";
     import ComponentProject from "./Project.vue";
     import ComponentProjectSsh from "./ProjectSsh.vue";
@@ -54,7 +54,7 @@
         private componentContainer!: ComponentContainer;
         private componentContainerCommand!: ComponentContainerCommand;
         private componentContainerData!: ComponentContainerData;
-        private componentContainerTerminal!: ComponentContainerTerminal;
+        private componentContainerConsole!: ComponentContainerConsole;
         private componentFooter!: ComponentFooter;
         private componentProject!: ComponentProject;
         private componentProjectSsh!: ComponentProjectSsh;
@@ -66,7 +66,7 @@
             this.componentContainer = new ComponentContainer();
             this.componentContainerCommand = new ComponentContainerCommand();
             this.componentContainerData = new ComponentContainerData();
-            this.componentContainerTerminal = new ComponentContainerTerminal();
+            this.componentContainerConsole = new ComponentContainerConsole();
             this.componentFooter = new ComponentFooter();
             this.componentProject = new ComponentProject();
             this.componentProjectSsh = new ComponentProjectSsh();
@@ -223,7 +223,7 @@
                         } else if (elementEventTarget.classList.contains("button_close")) {
                             this.componentProjectSsh.logicClose(componentWindow);
                             this.componentContainerCommand.logicClose(componentWindow);
-                            this.componentContainerTerminal.logicClose(componentWindow);
+                            this.componentContainerConsole.logicClose(componentWindow);
                             this.componentContainerData.logicClose(componentWindow);
 
                             const componentWindowParentNode = componentWindow.parentNode as HTMLElement;
@@ -275,7 +275,7 @@
             }
 
             this.componentProjectSsh.logicResize();
-            this.componentContainerTerminal.logicResize();
+            this.componentContainerConsole.logicResize();
         }
     }
 </script>

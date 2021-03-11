@@ -10,7 +10,7 @@
 
     import ComponentContainer from "./Container.vue";
     import ComponentContainerCommand from "./ContainerCommand.vue";
-    import ComponentContainerTerminal from "./ContainerTerminal.vue";
+    import ComponentContainerConsole from "./ContainerConsole.vue";
     import ComponentFooter from "./Footer.vue";
     import ComponentProjectExplore from "./ProjectExplore.vue";
     import ComponentProjectSsh from "./ProjectSsh.vue";
@@ -32,7 +32,7 @@
         // Variables
         private componentContainer!: ComponentContainer;
         private componentContainerCommand!: ComponentContainerCommand;
-        private componentContainerTerminal!: ComponentContainerTerminal;
+        private componentContainerConsole!: ComponentContainerConsole;
         private componentFooter!: ComponentFooter;
         private componentMenuRoot!: ComponentMenuRoot;
         private componentProjectExplore!: ComponentProjectExplore;
@@ -48,7 +48,7 @@
         protected created(): void {
             this.componentContainer = new ComponentContainer();
             this.componentContainerCommand = new ComponentContainerCommand();
-            this.componentContainerTerminal = new ComponentContainerTerminal();
+            this.componentContainerConsole = new ComponentContainerConsole();
             this.componentFooter = new ComponentFooter();
             this.componentMenuRoot = new ComponentMenuRoot();
             this.componentProjectExplore = new ComponentProjectExplore();
@@ -90,7 +90,7 @@
         private logicClickEvent(event: Event): void {
             this.componentContainer.logicClick(event);
             this.componentContainerCommand.logicClick(event);
-            this.componentContainerTerminal.logicClick(event);
+            this.componentContainerConsole.logicClick(event);
             this.componentFooter.logicClick(event);
             this.componentMenuRoot.logicClick(event);
             this.componentProjectExplore.logicClick(event);

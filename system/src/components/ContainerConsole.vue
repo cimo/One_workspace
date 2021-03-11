@@ -1,5 +1,7 @@
 <template>
-    <div class="terminal_container_component"></div>
+    <div class="console_component">
+        <div class="container_terminal"></div>
+    </div>
 </template>
 
 <script lang="ts">
@@ -19,7 +21,7 @@
     @Component({
         components: {}
     })
-    export default class ComponentContainerTerminal extends Vue {
+    export default class ComponentContainerConsole extends Vue {
         // Variables
 
         // Hooks
@@ -29,21 +31,19 @@
 
         // Logic
         private logicCreateXterm(componentWindow: HTMLElement, currentWindow: Interface.Window): void {
-            const componentTerminal = componentWindow.querySelector(".terminal_container_component") as HTMLElement;
+            const elementTerminal = componentWindow.querySelector(".container_terminal") as HTMLElement;
+            const computedStyle = window.getComputedStyle(elementTerminal);
 
             xtermList[currentWindow.containerName as any] = new Terminal({
                 cursorBlink: true
             });
             fitAddonList[currentWindow.containerName as any] = new FitAddon();
             xtermList[currentWindow.containerName as any].loadAddon(fitAddonList[currentWindow.containerName as any]);
-            xtermList[currentWindow.containerName as any].open(componentTerminal);
+            xtermList[currentWindow.containerName as any].open(elementTerminal);
             xtermList[currentWindow.containerName as any].focus();
-
-            const computedStyle = window.getComputedStyle(componentTerminal);
-            const elementTerminal = componentTerminal.querySelector(".terminal.xterm") as HTMLElement;
-            elementTerminal.style.height = computedStyle.height;
-
+            xtermList[currentWindow.containerName as any]._core.element.style.height = computedStyle.height;
             fitAddonList[currentWindow.containerName as any].fit();
+
             const size = fitAddonList[currentWindow.containerName as any].proposeDimensions();
 
             Sio.sendMessage("t_pty_start", {
@@ -63,7 +63,7 @@
                 cmd: `history -c && history -w && clear\r`
             });
 
-            xtermList[currentWindow.containerName as any].onData((data: any): void => {
+            xtermList[currentWindow.containerName as any].onData((data: unknown): void => {
                 Sio.sendMessage("t_pty_i", {
                     tag: currentWindow.containerName,
                     cmd: data
@@ -71,17 +71,15 @@
             });
 
             Sio.readMessage(`t_pty_o_${currentWindow.containerName}`, (data: Interface.SocketData): void => {
-                if (data.cmd && elementTerminal) {
+                if (data.cmd) {
                     if (data.cmd.indexOf(" is not running") !== -1) {
-                        this.logicRemoveXterm(elementTerminal, currentWindow);
+                        this.logicRemoveXterm(currentWindow);
 
                         return;
                     }
 
                     if (data.cmd.indexOf("\u0007") === -1 && (data.cmd.trim() === "exit" || data.cmd.trim() === "xterm_reset")) {
-                        Sio.stopRead(`t_pty_o_${currentWindow.containerName}`);
-
-                        this.logicRemoveXterm(elementTerminal, currentWindow);
+                        this.logicRemoveXterm(currentWindow);
 
                         this.logicCreateXterm(componentWindow, currentWindow);
                     } else {
@@ -93,18 +91,18 @@
             });
         }
 
-        private logicRemoveXterm(elementTerminal: HTMLElement, currentWindow: Interface.Window): void {
-            if (elementTerminal) {
+        private logicRemoveXterm(currentWindow: Interface.Window): void {
+            if (xtermList[currentWindow.containerName as any]) {
                 Sio.stopRead(`t_pty_o_${currentWindow.containerName}`);
 
                 Sio.sendMessage("t_pty_close", {
                     tag: currentWindow.containerName
                 });
 
+                xtermList[currentWindow.containerName as any]._core.element.remove();
+
                 delete xtermList[currentWindow.containerName as any];
                 delete fitAddonList[currentWindow.containerName as any];
-
-                elementTerminal.remove();
             }
         }
 
@@ -112,9 +110,7 @@
             const currentWindow = Helper.currentWindow(componentWindow);
 
             if (currentWindow) {
-                const elementTerminal = componentWindow.querySelector(".terminal.xterm") as HTMLElement;
-
-                if (!elementTerminal) {
+                if (!xtermList[currentWindow.containerName as any]) {
                     this.logicCreateXterm(componentWindow, currentWindow);
                 }
             }
@@ -123,28 +119,27 @@
         public logicClick(event: Event): void {
             const elementEventTarget = event.target as HTMLElement;
 
-            const componentWindow = Helper.findElement(elementEventTarget, ["terminal_container_component"], ["window_component"]);
+            const componentWindow = Helper.findElement(elementEventTarget, ["console_component"], ["window_component"]);
             const currentWindow = Helper.currentWindow(componentWindow);
 
-            if (currentWindow && xtermList[currentWindow.containerName as any]) {
-                xtermList[currentWindow.containerName as any].focus();
+            if (currentWindow) {
+                if (xtermList[currentWindow.containerName as any]) {
+                    xtermList[currentWindow.containerName as any].focus();
+                }
             }
         }
 
         public logicResize(): void {
-            const componentTerminalList = (document.querySelectorAll(".terminal_container_component") as any) as HTMLElement[];
+            const elementTerminalList = (document.querySelectorAll(".console_component .container_terminal") as any) as HTMLElement[];
 
-            for (const value of componentTerminalList) {
+            for (const value of elementTerminalList) {
                 const componentWindow = Helper.findElement(value, ["window_component"]);
                 const currentWindow = Helper.currentWindow(componentWindow);
 
                 if (currentWindow) {
-                    const elementTerminal = value.querySelector(".terminal.xterm") as HTMLElement;
-
-                    if (elementTerminal && fitAddonList[currentWindow.containerName as any]) {
+                    if (xtermList[currentWindow.containerName as any] && fitAddonList[currentWindow.containerName as any]) {
                         const computedStyle = window.getComputedStyle(value);
-                        elementTerminal.style.height = computedStyle.height;
-
+                        xtermList[currentWindow.containerName as any]._core.element.style.height = computedStyle.height;
                         fitAddonList[currentWindow.containerName as any].fit();
 
                         const size = fitAddonList[currentWindow.containerName as any].proposeDimensions();
@@ -162,21 +157,14 @@
             const currentWindow = Helper.currentWindow(componentWindow);
 
             if (currentWindow && currentWindow.containerName) {
-                Sio.stopRead(`t_pty_o_${currentWindow.containerName}`);
-
-                Sio.sendMessage("t_pty_close", {
-                    tag: currentWindow.containerName
-                });
-
-                delete xtermList[currentWindow.containerName as any];
-                delete fitAddonList[currentWindow.containerName as any];
+                this.logicRemoveXterm(currentWindow);
             }
         }
     }
 </script>
 
 <style lang="scss" scoped>
-    .terminal_container_component {
+    .console_component {
         display: none;
         position: absolute;
         top: 29px;
@@ -184,5 +172,13 @@
         left: 0;
         right: 0;
         padding: 0;
+
+        .container_terminal {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+        }
     }
 </style>

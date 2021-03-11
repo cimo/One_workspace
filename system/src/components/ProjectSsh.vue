@@ -41,7 +41,7 @@
             </div>
         </div>
         <div class="part_2_container">
-            <div class="terminal_project_component"></div>
+            <div class="container_terminal"></div>
         </div>
     </div>
 </template>
@@ -62,7 +62,8 @@
 
     let xterm: any = null;
     let fitAddon: any = null;
-    let selectEditIndexOld: number = -1;
+    let selectedIndexOld: number = 0;
+    let isChanged: boolean = false;
     let inputNameReplace: string = "";
 
     @Component({
@@ -90,47 +91,31 @@
         protected destroyed(): void {}
 
         // Logic
-        private logicFindWindowElement(componentWindow?: HTMLElement): void {
-            if (componentWindow) {
-                this.elementPart1Container = componentWindow.querySelector(".part_1_container") as HTMLElement;
-                this.elementPart2Container = componentWindow.querySelector(".part_2_container") as HTMLElement;
-                this.selectEdit = componentWindow.querySelector(".part_1_container select[name='edit']") as HTMLSelectElement;
-                this.inputName = componentWindow.querySelector(".part_1_container input[name='name']") as HTMLInputElement;
-                this.inputServer = componentWindow.querySelector(".part_1_container input[name='server']") as HTMLInputElement;
-                this.inputUsername = componentWindow.querySelector(".part_1_container input[name='username']") as HTMLInputElement;
-                this.inputPassword = componentWindow.querySelector(".part_1_container input[name='password']") as HTMLInputElement;
-                this.inputKeyPublic = componentWindow.querySelector(".part_1_container input[name='key_public']") as HTMLInputElement;
-                this.textareaDescription = componentWindow.querySelector("textarea[name='description']") as HTMLTextAreaElement;
-                this.buttonDelete = componentWindow.querySelector(".button_cmd_window.delete") as HTMLButtonElement;
-            } else {
-                this.elementPart1Container = document.querySelector(".window_component:not(.empty) .ssh_component .part_1_container") as HTMLElement;
-                this.elementPart2Container = document.querySelector(".window_component:not(.empty) .ssh_component .part_2_container") as HTMLElement;
-                this.selectEdit = document.querySelector(".window_component:not(.empty) .ssh_component .part_1_container select[name='edit']") as HTMLSelectElement;
-                this.inputName = document.querySelector(".window_component:not(.empty) .ssh_component .part_1_container input[name='name']") as HTMLInputElement;
-                this.inputServer = document.querySelector(".window_component:not(.empty) .ssh_component .part_1_container input[name='server']") as HTMLInputElement;
-                this.inputUsername = document.querySelector(".window_component:not(.empty) .ssh_component .part_1_container input[name='username']") as HTMLInputElement;
-                this.inputPassword = document.querySelector(".window_component:not(.empty) .ssh_component .part_1_container input[name='password']") as HTMLInputElement;
-                this.inputKeyPublic = document.querySelector(".window_component:not(.empty) .ssh_component .part_1_container input[name='key_public']") as HTMLInputElement;
-                this.textareaDescription = document.querySelector(".window_component:not(.empty) .ssh_component textarea[name='description']") as HTMLTextAreaElement;
-                this.buttonDelete = document.querySelector(".window_component:not(.empty) .ssh_component .button_cmd_window.delete") as HTMLButtonElement;
-            }
+        private logicFindWindowElement(componentWindow: HTMLElement): void {
+            this.elementPart1Container = componentWindow.querySelector(".part_1_container") as HTMLElement;
+            this.elementPart2Container = componentWindow.querySelector(".part_2_container") as HTMLElement;
+            this.selectEdit = componentWindow.querySelector(".part_1_container select[name='edit']") as HTMLSelectElement;
+            this.inputName = componentWindow.querySelector(".part_1_container input[name='name']") as HTMLInputElement;
+            this.inputServer = componentWindow.querySelector(".part_1_container input[name='server']") as HTMLInputElement;
+            this.inputUsername = componentWindow.querySelector(".part_1_container input[name='username']") as HTMLInputElement;
+            this.inputPassword = componentWindow.querySelector(".part_1_container input[name='password']") as HTMLInputElement;
+            this.inputKeyPublic = componentWindow.querySelector(".part_1_container input[name='key_public']") as HTMLInputElement;
+            this.textareaDescription = componentWindow.querySelector("textarea[name='description']") as HTMLTextAreaElement;
+            this.buttonDelete = componentWindow.querySelector(".button_cmd_window.delete") as HTMLButtonElement;
         }
 
         private logicCreateXterm(componentWindow: HTMLElement): void {
-            const elementTerminalProject = componentWindow.querySelector(".terminal_project_component") as HTMLElement;
+            const elementTerminal = componentWindow.querySelector(".container_terminal") as HTMLElement;
+            const computedStyle = window.getComputedStyle(elementTerminal);
 
             xterm = new Terminal({
                 cursorBlink: true
             });
             fitAddon = new FitAddon();
             xterm.loadAddon(fitAddon);
-            xterm.open(elementTerminalProject);
+            xterm.open(elementTerminal);
             xterm.focus();
-
-            const elementTerminal = elementTerminalProject.querySelector(".terminal.xterm") as HTMLElement;
-            const computedStyle = window.getComputedStyle(elementTerminalProject);
-            elementTerminal.style.height = computedStyle.height;
-
+            xterm._core.element.style.height = computedStyle.height;
             fitAddon.fit();
 
             const size = fitAddon.proposeDimensions();
@@ -145,9 +130,9 @@
             let command = "";
 
             if (this.inputPassword.value !== "") {
-                command = `sshpass -p "${this.inputPassword.value}" ssh ${this.inputUsername.value}@${this.inputServer.value}`;
+                command = `ssh -o ServerAliveInterval=30 ${this.inputUsername.value}@${this.inputServer.value}`;
             } else if (this.inputKeyPublic.value !== "") {
-                command = `chmod 400 ${pathKey} && ssh -i ${pathKey} ${this.inputUsername.value}@${this.inputServer.value}`;
+                command = `chmod 400 ${pathKey} && ssh -i ${pathKey} -o ServerAliveInterval=30 ${this.inputUsername.value}@${this.inputServer.value}`;
             }
 
             if (command !== "") {
@@ -156,7 +141,7 @@
                     cmd: `history -c && history -w && clear && ${command}\r`
                 });
 
-                xterm.onData((data: Interface.SocketData): void => {
+                xterm.onData((data: unknown) => {
                     Sio.sendMessage("t_pty_i", {
                         tag: "ssh",
                         cmd: data
@@ -164,9 +149,22 @@
                 });
 
                 Sio.readMessage("t_pty_o_ssh", (data: Interface.SocketData): void => {
-                    if (data.cmd && elementTerminal) {
-                        if (data.cmd.indexOf(" closed by ") !== -1 || data.cmd.indexOf("logout") !== -1 || this.selectEdit.selectedIndex === 0) {
-                            this.logicRemoveXterm(elementTerminal);
+                    if (data.cmd) {
+                        if (data.cmd.indexOf(" closed by ") !== -1 || data.cmd.indexOf("logout") !== -1) {
+                            this.selectEdit.selectedIndex = 0;
+                            selectedIndexOld = 0;
+
+                            this.inputName.value = "";
+                            inputNameReplace = "";
+                            this.inputServer.value = "";
+                            this.inputUsername.value = "";
+                            this.inputPassword.value = "";
+                            this.inputKeyPublic.value = "";
+                            this.textareaDescription.value = "";
+
+                            this.buttonDelete.style.display = "none";
+
+                            this.logicRemoveXterm();
                         } else if (xterm) {
                             xterm.write(data.cmd);
                         }
@@ -175,18 +173,80 @@
             }
         }
 
-        private logicRemoveXterm(elementTerminal: HTMLElement): void {
-            if (elementTerminal) {
+        private logicRemoveXterm(): void {
+            if (xterm) {
                 Sio.stopRead("t_pty_o_ssh");
 
                 Sio.sendMessage("t_pty_close", {
                     tag: "ssh"
                 });
 
+                xterm._core.element.remove();
+
                 xterm = null;
                 fitAddon = null;
+            }
+        }
 
-                elementTerminal.remove();
+        private logicChangeSub(): void {
+            selectedIndexOld = this.selectEdit.selectedIndex;
+
+            this.logicRemoveXterm();
+
+            if (this.selectEdit.selectedIndex > 0) {
+                const optionValue = this.selectEdit.options[this.selectEdit.selectedIndex].value;
+
+                Sio.sendMessage("t_exec_stream_i", {
+                    tag: "sshChangeLogicEdit",
+                    cmd: "read",
+                    path: `${Config.setting.systemData.pathSetting}/${optionValue}`
+                });
+
+                let buffer = "";
+
+                Sio.readMessage("t_exec_stream_o_sshChangeLogicEdit", (data: Interface.SocketData): void => {
+                    if (data.chunk === "end") {
+                        Sio.stopRead("t_exec_stream_o_sshChangeLogicEdit");
+
+                        if (buffer !== "") {
+                            const result = JSON.parse(buffer);
+
+                            this.inputName.value = result.name;
+                            inputNameReplace = Helper.replaceName(result.name, /\s/g, true);
+                            this.inputServer.value = result.server;
+                            this.inputUsername.value = result.username;
+                            this.inputKeyPublic.value = result.keyPublic;
+                            this.textareaDescription.value = result.description;
+
+                            this.buttonDelete.style.display = "inline-block";
+
+                            Sio.sendMessage("t_crypt_decrypt_i", {
+                                tag: "sshSetting",
+                                hex: result.password
+                            });
+
+                            Sio.readMessage("t_crypt_decrypt_o_sshSetting", (data: Interface.SocketData): void => {
+                                Sio.stopRead("t_crypt_decrypt_o_sshSetting");
+
+                                this.inputPassword.value = data.out ? data.out : "";
+
+                                isChanged = true;
+                            });
+                        }
+                    } else {
+                        buffer += data.chunk;
+                    }
+                });
+            } else {
+                this.inputName.value = "";
+                inputNameReplace = "";
+                this.inputServer.value = "";
+                this.inputUsername.value = "";
+                this.inputPassword.value = "";
+                this.inputKeyPublic.value = "";
+                this.textareaDescription.value = "";
+
+                this.buttonDelete.style.display = "none";
             }
         }
 
@@ -251,17 +311,11 @@
                             this.elementPart1Container.style.display = "none";
                             this.elementPart2Container.style.display = "block";
 
-                            const elementTerminal = componentWindow.querySelector(".terminal.xterm") as HTMLElement;
-
-                            if (selectEditIndexOld != this.selectEdit.selectedIndex) {
-                                this.logicRemoveXterm(elementTerminal);
-                            }
-
-                            if (!elementTerminal && this.selectEdit.selectedIndex > 0) {
+                            if (isChanged) {
                                 this.logicCreateXterm(componentWindow);
-                            }
 
-                            selectEditIndexOld = this.selectEdit.selectedIndex;
+                                isChanged = false;
+                            }
                         }
                     }
                 }
@@ -344,8 +398,11 @@
                                 if (data.close === 0 && this.selectEdit.selectedIndex > 0 && this.selectEdit.options[this.selectEdit.selectedIndex].value !== "") {
                                     Sio.stopRead("t_exec_o_sshClickLogicDelete");
 
+                                    this.logicRemoveXterm();
+
                                     this.selectEdit.options[this.selectEdit.selectedIndex].remove();
                                     this.selectEdit.selectedIndex = 0;
+                                    selectedIndexOld = 0;
 
                                     this.inputName.value = "";
                                     inputNameReplace = "";
@@ -373,77 +430,34 @@
                 this.logicFindWindowElement(componentWindow);
 
                 if (elementEventTarget.classList.contains("edit")) {
-                    if (this.selectEdit.selectedIndex > 0) {
-                        const optionValue = this.selectEdit.options[this.selectEdit.selectedIndex].value;
-
-                        Sio.sendMessage("t_exec_stream_i", {
-                            tag: "sshChangeLogicEdit",
-                            cmd: "read",
-                            path: `${Config.setting.systemData.pathSetting}/${optionValue}`
-                        });
-
-                        let buffer = "";
-
-                        Sio.readMessage("t_exec_stream_o_sshChangeLogicEdit", (data: Interface.SocketData): void => {
-                            if (data.chunk === "end") {
-                                Sio.stopRead("t_exec_stream_o_sshChangeLogicEdit");
-
-                                if (buffer !== "") {
-                                    const result = JSON.parse(buffer);
-
-                                    this.inputName.value = result.name;
-                                    inputNameReplace = Helper.replaceName(result.name, /\s/g, true);
-                                    this.inputServer.value = result.server;
-                                    this.inputUsername.value = result.username;
-                                    this.inputKeyPublic.value = result.keyPublic;
-                                    this.textareaDescription.value = result.description;
-
-                                    this.buttonDelete.style.display = "inline-block";
-
-                                    Sio.sendMessage("t_crypt_decrypt_i", {
-                                        tag: "sshSetting",
-                                        hex: result.password
-                                    });
-
-                                    Sio.readMessage("t_crypt_decrypt_o_sshSetting", (data: Interface.SocketData): void => {
-                                        Sio.stopRead("t_crypt_decrypt_o_sshSetting");
-
-                                        this.inputPassword.value = data.out ? data.out : "";
-                                    });
-                                }
-                            } else {
-                                buffer += data.chunk;
+                    if (selectedIndexOld > 0) {
+                        this.componentPrompt.logicShow(
+                            componentWindow,
+                            "If you change value, will lost the previous connection, continue?",
+                            (): void => {
+                                this.logicChangeSub();
+                            },
+                            (): void => {
+                                this.selectEdit.selectedIndex = selectedIndexOld;
                             }
-                        });
+                        );
                     } else {
-                        this.inputName.value = "";
-                        inputNameReplace = "";
-                        this.inputServer.value = "";
-                        this.inputUsername.value = "";
-                        this.inputPassword.value = "";
-                        this.inputKeyPublic.value = "";
-                        this.textareaDescription.value = "";
-
-                        this.buttonDelete.style.display = "none";
+                        this.logicChangeSub();
                     }
                 }
             }
         }
 
         public logicResize(): void {
-            const elementTerminalProjectList = (document.querySelectorAll(".terminal_project_component") as any) as HTMLElement[];
+            const elementTerminalList = (document.querySelectorAll(".ssh_component .container_terminal") as any) as HTMLElement[];
 
-            for (const value of elementTerminalProjectList) {
+            for (const value of elementTerminalList) {
                 const componentWindow = Helper.findElement(value, ["window_component"]);
 
                 if (componentWindow) {
-                    const elementTerminal = value.querySelector(".terminal.xterm") as HTMLElement;
-
-                    if (elementTerminal && fitAddon) {
+                    if (xterm && fitAddon) {
                         const computedStyle = window.getComputedStyle(value);
-
-                        elementTerminal.style.height = computedStyle.height;
-
+                        xterm._core.element.style.height = computedStyle.height;
                         fitAddon.fit();
 
                         const size = fitAddon.proposeDimensions();
@@ -461,12 +475,7 @@
             const currentWindow = Helper.currentWindow(componentWindow);
 
             if (currentWindow && currentWindow.name === "Ssh") {
-                Sio.stopRead("t_pty_o_ssh");
-
-                Sio.sendMessage("t_pty_close", { tag: "ssh" });
-
-                xterm = null;
-                fitAddon = null;
+                this.logicRemoveXterm();
             }
         }
     }
@@ -516,7 +525,7 @@
             right: 0;
             display: none;
 
-            .terminal_project_component {
+            .container_terminal {
                 position: absolute;
                 top: 0;
                 bottom: 0;

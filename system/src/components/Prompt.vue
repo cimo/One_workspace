@@ -24,7 +24,8 @@
     })
     export default class ComponentPrompt extends Vue {
         // Variables
-        private callback!: Interface.Callback;
+        private callbackOk!: Interface.Callback | undefined;
+        private callbackKo!: Interface.Callback | undefined;
         private elementComponentWindow!: HTMLElement;
         private element!: HTMLElement;
         private elementBodyMessage!: HTMLElement;
@@ -33,7 +34,8 @@
 
         // Hooks
         protected created(): void {
-            this.callback = (): void => {};
+            this.callbackOk = undefined;
+            this.callbackKo = undefined;
         }
 
         protected destroyed(): void {}
@@ -57,11 +59,15 @@
             if (elementEventTarget.classList.contains("ok")) {
                 isClicked = true;
 
-                if (this.callback) {
-                    this.callback();
+                if (this.callbackOk) {
+                    this.callbackOk();
                 }
             } else if (elementEventTarget.classList.contains("cancel")) {
                 isClicked = true;
+
+                if (this.callbackKo) {
+                    this.callbackKo();
+                }
             }
 
             if (this.element && isClicked) {
@@ -86,7 +92,7 @@
             }
         }
 
-        public logicShow(componentWindow: HTMLElement | null, message: string, logicCallback: Interface.Callback): void {
+        public logicShow(componentWindow: HTMLElement | null, message: string, parameterCallbackOk?: Interface.Callback, parameterCallbackKo?: Interface.Callback): void {
             this.logicFindWindowElement();
 
             if (componentWindow) {
@@ -101,7 +107,8 @@
                 this.elementButtonCancel.addEventListener("click", this.logicClickEvent, { passive: true });
                 this.elementButtonOk.addEventListener("click", this.logicClickEvent, { passive: true });
 
-                this.callback = logicCallback;
+                this.callbackOk = parameterCallbackOk;
+                this.callbackKo = parameterCallbackKo;
             }
         }
 
