@@ -24,7 +24,7 @@
                 <p>Username:</p>
                 <input type="text" name="username" value="" />
             </div>
-            <div class="section">
+            <div class="section" style="display: none;">
                 <p>Password:</p>
                 <input type="password" name="password" value="" />
             </div>
@@ -64,6 +64,7 @@
     let fitAddon: any = null;
     let selectedIndexOld: number = 0;
     let isChanged: boolean = false;
+    let isInputValid: boolean = false;
     let inputNameReplace: string = "";
 
     @Component({
@@ -129,10 +130,10 @@
 
             let command = "";
 
-            if (this.inputPassword.value !== "") {
-                command = `ssh -o ServerAliveInterval=30 ${this.inputUsername.value}@${this.inputServer.value}`;
-            } else if (this.inputKeyPublic.value !== "") {
+            if (this.inputKeyPublic.value !== "") {
                 command = `chmod 400 ${pathKey} && ssh -i ${pathKey} -o ServerAliveInterval=30 ${this.inputUsername.value}@${this.inputServer.value}`;
+            } else {
+                command = `ssh -o ServerAliveInterval=30 ${this.inputUsername.value}@${this.inputServer.value}`;
             }
 
             if (command !== "") {
@@ -250,10 +251,31 @@
             }
         }
 
+        private logicCheckInputValue(): void {
+            const inputNameCheck = /^[A-Za-z0-9-_ ]+$/.test(this.inputName.value);
+
+            if (inputNameCheck && this.inputName.value !== "" && this.inputServer.value !== "" && this.inputUsername.value !== "") {
+                isInputValid = true;
+            } else {
+                isInputValid = false;
+
+                if (this.inputName.value === "" || !inputNameCheck) {
+                    this.inputName.style.borderColor = "#ff0000";
+                }
+                if (this.inputServer.value === "") {
+                    this.inputServer.style.borderColor = "#ff0000";
+                }
+                if (this.inputUsername.value === "") {
+                    this.inputUsername.style.borderColor = "#ff0000";
+                }
+            }
+        }
+
         public logicInit(componentWindow: HTMLElement): void {
             this.logicFindWindowElement(componentWindow);
 
             Sio.sendMessage("t_exec_i", {
+                closeEnabled: false,
                 tag: "sshInit",
                 cmd: `ls "${Config.setting.systemData.pathSetting}"/*${Config.setting.systemData.extensionSsh} | sed 's#.*/##'`
             });
@@ -284,20 +306,26 @@
             const componentWindow = Helper.findElement(elementEventTarget, ["ssh_component"], ["window_component"]);
 
             if (componentWindow) {
-                this.logicFindWindowElement(componentWindow);
-
                 if (xterm) {
                     xterm.focus();
                 }
 
-                const menuElement = Helper.findElement(elementEventTarget, ["menu_ssh"]);
+                this.logicFindWindowElement(componentWindow);
 
-                if (menuElement) {
-                    const elementButtonList = (menuElement.querySelectorAll(".button") as any) as HTMLElement[];
+                this.inputName.style.borderColor = "transparent";
+                this.inputServer.style.borderColor = "transparent";
+                this.inputUsername.style.borderColor = "transparent";
+
+                const elementMenu = Helper.findElement(elementEventTarget, ["menu_ssh"]);
+
+                if (elementMenu) {
+                    const elementButtonList = (elementMenu.querySelectorAll(".button") as any) as HTMLElement[];
 
                     const index = Array.from(elementButtonList).indexOf(elementEventTarget);
 
-                    if (index >= 0) {
+                    this.logicCheckInputValue();
+
+                    if (index >= 0 && isInputValid) {
                         for (const value of elementButtonList) {
                             value.classList.remove("focused");
                         }
@@ -320,15 +348,10 @@
                     }
                 }
 
-                this.selectEdit.style.borderColor = "transparent";
-                this.inputName.style.borderColor = "transparent";
-                this.inputServer.style.borderColor = "transparent";
-                this.inputUsername.style.borderColor = "transparent";
-
                 if (elementEventTarget.classList.contains("save")) {
-                    const inputNameCheck = /^[A-Za-z0-9-_ ]+$/.test(this.inputName.value);
+                    this.logicCheckInputValue();
 
-                    if (inputNameCheck && this.inputName.value !== "" && this.inputServer.value !== "" && this.inputUsername.value !== "") {
+                    if (isInputValid) {
                         inputNameReplace = Helper.replaceName(this.inputName.value, /\s/g, true);
 
                         Sio.sendMessage("t_crypt_encrypt_i", {
@@ -375,27 +398,18 @@
                                 }
                             });
                         });
-                    } else {
-                        if (this.inputName.value === "" || !inputNameCheck) {
-                            this.inputName.style.borderColor = "#ff0000";
-                        }
-                        if (this.inputServer.value === "") {
-                            this.inputServer.style.borderColor = "#ff0000";
-                        }
-                        if (this.inputUsername.value === "") {
-                            this.inputUsername.style.borderColor = "#ff0000";
-                        }
                     }
                 } else if (elementEventTarget.classList.contains("delete")) {
                     if (this.selectEdit.selectedIndex > 0) {
                         this.componentPrompt.logicShow(componentWindow, "You really want to delete this ssh?", (): void => {
                             Sio.sendMessage("t_exec_i", {
+                                closeEnabled: true,
                                 tag: "sshClickLogicDelete",
                                 cmd: `rm "${Config.setting.systemData.pathSetting}/${inputNameReplace}${Config.setting.systemData.extensionSsh}"`
                             });
 
                             Sio.readMessage("t_exec_o_sshClickLogicDelete", (data: Interface.SocketData): void => {
-                                if (data.close === 0 && this.selectEdit.selectedIndex > 0 && this.selectEdit.options[this.selectEdit.selectedIndex].value !== "") {
+                                if (data.close === 0 && this.selectEdit.options[this.selectEdit.selectedIndex].value !== "") {
                                     Sio.stopRead("t_exec_o_sshClickLogicDelete");
 
                                     this.logicRemoveXterm();

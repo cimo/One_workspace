@@ -13,7 +13,7 @@ export const component: any = {};
 export const findElement = (element: HTMLElement | null, child: string[], parent?: string[]): HTMLElement | null => {
     if (element) {
         if (child.every((child) => element.classList.contains(child))) {
-            if (parent !== undefined) {
+            if (parent) {
                 return findElement(element.parentElement, parent);
             } else {
                 return element;
@@ -58,7 +58,7 @@ export const focusCurrentWindow = (componentWindow?: HTMLElement): void => {
         value.classList.remove("focused");
     }
 
-    if (componentWindow !== undefined) {
+    if (componentWindow) {
         const componentWindowDataName = componentWindow.getAttribute("data-name") as string;
 
         componentWindow.style.display = "block";

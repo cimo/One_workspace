@@ -57,6 +57,7 @@
     import ComponentToolSass from "./ToolSass.vue";
     import ComponentToolTerser from "./ToolTerser.vue";
 
+    let isInputValid: boolean = false;
     let inputNameReplace: string = "";
 
     @Component({
@@ -121,10 +122,29 @@
             });
         }
 
+        private logicCheckInputValue(): void {
+            const inputNameCheck = /^[A-Za-z0-9-_ ]+$/.test(this.inputName.value);
+            const inputFolderNameCheck = /^[A-Za-z0-9-_]+$/.test(this.inputFolderName.value);
+
+            if (inputNameCheck && inputFolderNameCheck && this.inputName.value !== "" && this.inputFolderName.value !== "") {
+                isInputValid = true;
+            } else {
+                isInputValid = false;
+
+                if (this.inputName.value === "" || !inputNameCheck) {
+                    this.inputName.style.borderColor = "#ff0000";
+                }
+                if (this.inputFolderName.value === "" || !inputFolderNameCheck) {
+                    this.inputFolderName.style.borderColor = "#ff0000";
+                }
+            }
+        }
+
         public logicInit(componentWindow: HTMLElement): void {
             this.logicFindWindowElement(componentWindow);
 
             Sio.sendMessage("t_exec_i", {
+                closeEnabled: false,
                 tag: "exploreInit",
                 cmd: `ls "${Config.setting.systemData.pathSetting}"/*${Config.setting.systemData.extensionProject} | sed 's#.*/##'`
             });
@@ -157,15 +177,13 @@
             if (componentWindow) {
                 this.logicFindWindowElement(componentWindow);
 
-                this.selectEdit.style.borderColor = "transparent";
                 this.inputName.style.borderColor = "transparent";
                 this.inputFolderName.style.borderColor = "transparent";
 
                 if (elementEventTarget.classList.contains("save")) {
-                    const inputNameCheck = /^[A-Za-z0-9-_ ]+$/.test(this.inputName.value);
-                    const folderNameCheck = /^[A-Za-z0-9-_]+$/.test(this.inputFolderName.value);
+                    this.logicCheckInputValue();
 
-                    if (inputNameCheck && folderNameCheck && this.inputName.value !== "" && this.inputFolderName.value !== "") {
+                    if (isInputValid) {
                         inputNameReplace = Helper.replaceName(this.inputName.value, /\s/g, true);
 
                         const content = {
@@ -205,6 +223,7 @@
 
                                 // Create folder root
                                 Sio.sendMessage("t_exec_i", {
+                                    closeEnabled: false,
                                     tag: "exploreClickLogicFolder",
                                     cmd: `mkdir -p "${Config.setting.systemData.pathProject}/${this.inputFolderName.value}/root"`
                                 });
@@ -212,6 +231,7 @@
                                 // Create git setting file
                                 if (this.checkboxGit.checked) {
                                     Sio.sendMessage("t_exec_i", {
+                                        closeEnabled: true,
                                         tag: "exploreGitClickLogicSetting",
                                         cmd: `test -f "${Config.setting.systemData.pathSetting}/${inputNameReplace}${Config.setting.systemData.extensionGit}"`
                                     });
@@ -232,6 +252,7 @@
                                 // Create sass setting file
                                 if (this.checkboxSass.checked) {
                                     Sio.sendMessage("t_exec_i", {
+                                        closeEnabled: true,
                                         tag: "exploreSassClickLogicSetting",
                                         cmd: `test -f "${Config.setting.systemData.pathSetting}/${inputNameReplace}${Config.setting.systemData.extensionSass}"`
                                     });
@@ -252,6 +273,7 @@
                                 // Create terser setting file
                                 if (this.checkboxTerser.checked) {
                                     Sio.sendMessage("t_exec_i", {
+                                        closeEnabled: true,
                                         tag: "exploreTerserClickLogicSetting",
                                         cmd: `test -f "${Config.setting.systemData.pathSetting}/${inputNameReplace}${Config.setting.systemData.extensionTerser}"`
                                     });
@@ -270,24 +292,18 @@
                                 }
                             }
                         });
-                    } else {
-                        if (this.inputName.value === "" || !inputNameCheck) {
-                            this.inputName.style.borderColor = "#ff0000";
-                        }
-                        if (this.inputFolderName.value === "" || !folderNameCheck) {
-                            this.inputFolderName.style.borderColor = "#ff0000";
-                        }
                     }
                 } else if (elementEventTarget.classList.contains("delete")) {
                     if (this.selectEdit.selectedIndex > 0) {
                         this.componentPrompt.logicShow(componentWindow, "You really want to delete this project?<br>(The root folder will be preserved).", (): void => {
                             Sio.sendMessage("t_exec_i", {
+                                closeEnabled: true,
                                 tag: "exploreClickLogicDelete",
                                 cmd: `rm "${Config.setting.systemData.pathSetting}/${inputNameReplace}${Config.setting.systemData.extensionProject}"`
                             });
 
                             Sio.readMessage("t_exec_o_exploreClickLogicDelete", (data: Interface.SocketData): void => {
-                                if (data.close === 0 && this.selectEdit.selectedIndex > 0 && this.selectEdit.options[this.selectEdit.selectedIndex].value) {
+                                if (data.close === 0 && this.selectEdit.options[this.selectEdit.selectedIndex].value) {
                                     Sio.stopRead("t_exec_o_exploreClickLogicDelete");
 
                                     this.logicDeleteFileSetting(Config.setting.systemData.extensionGit);
@@ -316,10 +332,12 @@
                         });
                     }
                 } else if (elementEventTarget.classList.contains("open_url")) {
-                    const tab = window.open(this.inputUrlRoot.value, "_blank");
+                    if (this.selectEdit.selectedIndex > 0 && this.inputUrlRoot.value !== "") {
+                        const tab = window.open(this.inputUrlRoot.value, "_blank");
 
-                    if (tab) {
-                        tab.focus();
+                        if (tab) {
+                            tab.focus();
+                        }
                     }
                 }
             }

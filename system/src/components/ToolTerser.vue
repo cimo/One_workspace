@@ -41,6 +41,7 @@
     import * as Helper from "../assets/js/Helper";
     import * as Sio from "../assets/js/Sio";
 
+    let isInputValid: boolean = false;
     let projectName: string = "";
     let projectPath: string = "";
 
@@ -50,8 +51,8 @@
     export default class ComponentToolTerser extends Vue {
         // Variables
         private selectEdit!: HTMLSelectElement;
-        private inputFolderInput!: HTMLInputElement;
-        private inputFolderOutput!: HTMLInputElement;
+        private inputFolderIn!: HTMLInputElement;
+        private inputFolderOut!: HTMLInputElement;
         private elementOutput!: HTMLElement;
 
         // Hooks
@@ -63,14 +64,32 @@
         private logicFindWindowElement(componentWindow?: HTMLElement): void {
             if (componentWindow) {
                 this.selectEdit = componentWindow.querySelector("select[name='edit']") as HTMLSelectElement;
-                this.inputFolderInput = componentWindow.querySelector("input[name='folder_input']") as HTMLInputElement;
-                this.inputFolderOutput = componentWindow.querySelector("input[name='folder_output']") as HTMLInputElement;
+                this.inputFolderIn = componentWindow.querySelector("input[name='folder_input']") as HTMLInputElement;
+                this.inputFolderOut = componentWindow.querySelector("input[name='folder_output']") as HTMLInputElement;
                 this.elementOutput = componentWindow.querySelector(".output") as HTMLElement;
             } else {
                 this.selectEdit = document.querySelector(".window_component:not(.empty) .terser_component select[name='edit']") as HTMLSelectElement;
-                this.inputFolderInput = document.querySelector(".window_component:not(.empty) .terser_component input[name='folder_input']") as HTMLInputElement;
-                this.inputFolderOutput = document.querySelector(".window_component:not(.empty) .terser_component input[name='folder_output']") as HTMLInputElement;
+                this.inputFolderIn = document.querySelector(".window_component:not(.empty) .terser_component input[name='folder_input']") as HTMLInputElement;
+                this.inputFolderOut = document.querySelector(".window_component:not(.empty) .terser_component input[name='folder_output']") as HTMLInputElement;
                 this.elementOutput = document.querySelector(".window_component:not(.empty) .terser_component .output") as HTMLElement;
+            }
+        }
+
+        private logicCheckInputValue(): void {
+            const inputFolderInCheck = /^[A-Za-z0-9-_/]+$/.test(this.inputFolderIn.value);
+            const inputFolderOutCheck = /^[A-Za-z0-9-_/]+$/.test(this.inputFolderOut.value);
+
+            if (inputFolderInCheck && inputFolderOutCheck && this.inputFolderIn.value !== "" && this.inputFolderOut.value !== "") {
+                isInputValid = true;
+            } else {
+                isInputValid = false;
+
+                if (this.inputFolderIn.value === "" || !inputFolderInCheck) {
+                    this.inputFolderIn.style.borderColor = "#ff0000";
+                }
+                if (this.inputFolderOut.value === "" || !inputFolderOutCheck) {
+                    this.inputFolderOut.style.borderColor = "#ff0000";
+                }
             }
         }
 
@@ -78,6 +97,7 @@
             this.logicFindWindowElement(componentWindow);
 
             Sio.sendMessage("t_exec_i", {
+                closeEnabled: false,
                 tag: "terserInit",
                 cmd: `ls "${Config.setting.systemData.pathSetting}"/*${Config.setting.systemData.extensionTerser} | sed 's#.*/##'`
             });
@@ -110,45 +130,44 @@
             if (componentWindow) {
                 this.logicFindWindowElement(componentWindow);
 
-                this.selectEdit.style.borderColor = "transparent";
-                this.inputFolderInput.style.borderColor = "transparent";
-                this.inputFolderOutput.style.borderColor = "transparent";
+                this.inputFolderIn.style.borderColor = "transparent";
+                this.inputFolderOut.style.borderColor = "transparent";
 
-                if (this.selectEdit.selectedIndex > 0 && projectName !== "") {
-                    if (this.inputFolderInput.value !== "" && this.inputFolderOutput.value !== "") {
-                        if (elementEventTarget.classList.contains("save")) {
-                            this.logicCreateFile();
-                        } else if (elementEventTarget.classList.contains("execute")) {
-                            this.elementOutput.innerHTML = "";
+                if (elementEventTarget.classList.contains("save")) {
+                    this.logicCheckInputValue();
 
-                            const input = `${projectPath}${this.inputFolderInput.value}`;
-                            const output = `${projectPath}${this.inputFolderOutput.value}`;
+                    if (isInputValid) {
+                        this.logicCreateFile();
+                    }
+                } else if (elementEventTarget.classList.contains("execute")) {
+                    this.logicCheckInputValue();
 
-                            const command = `find "${input}" -name '*.min.js' -delete\
+                    if (isInputValid) {
+                        this.elementOutput.innerHTML = "";
+
+                        const input = `${projectPath}${this.inputFolderIn.value}`;
+                        const output = `${projectPath}${this.inputFolderOut.value}`;
+
+                        const command = `find "${input}" -name '*.min.js' -delete\
                                 && echo "$(find "${input}" -name '*.js')" | while read fileName; do terser "$fileName" --compress --mangle --output "${output}/$(basename \${fileName%%.*}).min.js"; done\
                                 && ls "${output}"/*.min.js | sed 's#.*/##'`;
 
-                            Sio.sendMessage("t_exec_i", {
-                                tag: "terserCommand",
-                                cmd: command
-                            });
+                        Sio.sendMessage("t_exec_i", {
+                            closeEnabled: false,
+                            tag: "terserCommand",
+                            cmd: command
+                        });
 
-                            Sio.readMessage("t_exec_o_terserCommand", (data: Interface.SocketData): void => {
-                                const result = data.out ? data.out : data.err;
+                        Sio.readMessage("t_exec_o_terserCommand", (data: Interface.SocketData): void => {
+                            const result = data.out ? data.out : data.err;
 
-                                if (result) {
-                                    Sio.stopRead("t_exec_o_terserCommand");
+                            if (result) {
+                                Sio.stopRead("t_exec_o_terserCommand");
 
-                                    this.elementOutput.innerHTML = result;
-                                }
-                            });
-                        }
-                    } else {
-                        this.inputFolderInput.style.borderColor = "#ff0000";
-                        this.inputFolderOutput.style.borderColor = "#ff0000";
+                                this.elementOutput.innerHTML = result;
+                            }
+                        });
                     }
-                } else {
-                    this.selectEdit.style.borderColor = "#ff0000";
                 }
             }
         }
@@ -182,8 +201,8 @@
 
                                     projectName = result.name;
                                     projectPath = result.path;
-                                    this.inputFolderInput.value = result.input;
-                                    this.inputFolderOutput.value = result.output;
+                                    this.inputFolderIn.value = result.input;
+                                    this.inputFolderOut.value = result.output;
                                     this.elementOutput.innerHTML = "";
                                 }
                             } else {
@@ -193,8 +212,8 @@
                     } else {
                         projectName = "";
                         projectPath = "";
-                        this.inputFolderInput.value = "";
-                        this.inputFolderOutput.value = "";
+                        this.inputFolderIn.value = "";
+                        this.inputFolderOut.value = "";
                         this.elementOutput.innerHTML = "";
                     }
                 }
@@ -212,8 +231,8 @@
             }
 
             const content = {
-                input: this.inputFolderInput ? this.inputFolderInput.value : "",
-                output: this.inputFolderOutput ? this.inputFolderOutput.value : "",
+                input: this.inputFolderIn ? this.inputFolderIn.value : "",
+                output: this.inputFolderOut ? this.inputFolderOut.value : "",
                 name: projectName,
                 path: projectPath
             };
@@ -240,8 +259,8 @@
                             option.selected = true;
                             this.selectEdit.appendChild(option);
 
-                            this.inputFolderInput.value = "";
-                            this.inputFolderOutput.value = "";
+                            this.inputFolderIn.value = "";
+                            this.inputFolderOut.value = "";
                             this.elementOutput.innerHTML = "";
                         }
                     }
@@ -260,8 +279,8 @@
                         projectName = "";
                         projectPath = "";
                         this.selectEdit.selectedIndex = 0;
-                        this.inputFolderInput.value = "";
-                        this.inputFolderOutput.value = "";
+                        this.inputFolderIn.value = "";
+                        this.inputFolderOut.value = "";
                         this.elementOutput.innerHTML = "";
 
                         break;

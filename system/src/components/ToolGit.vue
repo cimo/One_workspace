@@ -86,6 +86,7 @@
     import * as Helper from "../assets/js/Helper";
     import * as Sio from "../assets/js/Sio";
 
+    let isInputValid: boolean = false;
     let projectName: string = "";
     let projectPath: string = "";
 
@@ -143,10 +144,86 @@
             }
         }
 
+        private logicCheckInputValue(elementEventTarget?: HTMLElement): void {
+            const inputBranchNameMatch1 = /^[A-Za-z0-9-_/ ]+$/.test(this.inputBranchName1.value as string);
+            const inputBranchNameMatch2 = /^[A-Za-z0-9-_/ ]+$/.test(this.inputBranchName2.value as string);
+
+            if (!elementEventTarget || (!elementEventTarget.classList.contains("pull") && !elementEventTarget.classList.contains("reset") && !elementEventTarget.classList.contains("push") && !elementEventTarget.classList.contains("commit"))) {
+                if (this.inputUrl.value !== "" && this.inputUsername.value !== "" && this.inputPassword.value !== "") {
+                    isInputValid = true;
+                } else {
+                    isInputValid = false;
+
+                    if (this.inputUrl.value === "") {
+                        this.inputUrl.style.borderColor = "#ff0000";
+                    }
+                    if (this.inputUsername.value === "") {
+                        this.inputUsername.style.borderColor = "#ff0000";
+                    }
+                    if (this.inputPassword.value === "") {
+                        this.inputPassword.style.borderColor = "#ff0000";
+                    }
+                }
+            } else if (elementEventTarget.classList.contains("pull") || elementEventTarget.classList.contains("reset")) {
+                if (inputBranchNameMatch1 && this.inputUrl.value !== "" && this.inputUsername.value !== "" && this.inputPassword.value !== "") {
+                    isInputValid = true;
+                } else {
+                    isInputValid = false;
+
+                    if (this.inputUrl.value === "") {
+                        this.inputUrl.style.borderColor = "#ff0000";
+                    }
+                    if (this.inputUsername.value === "") {
+                        this.inputUsername.style.borderColor = "#ff0000";
+                    }
+                    if (this.inputPassword.value === "") {
+                        this.inputPassword.style.borderColor = "#ff0000";
+                    }
+                    if (this.inputBranchName1.value === "" || !inputBranchNameMatch1) {
+                        this.inputBranchName1.style.borderColor = "#ff0000";
+                    }
+                }
+            } else if (elementEventTarget.classList.contains("push")) {
+                if (inputBranchNameMatch2 && this.inputUrl.value !== "" && this.inputUsername.value !== "" && this.inputPassword.value !== "") {
+                    this.inputCommitDescription.value = "";
+
+                    isInputValid = true;
+                } else {
+                    isInputValid = false;
+
+                    if (this.inputUrl.value === "") {
+                        this.inputUrl.style.borderColor = "#ff0000";
+                    }
+                    if (this.inputUsername.value === "") {
+                        this.inputUsername.style.borderColor = "#ff0000";
+                    }
+                    if (this.inputPassword.value === "") {
+                        this.inputPassword.style.borderColor = "#ff0000";
+                    }
+                    if (this.inputBranchName2.value === "" || !inputBranchNameMatch2) {
+                        this.inputBranchName2.style.borderColor = "#ff0000";
+                    }
+                }
+            } else if (elementEventTarget.classList.contains("commit")) {
+                if (this.inputCommitDescription.value !== "") {
+                    this.inputBranchName2.value = "";
+
+                    isInputValid = true;
+                } else {
+                    isInputValid = false;
+
+                    if (this.inputCommitDescription.value === "") {
+                        this.inputCommitDescription.style.borderColor = "#ff0000";
+                    }
+                }
+            }
+        }
+
         public logicInit(componentWindow: HTMLElement): void {
             this.logicFindWindowElement(componentWindow);
 
             Sio.sendMessage("t_exec_i", {
+                closeEnabled: false,
                 tag: "gitInit",
                 cmd: `ls "${Config.setting.systemData.pathSetting}"/*${Config.setting.systemData.extensionGit} | sed 's#.*/##'`
             });
@@ -179,6 +256,13 @@
             if (componentWindow) {
                 this.logicFindWindowElement(componentWindow);
 
+                this.inputUrl.style.borderColor = "transparent";
+                this.inputUsername.style.borderColor = "transparent";
+                this.inputPassword.style.borderColor = "transparent";
+                this.inputBranchName1.style.borderColor = "transparent";
+                this.inputBranchName2.style.borderColor = "transparent";
+                this.inputCommitDescription.style.borderColor = "transparent";
+
                 const elementMenu = Helper.findElement(elementEventTarget, ["menu_git"]);
 
                 if (elementMenu) {
@@ -186,7 +270,9 @@
 
                     const index = Array.from(elementButtonList).indexOf(elementEventTarget);
 
-                    if (index >= 0) {
+                    this.logicCheckInputValue();
+
+                    if (index >= 0 && isInputValid) {
                         for (const value of elementButtonList) {
                             value.classList.remove("focused");
                         }
@@ -203,122 +289,84 @@
                     }
                 }
 
-                this.selectEdit.style.borderColor = "transparent";
-                this.inputUrl.style.borderColor = "transparent";
-                this.inputUsername.style.borderColor = "transparent";
-                this.inputPassword.style.borderColor = "transparent";
-                this.inputBranchName1.style.borderColor = "transparent";
-                this.inputBranchName2.style.borderColor = "transparent";
-                this.inputCommitDescription.style.borderColor = "transparent";
+                if (elementEventTarget.classList.contains("save")) {
+                    this.logicCheckInputValue(elementEventTarget);
 
-                if (this.selectEdit.selectedIndex > 0 && projectName !== "") {
-                    if (this.inputUrl.value !== "" && this.inputUsername.value !== "" && this.inputPassword.value !== "") {
-                        if (elementEventTarget.classList.contains("save")) {
-                            this.logicCreateFile();
-                        } else if (elementEventTarget.classList.contains("git_command")) {
-                            this.elementOutput1.innerHTML = "";
-                            this.elementOutput2.innerHTML = "";
+                    if (isInputValid) {
+                        this.logicCreateFile();
+                    }
+                } else if (elementEventTarget.classList.contains("git_command")) {
+                    this.logicCheckInputValue(elementEventTarget);
 
-                            let url = "";
-                            let command = "";
+                    if (isInputValid) {
+                        this.elementOutput1.innerHTML = "";
+                        this.elementOutput2.innerHTML = "";
 
-                            if (this.inputUrl.value.indexOf("https://") !== -1) {
-                                const inputUrlValue = this.inputUrl.value.replace("https://", "");
+                        let url = "";
+                        let command = "";
 
-                                url = `https://${this.inputUsername.value}:${this.inputPassword.value}@${inputUrlValue}`;
-                            } else {
-                                url = this.inputUrl.value;
-                            }
+                        if (this.inputUrl.value.indexOf("https://") !== -1) {
+                            const inputUrlValue = this.inputUrl.value.replace("https://", "");
 
-                            const branchNameMatch1 = /^[A-Za-z0-9-_/ ]+$/.test(this.inputBranchName1.value as string);
-                            const branchNameMatch2 = /^[A-Za-z0-9-_/ ]+$/.test(this.inputBranchName2.value as string);
+                            url = `https://${this.inputUsername.value}:${this.inputPassword.value}@${inputUrlValue}`;
+                        } else {
+                            url = this.inputUrl.value;
+                        }
 
-                            if (elementEventTarget.classList.contains("clone")) {
-                                command = `mkdir -p "${projectPath}" && cd "${projectPath}" && git clone ${url} .`;
-                            } else if (elementEventTarget.classList.contains("pull")) {
-                                if (branchNameMatch1) {
-                                    command = `cd "${projectPath}" && git pull ${url} ${this.inputBranchName1.value}`;
-                                } else {
-                                    this.inputBranchName1.style.borderColor = "#ff0000";
-                                }
-                            } else if (elementEventTarget.classList.contains("fetch")) {
-                                command = `cd "${projectPath}" && git fetch --all`;
-                            } else if (elementEventTarget.classList.contains("reset")) {
-                                if (branchNameMatch1) {
-                                    command = `cd "${projectPath}" && git reset --hard ${this.inputBranchName1.value}`;
-                                } else {
-                                    this.inputBranchName1.style.borderColor = "#ff0000";
-                                }
-                            } else if (elementEventTarget.classList.contains("status")) {
-                                command = `cd "${projectPath}" && git status`;
-                            } else if (elementEventTarget.classList.contains("commit")) {
-                                this.inputBranchName2.value = "";
+                        if (elementEventTarget.classList.contains("clone")) {
+                            command = `mkdir -p "${projectPath}" && cd "${projectPath}" && git clone ${url} .`;
+                        } else if (elementEventTarget.classList.contains("pull")) {
+                            command = `cd "${projectPath}" && git pull ${url} ${this.inputBranchName1.value}`;
+                        } else if (elementEventTarget.classList.contains("fetch")) {
+                            command = `cd "${projectPath}" && git fetch --all`;
+                        } else if (elementEventTarget.classList.contains("reset")) {
+                            command = `cd "${projectPath}" && git reset --hard ${this.inputBranchName1.value}`;
+                        } else if (elementEventTarget.classList.contains("status")) {
+                            command = `cd "${projectPath}" && git status`;
+                        } else if (elementEventTarget.classList.contains("commit")) {
+                            command = `cd "${projectPath}" && git commit -m "${this.inputCommitDescription.value}"`;
+                        } else if (elementEventTarget.classList.contains("push")) {
+                            command = `cd "${projectPath}" && git remote set-url origin ${url} && git push ${this.inputBranchName2.value}`;
+                        }
 
-                                if (this.inputCommitDescription.value !== "") {
-                                    command = `cd "${projectPath}" && git commit -m "${this.inputCommitDescription.value}"`;
-                                } else {
-                                    this.inputCommitDescription.style.borderColor = "#ff0000";
-                                }
-                            } else if (elementEventTarget.classList.contains("push")) {
-                                this.inputCommitDescription.value = "";
+                        if (command !== "") {
+                            Sio.sendMessage("t_exec_i", {
+                                closeEnabled: true,
+                                tag: "gitCommand",
+                                cmd: command
+                            });
 
-                                if (branchNameMatch2) {
-                                    command = `cd "${projectPath}" && git remote set-url origin ${url} && git push ${this.inputBranchName2.value}`;
-                                } else {
-                                    this.inputBranchName2.style.borderColor = "#ff0000";
-                                }
-                            }
+                            let buffer = "";
 
-                            if (command !== "") {
-                                Sio.sendMessage("t_exec_i", {
-                                    tag: "gitCommand",
-                                    cmd: command
-                                });
+                            Sio.readMessage("t_exec_o_gitCommand", (data: Interface.SocketData): void => {
+                                if (data.close === 0 || data.close === 1 || data.close === 128) {
+                                    Sio.stopRead("t_exec_o_gitCommand");
 
-                                let buffer = "";
+                                    if (buffer !== "") {
+                                        const computedStyle = window.getComputedStyle(this.elementPart1Container);
 
-                                Sio.readMessage("t_exec_o_gitCommand", (data: Interface.SocketData): void => {
-                                    if (data.close === 0 || data.close === 1 || data.close === 128) {
-                                        Sio.stopRead("t_exec_o_gitCommand");
-
-                                        if (buffer !== "") {
-                                            const computedStyle = window.getComputedStyle(this.elementPart1Container);
-
-                                            if (computedStyle.display === "block") {
-                                                this.elementOutput1.innerHTML = buffer;
-                                            } else {
-                                                this.elementOutput2.innerHTML = buffer;
-                                            }
-                                        }
-                                    }
-
-                                    const result = data.out ? data.out : data.err;
-
-                                    if (result) {
-                                        if (elementEventTarget.classList.contains("clone")) {
-                                            buffer = result;
-                                        } else if (elementEventTarget.classList.contains("fetch")) {
-                                            buffer = result;
+                                        if (computedStyle.display === "block") {
+                                            this.elementOutput1.innerHTML = buffer;
                                         } else {
-                                            buffer += result;
+                                            this.elementOutput2.innerHTML = buffer;
                                         }
                                     }
-                                });
-                            }
-                        }
-                    } else {
-                        if (this.inputUrl.value === "") {
-                            this.inputUrl.style.borderColor = "#ff0000";
-                        }
-                        if (this.inputUsername.value === "") {
-                            this.inputUsername.style.borderColor = "#ff0000";
-                        }
-                        if (this.inputPassword.value === "") {
-                            this.inputPassword.style.borderColor = "#ff0000";
+                                }
+
+                                const result = data.out ? data.out : data.err;
+
+                                if (result) {
+                                    if (elementEventTarget.classList.contains("clone")) {
+                                        buffer = result;
+                                    } else if (elementEventTarget.classList.contains("fetch")) {
+                                        buffer = result;
+                                    } else {
+                                        buffer += result;
+                                    }
+                                }
+                            });
                         }
                     }
-                } else {
-                    this.selectEdit.style.borderColor = "#ff0000";
                 }
             }
         }

@@ -126,6 +126,7 @@
 
                     if (index === 0) {
                         Sio.sendMessage("t_exec_i", {
+                            closeEnabled: true,
                             tag: `${currentWindow.containerName}_command`,
                             cmd: `docker start ${currentWindow.containerName}`
                         });
@@ -134,6 +135,7 @@
                         commandStatusList[currentWindow.containerName as any] = index;
                     } else if (index === 1) {
                         Sio.sendMessage("t_exec_i", {
+                            closeEnabled: true,
                             tag: `${currentWindow.containerName}_command`,
                             cmd: `docker restart ${currentWindow.containerName}`
                         });
@@ -142,6 +144,7 @@
                         commandStatusList[currentWindow.containerName as any] = index;
                     } else if (index === 2) {
                         Sio.sendMessage("t_exec_i", {
+                            closeEnabled: true,
                             tag: `${currentWindow.containerName}_command`,
                             cmd: `docker stop ${currentWindow.containerName}`
                         });
