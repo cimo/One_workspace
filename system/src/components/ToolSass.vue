@@ -102,7 +102,7 @@
                 cmd: `ls "${Config.setting.systemData.pathSetting}"/*${Config.setting.systemData.extensionSass} | sed 's#.*/##'`
             });
 
-            Sio.readMessage("t_exec_o_sassInit", (data: Interface.SocketData): void => {
+            Sio.readMessage("t_exec_o_sassInit", (data: Interface.SocketData) => {
                 if (data.out) {
                     Sio.stopRead("t_exec_o_sassInit");
 
@@ -156,7 +156,7 @@
                             cmd: command
                         });
 
-                        Sio.readMessage("t_exec_o_sassCommand", (data: Interface.SocketData): void => {
+                        Sio.readMessage("t_exec_o_sassCommand", (data: Interface.SocketData) => {
                             const result = data.out ? data.out : data.err;
 
                             if (result) {
@@ -190,7 +190,7 @@
 
                         let buffer = "";
 
-                        Sio.readMessage("t_exec_stream_o_sassChangeLogicEdit", (data: Interface.SocketData): void => {
+                        Sio.readMessage("t_exec_stream_o_sassChangeLogicEdit", (data: Interface.SocketData) => {
                             if (data.chunk === "end") {
                                 Sio.stopRead("t_exec_stream_o_sassChangeLogicEdit");
 
@@ -242,7 +242,7 @@
                 content: JSON.stringify(content)
             });
 
-            Sio.readMessage("t_exec_stream_o_sassClickLogicSave", (data: Interface.SocketData): void => {
+            Sio.readMessage("t_exec_stream_o_sassClickLogicSave", (data: Interface.SocketData) => {
                 if (data.chunk === "end") {
                     Sio.stopRead("t_exec_stream_o_sassClickLogicSave");
 

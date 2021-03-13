@@ -149,7 +149,7 @@
                 cmd: `ls "${Config.setting.systemData.pathSetting}"/*${Config.setting.systemData.extensionProject} | sed 's#.*/##'`
             });
 
-            Sio.readMessage("t_exec_o_exploreInit", (data: Interface.SocketData): void => {
+            Sio.readMessage("t_exec_o_exploreInit", (data: Interface.SocketData) => {
                 if (data.out) {
                     Sio.stopRead("t_exec_o_exploreInit");
 
@@ -204,7 +204,7 @@
                             content: JSON.stringify(content)
                         });
 
-                        Sio.readMessage("t_exec_stream_o_exploreClickLogicSave", (data: Interface.SocketData): void => {
+                        Sio.readMessage("t_exec_stream_o_exploreClickLogicSave", (data: Interface.SocketData) => {
                             if (data.chunk === "end") {
                                 Sio.stopRead("t_exec_stream_o_exploreClickLogicSave");
 
@@ -236,7 +236,7 @@
                                         cmd: `test -f "${Config.setting.systemData.pathSetting}/${inputNameReplace}${Config.setting.systemData.extensionGit}"`
                                     });
 
-                                    Sio.readMessage("t_exec_o_exploreGitClickLogicSetting", (data: Interface.SocketData): void => {
+                                    Sio.readMessage("t_exec_o_exploreGitClickLogicSetting", (data: Interface.SocketData) => {
                                         if (data.close === 1) {
                                             Sio.stopRead("t_exec_o_exploreGitClickLogicSetting");
 
@@ -257,7 +257,7 @@
                                         cmd: `test -f "${Config.setting.systemData.pathSetting}/${inputNameReplace}${Config.setting.systemData.extensionSass}"`
                                     });
 
-                                    Sio.readMessage("t_exec_o_exploreSassClickLogicSetting", (data: Interface.SocketData): void => {
+                                    Sio.readMessage("t_exec_o_exploreSassClickLogicSetting", (data: Interface.SocketData) => {
                                         if (data.close === 1) {
                                             Sio.stopRead("t_exec_o_exploreSassClickLogicSetting");
 
@@ -278,7 +278,7 @@
                                         cmd: `test -f "${Config.setting.systemData.pathSetting}/${inputNameReplace}${Config.setting.systemData.extensionTerser}"`
                                     });
 
-                                    Sio.readMessage("t_exec_o_exploreTerserClickLogicSetting", (data: Interface.SocketData): void => {
+                                    Sio.readMessage("t_exec_o_exploreTerserClickLogicSetting", (data: Interface.SocketData) => {
                                         if (data.close === 1) {
                                             Sio.stopRead("t_exec_o_exploreTerserClickLogicSetting");
 
@@ -295,41 +295,44 @@
                     }
                 } else if (elementEventTarget.classList.contains("delete")) {
                     if (this.selectEdit.selectedIndex > 0) {
-                        this.componentPrompt.logicShow(componentWindow, "You really want to delete this project?<br>(The root folder will be preserved).", (): void => {
-                            Sio.sendMessage("t_exec_i", {
-                                closeEnabled: true,
-                                tag: "exploreClickLogicDelete",
-                                cmd: `rm "${Config.setting.systemData.pathSetting}/${inputNameReplace}${Config.setting.systemData.extensionProject}"`
-                            });
+                        this.componentPrompt
+                            .logicShow(componentWindow, "You really want to delete this project?<br>(The root folder will be preserved).")
+                            .then(() => {
+                                Sio.sendMessage("t_exec_i", {
+                                    closeEnabled: true,
+                                    tag: "exploreClickLogicDelete",
+                                    cmd: `rm "${Config.setting.systemData.pathSetting}/${inputNameReplace}${Config.setting.systemData.extensionProject}"`
+                                });
 
-                            Sio.readMessage("t_exec_o_exploreClickLogicDelete", (data: Interface.SocketData): void => {
-                                if (data.close === 0 && this.selectEdit.options[this.selectEdit.selectedIndex].value) {
-                                    Sio.stopRead("t_exec_o_exploreClickLogicDelete");
+                                Sio.readMessage("t_exec_o_exploreClickLogicDelete", (data: Interface.SocketData) => {
+                                    if (data.close === 0 && this.selectEdit.options[this.selectEdit.selectedIndex].value) {
+                                        Sio.stopRead("t_exec_o_exploreClickLogicDelete");
 
-                                    this.logicDeleteFileSetting(Config.setting.systemData.extensionGit);
-                                    this.logicDeleteFileSetting(Config.setting.systemData.extensionTerser);
-                                    this.logicDeleteFileSetting(Config.setting.systemData.extensionSass);
+                                        this.logicDeleteFileSetting(Config.setting.systemData.extensionGit);
+                                        this.logicDeleteFileSetting(Config.setting.systemData.extensionTerser);
+                                        this.logicDeleteFileSetting(Config.setting.systemData.extensionSass);
 
-                                    this.componentToolGit.logicDeleteOption();
-                                    this.componentToolTerser.logicDeleteOption();
-                                    this.componentToolSass.logicDeleteOption();
+                                        this.componentToolGit.logicDeleteOption();
+                                        this.componentToolTerser.logicDeleteOption();
+                                        this.componentToolSass.logicDeleteOption();
 
-                                    this.selectEdit.options[this.selectEdit.selectedIndex].remove();
-                                    this.selectEdit.selectedIndex = 0;
+                                        this.selectEdit.options[this.selectEdit.selectedIndex].remove();
+                                        this.selectEdit.selectedIndex = 0;
 
-                                    this.inputName.value = "";
-                                    inputNameReplace = "";
-                                    this.inputFolderName.value = "";
-                                    this.inputUrlRoot.value = "";
-                                    this.textareaDescription.value = "";
-                                    this.checkboxGit.checked = false;
-                                    this.checkboxTerser.checked = false;
-                                    this.checkboxSass.checked = false;
+                                        this.inputName.value = "";
+                                        inputNameReplace = "";
+                                        this.inputFolderName.value = "";
+                                        this.inputUrlRoot.value = "";
+                                        this.textareaDescription.value = "";
+                                        this.checkboxGit.checked = false;
+                                        this.checkboxTerser.checked = false;
+                                        this.checkboxSass.checked = false;
 
-                                    this.buttonDelete.style.display = "none";
-                                }
-                            });
-                        });
+                                        this.buttonDelete.style.display = "none";
+                                    }
+                                });
+                            })
+                            .catch(() => {});
                     }
                 } else if (elementEventTarget.classList.contains("open_url")) {
                     if (this.selectEdit.selectedIndex > 0 && this.inputUrlRoot.value !== "") {
@@ -363,7 +366,7 @@
 
                         let buffer = "";
 
-                        Sio.readMessage("t_exec_stream_o_exploreChangeLogicEdit", (data: Interface.SocketData): void => {
+                        Sio.readMessage("t_exec_stream_o_exploreChangeLogicEdit", (data: Interface.SocketData) => {
                             if (data.chunk === "end") {
                                 Sio.stopRead("t_exec_stream_o_exploreChangeLogicEdit");
 

@@ -54,7 +54,7 @@
                     });
                 }, 1000);
 
-                Sio.readMessage(`t_exec_o_${containerName}_data`, (data: Interface.SocketData): void => {
+                Sio.readMessage(`t_exec_o_${containerName}_data`, (data: Interface.SocketData) => {
                     if (this.componentWindowList[containerName as any]) {
                         if (data.out) {
                             const resultList = data.out.split("[-]");

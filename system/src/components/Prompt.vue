@@ -7,7 +7,7 @@
             <p class="message"></p>
         </div>
         <div class="footer">
-            <div class="button_cmd_window cancel">Cancel</div>
+            <div class="button_cmd_window ko">Cancel</div>
             <div class="button_cmd_window ok">Ok</div>
         </div>
     </div>
@@ -16,7 +16,6 @@
 <script lang="ts">
     import { Component, Vue } from "vue-property-decorator";
 
-    import * as Interface from "../assets/js/Interface";
     import * as Helper from "../assets/js/Helper";
 
     @Component({
@@ -24,19 +23,14 @@
     })
     export default class ComponentPrompt extends Vue {
         // Variables
-        private callbackOk!: Interface.Callback | undefined;
-        private callbackKo!: Interface.Callback | undefined;
         private elementComponentWindow!: HTMLElement;
         private element!: HTMLElement;
         private elementBodyMessage!: HTMLElement;
-        private elementButtonCancel!: EventTarget;
         private elementButtonOk!: EventTarget;
+        private elementButtonKo!: EventTarget;
 
         // Hooks
-        protected created(): void {
-            this.callbackOk = undefined;
-            this.callbackKo = undefined;
-        }
+        protected created(): void {}
 
         protected destroyed(): void {}
 
@@ -46,34 +40,13 @@
 
             if (this.element) {
                 this.elementBodyMessage = this.element.querySelector(".body .message") as HTMLElement;
-                this.elementButtonCancel = this.element.querySelector(".button_cmd_window.cancel") as HTMLElement;
                 this.elementButtonOk = this.element.querySelector(".button_cmd_window.ok") as HTMLElement;
+                this.elementButtonKo = this.element.querySelector(".button_cmd_window.ko") as HTMLElement;
             }
         }
 
-        private logicClickEvent(event: Event): void {
-            const elementEventTarget = event.target as HTMLElement;
-
-            let isClicked = false;
-
-            if (elementEventTarget.classList.contains("ok")) {
-                isClicked = true;
-
-                if (this.callbackOk) {
-                    this.callbackOk();
-                }
-            } else if (elementEventTarget.classList.contains("cancel")) {
-                isClicked = true;
-
-                if (this.callbackKo) {
-                    this.callbackKo();
-                }
-            }
-
-            if (this.element && isClicked) {
-                this.elementButtonCancel.removeEventListener("click", this.logicClickEvent, false);
-                this.elementButtonOk.removeEventListener("click", this.logicClickEvent, false);
-
+        private logicHide(): void {
+            if (this.element) {
                 this.element.style.display = "none";
 
                 if (this.elementComponentWindow) {
@@ -92,10 +65,10 @@
             }
         }
 
-        public logicShow(componentWindow: HTMLElement | null, message: string, parameterCallbackOk?: Interface.Callback, parameterCallbackKo?: Interface.Callback): void {
-            this.logicFindWindowElement();
+        public logicShow(componentWindow: HTMLElement, message: string): Promise<void> {
+            return new Promise((resolve, reject): void => {
+                this.logicFindWindowElement();
 
-            if (componentWindow) {
                 Helper.focusCurrentWindow();
 
                 Helper.focusCurrentTaskbarElement();
@@ -104,12 +77,25 @@
 
                 this.elementComponentWindow = componentWindow;
                 this.elementBodyMessage.innerHTML = message;
-                this.elementButtonCancel.addEventListener("click", this.logicClickEvent, { passive: true });
-                this.elementButtonOk.addEventListener("click", this.logicClickEvent, { passive: true });
+                this.elementButtonOk.addEventListener(
+                    "click",
+                    (): void => {
+                        resolve();
 
-                this.callbackOk = parameterCallbackOk;
-                this.callbackKo = parameterCallbackKo;
-            }
+                        this.logicHide();
+                    },
+                    { passive: true, once: true }
+                );
+                this.elementButtonKo.addEventListener(
+                    "click",
+                    (): void => {
+                        reject();
+
+                        this.logicHide();
+                    },
+                    { passive: true, once: true }
+                );
+            });
         }
 
         public logicCheck(): boolean {

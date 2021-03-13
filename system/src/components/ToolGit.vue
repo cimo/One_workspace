@@ -228,7 +228,7 @@
                 cmd: `ls "${Config.setting.systemData.pathSetting}"/*${Config.setting.systemData.extensionGit} | sed 's#.*/##'`
             });
 
-            Sio.readMessage("t_exec_o_gitInit", (data: Interface.SocketData): void => {
+            Sio.readMessage("t_exec_o_gitInit", (data: Interface.SocketData) => {
                 if (data.out) {
                     Sio.stopRead("t_exec_o_gitInit");
 
@@ -338,7 +338,7 @@
 
                             let buffer = "";
 
-                            Sio.readMessage("t_exec_o_gitCommand", (data: Interface.SocketData): void => {
+                            Sio.readMessage("t_exec_o_gitCommand", (data: Interface.SocketData) => {
                                 if (data.close === 0 || data.close === 1 || data.close === 128) {
                                     Sio.stopRead("t_exec_o_gitCommand");
 
@@ -391,7 +391,7 @@
 
                         let buffer = "";
 
-                        Sio.readMessage("t_exec_stream_o_gitChangeLogicEdit", (data: Interface.SocketData): void => {
+                        Sio.readMessage("t_exec_stream_o_gitChangeLogicEdit", (data: Interface.SocketData) => {
                             if (data.chunk === "end") {
                                 Sio.stopRead("t_exec_stream_o_gitChangeLogicEdit");
 
@@ -414,7 +414,7 @@
                                         hex: result.password
                                     });
 
-                                    Sio.readMessage("t_crypt_decrypt_o_gitSetting", (data: Interface.SocketData): void => {
+                                    Sio.readMessage("t_crypt_decrypt_o_gitSetting", (data: Interface.SocketData) => {
                                         Sio.stopRead("t_crypt_decrypt_o_gitSetting");
 
                                         this.inputPassword.value = data.out ? data.out : "";
@@ -456,7 +456,7 @@
                 text: this.inputPassword ? this.inputPassword.value : ""
             });
 
-            Sio.readMessage("t_crypt_encrypt_o_gitSetting", (data: Interface.SocketData): void => {
+            Sio.readMessage("t_crypt_encrypt_o_gitSetting", (data: Interface.SocketData) => {
                 Sio.stopRead("t_crypt_encrypt_o_gitSetting");
 
                 const content = {
@@ -474,7 +474,7 @@
                     content: JSON.stringify(content)
                 });
 
-                Sio.readMessage("t_exec_stream_o_gitClickLogicSave", (data: Interface.SocketData): void => {
+                Sio.readMessage("t_exec_stream_o_gitClickLogicSave", (data: Interface.SocketData) => {
                     if (data.chunk === "end") {
                         Sio.stopRead("t_exec_stream_o_gitClickLogicSave");
 

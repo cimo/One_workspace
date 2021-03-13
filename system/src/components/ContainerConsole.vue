@@ -70,7 +70,7 @@
                 });
             });
 
-            Sio.readMessage(`t_pty_o_${currentWindow.containerName}`, (data: Interface.SocketData): void => {
+            Sio.readMessage(`t_pty_o_${currentWindow.containerName}`, (data: Interface.SocketData) => {
                 if (data.cmd) {
                     if (data.cmd.indexOf(" is not running") !== -1) {
                         this.logicRemoveXterm(currentWindow);

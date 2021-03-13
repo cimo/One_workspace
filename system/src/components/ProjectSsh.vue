@@ -149,9 +149,11 @@
                     });
                 });
 
-                Sio.readMessage("t_pty_o_ssh", (data: Interface.SocketData): void => {
+                Sio.readMessage("t_pty_o_ssh", (data: Interface.SocketData) => {
                     if (data.cmd) {
                         if (data.cmd.indexOf(" closed by ") !== -1 || data.cmd.indexOf("logout") !== -1) {
+                            this.logicRemoveXterm();
+
                             this.selectEdit.selectedIndex = 0;
                             selectedIndexOld = 0;
 
@@ -164,8 +166,6 @@
                             this.textareaDescription.value = "";
 
                             this.buttonDelete.style.display = "none";
-
-                            this.logicRemoveXterm();
                         } else if (xterm) {
                             xterm.write(data.cmd);
                         }
@@ -205,7 +205,7 @@
 
                 let buffer = "";
 
-                Sio.readMessage("t_exec_stream_o_sshChangeLogicEdit", (data: Interface.SocketData): void => {
+                Sio.readMessage("t_exec_stream_o_sshChangeLogicEdit", (data: Interface.SocketData) => {
                     if (data.chunk === "end") {
                         Sio.stopRead("t_exec_stream_o_sshChangeLogicEdit");
 
@@ -226,7 +226,7 @@
                                 hex: result.password
                             });
 
-                            Sio.readMessage("t_crypt_decrypt_o_sshSetting", (data: Interface.SocketData): void => {
+                            Sio.readMessage("t_crypt_decrypt_o_sshSetting", (data: Interface.SocketData) => {
                                 Sio.stopRead("t_crypt_decrypt_o_sshSetting");
 
                                 this.inputPassword.value = data.out ? data.out : "";
@@ -280,7 +280,7 @@
                 cmd: `ls "${Config.setting.systemData.pathSetting}"/*${Config.setting.systemData.extensionSsh} | sed 's#.*/##'`
             });
 
-            Sio.readMessage("t_exec_o_sshInit", (data: Interface.SocketData): void => {
+            Sio.readMessage("t_exec_o_sshInit", (data: Interface.SocketData) => {
                 if (data.out) {
                     Sio.stopRead("t_exec_o_sshInit");
 
@@ -325,17 +325,21 @@
 
                     this.logicCheckInputValue();
 
-                    if (index >= 0 && isInputValid) {
+                    if (index >= 0) {
                         for (const value of elementButtonList) {
                             value.classList.remove("focused");
                         }
 
-                        elementButtonList[index].classList.add("focused");
+                        if (isInputValid) {
+                            elementButtonList[index].classList.add("focused");
+                        } else {
+                            elementButtonList[0].classList.add("focused");
+                        }
 
                         if (index === 0) {
                             this.elementPart1Container.style.display = "block";
                             this.elementPart2Container.style.display = "none";
-                        } else if (index === 1) {
+                        } else if (index === 1 && isInputValid) {
                             this.elementPart1Container.style.display = "none";
                             this.elementPart2Container.style.display = "block";
 
@@ -359,7 +363,7 @@
                             text: this.inputPassword ? this.inputPassword.value : ""
                         });
 
-                        Sio.readMessage("t_crypt_encrypt_o_sshSetting", (data: Interface.SocketData): void => {
+                        Sio.readMessage("t_crypt_encrypt_o_sshSetting", (data: Interface.SocketData) => {
                             Sio.stopRead("t_crypt_encrypt_o_sshSetting");
 
                             const content = {
@@ -379,7 +383,7 @@
                                 content: JSON.stringify(content)
                             });
 
-                            Sio.readMessage("t_exec_stream_o_sshClickLogicSave", (data: Interface.SocketData): void => {
+                            Sio.readMessage("t_exec_stream_o_sshClickLogicSave", (data: Interface.SocketData) => {
                                 if (data.chunk === "end") {
                                     Sio.stopRead("t_exec_stream_o_sshClickLogicSave");
 
@@ -401,35 +405,38 @@
                     }
                 } else if (elementEventTarget.classList.contains("delete")) {
                     if (this.selectEdit.selectedIndex > 0) {
-                        this.componentPrompt.logicShow(componentWindow, "You really want to delete this ssh?", (): void => {
-                            Sio.sendMessage("t_exec_i", {
-                                closeEnabled: true,
-                                tag: "sshClickLogicDelete",
-                                cmd: `rm "${Config.setting.systemData.pathSetting}/${inputNameReplace}${Config.setting.systemData.extensionSsh}"`
-                            });
+                        this.componentPrompt
+                            .logicShow(componentWindow, "You really want to delete this ssh?")
+                            .then(() => {
+                                Sio.sendMessage("t_exec_i", {
+                                    closeEnabled: true,
+                                    tag: "sshClickLogicDelete",
+                                    cmd: `rm "${Config.setting.systemData.pathSetting}/${inputNameReplace}${Config.setting.systemData.extensionSsh}"`
+                                });
 
-                            Sio.readMessage("t_exec_o_sshClickLogicDelete", (data: Interface.SocketData): void => {
-                                if (data.close === 0 && this.selectEdit.options[this.selectEdit.selectedIndex].value !== "") {
-                                    Sio.stopRead("t_exec_o_sshClickLogicDelete");
+                                Sio.readMessage("t_exec_o_sshClickLogicDelete", (data: Interface.SocketData) => {
+                                    if (data.close === 0 && this.selectEdit.options[this.selectEdit.selectedIndex].value !== "") {
+                                        Sio.stopRead("t_exec_o_sshClickLogicDelete");
 
-                                    this.logicRemoveXterm();
+                                        this.logicRemoveXterm();
 
-                                    this.selectEdit.options[this.selectEdit.selectedIndex].remove();
-                                    this.selectEdit.selectedIndex = 0;
-                                    selectedIndexOld = 0;
+                                        this.selectEdit.options[this.selectEdit.selectedIndex].remove();
+                                        this.selectEdit.selectedIndex = 0;
+                                        selectedIndexOld = 0;
 
-                                    this.inputName.value = "";
-                                    inputNameReplace = "";
-                                    this.inputServer.value = "";
-                                    this.inputUsername.value = "";
-                                    this.inputPassword.value = "";
-                                    this.inputKeyPublic.value = "";
-                                    this.textareaDescription.value = "";
+                                        this.inputName.value = "";
+                                        inputNameReplace = "";
+                                        this.inputServer.value = "";
+                                        this.inputUsername.value = "";
+                                        this.inputPassword.value = "";
+                                        this.inputKeyPublic.value = "";
+                                        this.textareaDescription.value = "";
 
-                                    this.buttonDelete.style.display = "none";
-                                }
-                            });
-                        });
+                                        this.buttonDelete.style.display = "none";
+                                    }
+                                });
+                            })
+                            .catch(() => {});
                     }
                 }
             }
@@ -445,16 +452,14 @@
 
                 if (elementEventTarget.classList.contains("edit")) {
                     if (selectedIndexOld > 0) {
-                        this.componentPrompt.logicShow(
-                            componentWindow,
-                            "If you change value, will lost the previous connection, continue?",
-                            (): void => {
+                        this.componentPrompt
+                            .logicShow(componentWindow, "If you change value, will lost the previous connection, continue?")
+                            .then(() => {
                                 this.logicChangeSub();
-                            },
-                            (): void => {
+                            })
+                            .catch(() => {
                                 this.selectEdit.selectedIndex = selectedIndexOld;
-                            }
-                        );
+                            });
                     } else {
                         this.logicChangeSub();
                     }

@@ -102,7 +102,7 @@
                 cmd: `ls "${Config.setting.systemData.pathSetting}"/*${Config.setting.systemData.extensionTerser} | sed 's#.*/##'`
             });
 
-            Sio.readMessage("t_exec_o_terserInit", (data: Interface.SocketData): void => {
+            Sio.readMessage("t_exec_o_terserInit", (data: Interface.SocketData) => {
                 if (data.out) {
                     Sio.stopRead("t_exec_o_terserInit");
 
@@ -158,7 +158,7 @@
                             cmd: command
                         });
 
-                        Sio.readMessage("t_exec_o_terserCommand", (data: Interface.SocketData): void => {
+                        Sio.readMessage("t_exec_o_terserCommand", (data: Interface.SocketData) => {
                             const result = data.out ? data.out : data.err;
 
                             if (result) {
@@ -192,7 +192,7 @@
 
                         let buffer = "";
 
-                        Sio.readMessage("t_exec_stream_o_terserChangeLogicEdit", (data: Interface.SocketData): void => {
+                        Sio.readMessage("t_exec_stream_o_terserChangeLogicEdit", (data: Interface.SocketData) => {
                             if (data.chunk === "end") {
                                 Sio.stopRead("t_exec_stream_o_terserChangeLogicEdit");
 
@@ -244,7 +244,7 @@
                 content: JSON.stringify(content)
             });
 
-            Sio.readMessage("t_exec_stream_o_terserClickLogicSave", (data: Interface.SocketData): void => {
+            Sio.readMessage("t_exec_stream_o_terserClickLogicSave", (data: Interface.SocketData) => {
                 if (data.chunk === "end") {
                     Sio.stopRead("t_exec_stream_o_terserClickLogicSave");
 

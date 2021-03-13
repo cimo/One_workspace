@@ -84,7 +84,7 @@
                     });
                 }, 1000);
 
-                Sio.readMessage(`t_exec_o_${containerName}_status`, (data: Interface.SocketData): void => {
+                Sio.readMessage(`t_exec_o_${containerName}_status`, (data: Interface.SocketData) => {
                     if (data.out && commandStatusList[containerName as any] === -1) {
                         this.elementStatusList[containerName as any].innerHTML = data.out;
                     }
@@ -153,7 +153,7 @@
                         commandStatusList[currentWindow.containerName as any] = index;
                     }
 
-                    Sio.readMessage(`t_exec_o_${currentWindow.containerName}_command`, (data: Interface.SocketData): void => {
+                    Sio.readMessage(`t_exec_o_${currentWindow.containerName}_command`, (data: Interface.SocketData) => {
                         if (data.close === 0) {
                             Sio.stopRead(`t_exec_o_${currentWindow.containerName}_command`);
 

@@ -29,6 +29,8 @@ RUN cd ~ \
 && chmod +x /usr/local/bin/entrypoint.sh \
 && apt-get update && apt-get install -y \
 software-properties-common \
+apt-transport-https \
+lsb-release \
 sudo \
 nano \
 tzdata \
@@ -39,10 +41,6 @@ zip \
 unzip \
 cron \
 wget \
-# Docker
-&& wget -q https://download.docker.com/linux/static/stable/x86_64/docker-19.03.9.tgz \
-&& tar -xzvf docker-19.03.9.tgz -C /tmp \
-&& mv /tmp/docker/docker /usr/bin \
 # Time
 && ln -sf /usr/share/zoneinfo/${TIMEZONE} /etc/localtime \
 && dpkg-reconfigure -f noninteractive tzdata \
@@ -50,9 +48,11 @@ wget \
 && npm install -g @vue/cli \
 && npm install -g terser \
 && npm install -g sass \
+# Docker
+&& curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add - \
+&& add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable" \
+&& apt-get update && apt-get install -y docker-ce docker-ce-cli containerd.io \
 # Clean
-&& rm docker-19.03.9.tgz \
-&& rm -rf /tmp/docker \
 && rm -rf /var/lib/apt/lists/* \
 && apt-get clean -y \
 && apt-get autoclean -y \

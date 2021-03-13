@@ -11,11 +11,13 @@ module.exports = {
     rules: {
         "no-console": process.env.NODE_ENV === "production" ? "warn" : "off",
         "no-debugger": process.env.NODE_ENV === "production" ? "warn" : "off",
-        curly: "error",
-        "sort-imports": "off",
-        "no-empty-function": "off",
+        curly: ["error"],
         "object-curly-spacing": "off",
+        "sort-imports": "off",
+        "no-unused-vars": "off",
+        "no-empty-function": "off",
         "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/no-unused-vars": "off",
         "@typescript-eslint/no-empty-function": "off",
         "prettier/prettier": [
             "error",
@@ -50,6 +52,7 @@ module.exports = {
         {
             files: ["*.vue"],
             rules: {
+                "no-unused-vars": "off",
                 "@typescript-eslint/no-unused-vars": [2, { args: "none" }]
             }
         }
