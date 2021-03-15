@@ -16,7 +16,7 @@ export const sendMessage = (tag: string, command: object, time: number = 0): num
     return null;
 };
 
-export const readMessage = (tag: string, callback: Interface.Callback): void => {
+export const readMessage = (tag: string, callback: Interface.SocketCallback): void => {
     socketIo.on(tag, (data: Interface.SocketData) => {
         callback(data);
     });

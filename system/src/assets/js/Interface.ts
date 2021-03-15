@@ -1,5 +1,5 @@
-export interface Callback {
-    (data?: any): void;
+export interface SocketCallback {
+    (data?: unknown): void;
 }
 
 export interface SocketData {

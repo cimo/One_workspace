@@ -151,11 +151,11 @@
 
                 Sio.readMessage("t_pty_o_ssh", (data: Interface.SocketData) => {
                     if (data.cmd) {
-                        if (data.cmd.indexOf(" closed by ") !== -1 || data.cmd.indexOf("logout") !== -1) {
-                            this.logicRemoveXterm();
-
+                        if (data.cmd.indexOf("\u0007") === -1 && (data.cmd.indexOf("closed by") !== -1 || data.cmd.indexOf("logout") !== -1)) {
                             this.selectEdit.selectedIndex = 0;
                             selectedIndexOld = 0;
+
+                            this.logicRemoveXterm();
 
                             this.inputName.value = "";
                             inputNameReplace = "";
@@ -330,7 +330,7 @@
                             value.classList.remove("focused");
                         }
 
-                        if (isInputValid) {
+                        if (isChanged) {
                             elementButtonList[index].classList.add("focused");
                         } else {
                             elementButtonList[0].classList.add("focused");
@@ -418,11 +418,11 @@
                                     if (data.close === 0 && this.selectEdit.options[this.selectEdit.selectedIndex].value !== "") {
                                         Sio.stopRead("t_exec_o_sshClickLogicDelete");
 
-                                        this.logicRemoveXterm();
-
                                         this.selectEdit.options[this.selectEdit.selectedIndex].remove();
                                         this.selectEdit.selectedIndex = 0;
                                         selectedIndexOld = 0;
+
+                                        this.logicRemoveXterm();
 
                                         this.inputName.value = "";
                                         inputNameReplace = "";

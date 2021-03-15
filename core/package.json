@@ -1,12 +1,12 @@
 {
-    "name": "One_workspace",
+    "name": "NodeJs_sk",
     "version": "1.0.0",
     "author": "cimo",
-    "description": "One workspace",
+    "description": "NodeJs sk",
     "license": "MIT",
     "repository": {
         "type": "git",
-        "url": "https://github.com/cimo/One_workspace"
+        "url": "https://github.com/cimo/NodeJs_sk"
     },
     "dependencies": {
         "express": "4.17.1",
