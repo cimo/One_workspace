@@ -20,7 +20,7 @@ module.exports = {
         loaderOptions: {
             sass: {
                 implementation: require("sass"),
-                prependData: '@import "./src/scss/global.scss";'
+                prependData: "@import './src/scss/global.scss';"
             }
         }
     }

@@ -1,6 +1,7 @@
+import { io } from "socket.io-client";
+
 import * as Config from "./Config";
 import * as Interface from "./Interface";
-import { io } from "socket.io-client";
 
 const socketIo: any = io(Config.setting.websocket.url);
 

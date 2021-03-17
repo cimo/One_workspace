@@ -8,7 +8,44 @@ let dragOffsetY: number = 0;
 let dragStartX: number = 0;
 let dragStartY: number = 0;
 
-export const component: any = {};
+const dragStart = (event: Event): void => {
+    for (const value of dragTagList) {
+        const elementEvenTarget = event.target as HTMLElement;
+        const touchEvent = event as TouchEvent;
+        const mouseEvent = event as MouseEvent;
+
+        dragTarget = findElement(elementEvenTarget, value);
+
+        if (dragTarget && elementEvenTarget.classList.contains("drag")) {
+            dragOffsetX = dragTarget.offsetLeft;
+            dragOffsetY = dragTarget.offsetTop;
+
+            dragStartX = event.type === "touchstart" ? touchEvent.touches[0].clientX : mouseEvent.clientX;
+            dragStartY = event.type === "touchstart" ? touchEvent.touches[0].clientY : mouseEvent.clientY;
+
+            dragActive = true;
+
+            break;
+        }
+    }
+};
+
+const dragMove = (event: Event): void => {
+    if (dragTarget && dragActive) {
+        const touchEvent = event as TouchEvent;
+        const mouseEvent = event as MouseEvent;
+
+        const dragCurrentX = dragOffsetX + (event.type === "touchstart" ? touchEvent.touches[0].clientX : mouseEvent.clientX) - dragStartX;
+        const dragCurrentY = dragOffsetY + (event.type === "touchstart" ? touchEvent.touches[0].clientY : mouseEvent.clientY) - dragStartY;
+
+        dragTarget.style.left = `${dragCurrentX}px`;
+        dragTarget.style.top = `${dragCurrentY}px`;
+    }
+};
+
+const dragEnd = (): void => {
+    dragActive = false;
+};
 
 export const findElement = (element: HTMLElement | null, child: string[], parent?: string[]): HTMLElement | null => {
     if (element) {
@@ -148,45 +185,6 @@ export const replaceName = (name: string, rule: RegExp, isLower: boolean): strin
     }
 
     return nameReplace;
-};
-
-const dragStart = (event: Event): void => {
-    for (const value of dragTagList) {
-        const elementEvenTarget = event.target as HTMLElement;
-        const touchEvent = event as TouchEvent;
-        const mouseEvent = event as MouseEvent;
-
-        dragTarget = findElement(elementEvenTarget, value);
-
-        if (dragTarget && elementEvenTarget.classList.contains("drag")) {
-            dragOffsetX = dragTarget.offsetLeft;
-            dragOffsetY = dragTarget.offsetTop;
-
-            dragStartX = event.type === "touchstart" ? touchEvent.touches[0].clientX : mouseEvent.clientX;
-            dragStartY = event.type === "touchstart" ? touchEvent.touches[0].clientY : mouseEvent.clientY;
-
-            dragActive = true;
-
-            break;
-        }
-    }
-};
-
-const dragMove = (event: Event): void => {
-    if (dragTarget && dragActive) {
-        const touchEvent = event as TouchEvent;
-        const mouseEvent = event as MouseEvent;
-
-        const dragCurrentX = dragOffsetX + (event.type === "touchstart" ? touchEvent.touches[0].clientX : mouseEvent.clientX) - dragStartX;
-        const dragCurrentY = dragOffsetY + (event.type === "touchstart" ? touchEvent.touches[0].clientY : mouseEvent.clientY) - dragStartY;
-
-        dragTarget.style.left = `${dragCurrentX}px`;
-        dragTarget.style.top = `${dragCurrentY}px`;
-    }
-};
-
-const dragEnd = (): void => {
-    dragActive = false;
 };
 
 export const dragInit = (parent: HTMLElement, tagList: string[]): void => {

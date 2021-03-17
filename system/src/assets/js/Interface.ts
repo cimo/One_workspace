@@ -1,7 +1,3 @@
-export interface SocketCallback {
-    (data?: unknown): void;
-}
-
 export interface SocketData {
     tag?: string;
     cmd?: string;
@@ -9,6 +5,9 @@ export interface SocketData {
     err?: string;
     close?: string | number;
     chunk?: string;
+}
+export interface SocketCallback {
+    (data?: any): void;
 }
 
 export interface Item {

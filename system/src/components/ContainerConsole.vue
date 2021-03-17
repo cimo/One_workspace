@@ -63,7 +63,7 @@
                 cmd: `history -c && history -w && clear\r`
             });
 
-            xtermList[currentWindow.containerName as any].onData((data: unknown): void => {
+            xtermList[currentWindow.containerName as any].onData((data: string): void => {
                 Sio.sendMessage("t_pty_i", {
                     tag: currentWindow.containerName,
                     cmd: data
@@ -72,7 +72,7 @@
 
             Sio.readMessage(`t_pty_o_${currentWindow.containerName}`, (data: Interface.SocketData) => {
                 if (data.cmd) {
-                    if (data.cmd.indexOf(" is not running") !== -1) {
+                    if (data.cmd.indexOf("is not running") !== -1) {
                         this.logicRemoveXterm(currentWindow);
 
                         return;

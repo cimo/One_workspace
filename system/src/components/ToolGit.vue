@@ -64,6 +64,9 @@
                     <div class="button_cmd_window git_command status">
                         Status
                     </div>
+                    <div class="button_cmd_window git_command add">
+                        Add
+                    </div>
                     <div class="button_cmd_window git_command commit">
                         Commit
                     </div>
@@ -323,6 +326,8 @@
                             command = `cd "${projectPath}" && git reset --hard ${this.inputBranchName1.value}`;
                         } else if (elementEventTarget.classList.contains("status")) {
                             command = `cd "${projectPath}" && git status`;
+                        } else if (elementEventTarget.classList.contains("add")) {
+                            command = `cd "${projectPath}" && git add .`;
                         } else if (elementEventTarget.classList.contains("commit")) {
                             command = `cd "${projectPath}" && git commit -m "${this.inputCommitDescription.value}"`;
                         } else if (elementEventTarget.classList.contains("push")) {

@@ -142,7 +142,7 @@
                     cmd: `history -c && history -w && clear && ${command}\r`
                 });
 
-                xterm.onData((data: unknown) => {
+                xterm.onData((data: string) => {
                     Sio.sendMessage("t_pty_i", {
                         tag: "ssh",
                         cmd: data
