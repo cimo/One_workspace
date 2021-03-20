@@ -97,12 +97,12 @@
             this.logicFindWindowElement(componentWindow);
 
             Sio.sendMessage("t_exec_i", {
-                closeEnabled: false,
+                closeActive: false,
                 tag: "terserInit",
-                cmd: `ls "${Config.setting.systemData.pathSetting}"/*${Config.setting.systemData.extensionTerser} | sed 's#.*/##'`
+                cmd: `ls "${Config.data.systemData.pathSetting}"/*${Config.data.systemData.extensionTerser} | sed 's#.*/##'`
             });
 
-            Sio.readMessage("t_exec_o_terserInit", (data: Interface.SocketData) => {
+            Sio.readMessage("t_exec_o_terserInit", (data: Interface.Socket) => {
                 if (data.out) {
                     Sio.stopRead("t_exec_o_terserInit");
 
@@ -113,7 +113,7 @@
                             if (value !== "" && value.indexOf("ls: ") === -1) {
                                 const option = document.createElement("option");
                                 option.value = value;
-                                option.text = value.replace(Config.setting.systemData.extensionTerser, "");
+                                option.text = value.replace(Config.data.systemData.extensionTerser, "");
                                 this.selectEdit.appendChild(option);
                             }
                         }
@@ -153,12 +153,12 @@
                                 && ls "${output}"/*.min.js | sed 's#.*/##'`;
 
                         Sio.sendMessage("t_exec_i", {
-                            closeEnabled: false,
+                            closeActive: false,
                             tag: "terserCommand",
                             cmd: command
                         });
 
-                        Sio.readMessage("t_exec_o_terserCommand", (data: Interface.SocketData) => {
+                        Sio.readMessage("t_exec_o_terserCommand", (data: Interface.Socket) => {
                             const result = data.out ? data.out : data.err;
 
                             if (result) {
@@ -187,12 +187,12 @@
                         Sio.sendMessage("t_exec_stream_i", {
                             tag: "terserChangeLogicEdit",
                             cmd: "read",
-                            path: `${Config.setting.systemData.pathSetting}/${optionValue}`
+                            path: `${Config.data.systemData.pathSetting}/${optionValue}`
                         });
 
                         let buffer = "";
 
-                        Sio.readMessage("t_exec_stream_o_terserChangeLogicEdit", (data: Interface.SocketData) => {
+                        Sio.readMessage("t_exec_stream_o_terserChangeLogicEdit", (data: Interface.Socket) => {
                             if (data.chunk === "end") {
                                 Sio.stopRead("t_exec_stream_o_terserChangeLogicEdit");
 
@@ -240,16 +240,16 @@
             Sio.sendMessage("t_exec_stream_i", {
                 tag: "terserClickLogicSave",
                 cmd: "write",
-                path: `${Config.setting.systemData.pathSetting}/${projectName}${Config.setting.systemData.extensionTerser}`,
+                path: `${Config.data.systemData.pathSetting}/${projectName}${Config.data.systemData.extensionTerser}`,
                 content: JSON.stringify(content)
             });
 
-            Sio.readMessage("t_exec_stream_o_terserClickLogicSave", (data: Interface.SocketData) => {
+            Sio.readMessage("t_exec_stream_o_terserClickLogicSave", (data: Interface.Socket) => {
                 if (data.chunk === "end") {
                     Sio.stopRead("t_exec_stream_o_terserClickLogicSave");
 
                     if (this.selectEdit) {
-                        const optionValue = `${projectName}${Config.setting.systemData.extensionTerser}`;
+                        const optionValue = `${projectName}${Config.data.systemData.extensionTerser}`;
                         const elementOption = this.selectEdit.querySelector(`option[value="${optionValue}"`) as HTMLOptionElement;
 
                         if (!elementOption) {
@@ -273,7 +273,7 @@
 
             if (this.selectEdit) {
                 for (const option of this.selectEdit.options) {
-                    if (option.value === `${projectName}${Config.setting.systemData.extensionTerser}`) {
+                    if (option.value === `${projectName}${Config.data.systemData.extensionTerser}`) {
                         option.remove();
 
                         projectName = "";

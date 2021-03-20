@@ -1,24 +1,11 @@
-export interface SocketData {
-    tag?: string;
-    cmd?: string;
-    out?: string;
-    err?: string;
-    close?: string | number;
-    chunk?: string;
-}
-export interface SocketCallback {
-    (data?: any): void;
-}
-
-export interface Item {
+export interface ConfigItem {
     category?: string;
     name?: string;
     containerName?: string;
     imagePath?: string;
     imageName?: string;
 }
-
-export interface Setting extends Item {
+export interface Config extends ConfigItem {
     nodeJs: { url: string };
     websocket: { url: string };
     vueJs: { uiPort: number };
@@ -35,11 +22,23 @@ export interface Setting extends Item {
         desktopWidth: 840;
     };
     menuRoot: {
-        sideItemList: Item[];
-        projectItemList: Item[];
-        toolItemList: Item[];
-        containerItemList: Item[];
+        sideItemList: ConfigItem[];
+        projectItemList: ConfigItem[];
+        toolItemList: ConfigItem[];
+        containerItemList: ConfigItem[];
     };
+}
+
+export interface Socket {
+    tag?: string;
+    cmd?: string;
+    out?: string;
+    err?: string;
+    close?: string | number;
+    chunk?: string;
+}
+export interface CallbackSocket {
+    (data?: any): void;
 }
 
 export interface Window {

@@ -5,7 +5,7 @@ const domain = "localhost";
 const nodeJsPort: number = window.location.protocol === "http:" ? 1080 : 1443;
 const websocketProtocol: string = window.location.protocol === "http:" ? "ws:" : "wss:";
 
-export const setting: Interface.Setting = {
+export const data: Interface.Config = {
     nodeJs: {
         url: `${window.location.protocol}//${domain}:${nodeJsPort}`
     },

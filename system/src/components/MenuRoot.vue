@@ -4,7 +4,7 @@
         <div class="menuRoot_container">
             <div class="menuRoot_side">
                 <div class="menuRoot_side_container">
-                    <div v-for="(value, key) in interfaceSetting.menuRoot.sideItemList" v-bind:key="`${key}-${value.name}`" class="window_opener" v-bind:data-category="value.category" v-bind:data-name="value.name">
+                    <div v-for="(value, key) in interfaceConfig.menuRoot.sideItemList" v-bind:key="`${key}-${value.name}`" class="window_opener" v-bind:data-category="value.category" v-bind:data-name="value.name">
                         <div class="item">
                             <img class="icon" v-bind:src="value.imagePath" v-bind:alt="value.imageName" />
                         </div>
@@ -13,21 +13,21 @@
             </div>
             <div class="menuRoot_panel">
                 <p class="label">Project</p>
-                <div v-for="(value, key) in interfaceSetting.menuRoot.projectItemList" v-bind:key="`${key}-${value.name}`" class="window_opener" v-bind:data-category="value.category" v-bind:data-name="value.name">
+                <div v-for="(value, key) in interfaceConfig.menuRoot.projectItemList" v-bind:key="`${key}-${value.name}`" class="window_opener" v-bind:data-category="value.category" v-bind:data-name="value.name">
                     <div class="program">
                         <img class="icon" v-bind:src="value.imagePath" v-bind:alt="value.imageName" />
                         <p class="text">{{ value.name }}</p>
                     </div>
                 </div>
                 <p class="label">Tool</p>
-                <div v-for="(value, key) in interfaceSetting.menuRoot.toolItemList" v-bind:key="`${key}-${value.name}`" class="window_opener" v-bind:data-category="value.category" v-bind:data-name="value.name">
+                <div v-for="(value, key) in interfaceConfig.menuRoot.toolItemList" v-bind:key="`${key}-${value.name}`" class="window_opener" v-bind:data-category="value.category" v-bind:data-name="value.name">
                     <div class="program">
                         <img class="icon" v-bind:src="value.imagePath" v-bind:alt="value.imageName" />
                         <p class="text">{{ value.name }}</p>
                     </div>
                 </div>
                 <p class="label">Container</p>
-                <div v-for="(value, key) in interfaceSetting.menuRoot.containerItemList" v-bind:key="`${key}-${value.name}`" class="window_opener" v-bind:data-category="value.category" v-bind:data-name="value.name" v-bind:data-container_name="value.containerName">
+                <div v-for="(value, key) in interfaceConfig.menuRoot.containerItemList" v-bind:key="`${key}-${value.name}`" class="window_opener" v-bind:data-category="value.category" v-bind:data-name="value.name" v-bind:data-container_name="value.containerName">
                     <div class="program">
                         <img class="icon" v-bind:src="value.imagePath" v-bind:alt="value.imageName" />
                         <p class="text">{{ value.name }}</p>
@@ -55,14 +55,14 @@
         // Variables
         private componentPrompt!: ComponentPrompt;
         private componentWindow!: ComponentWindow;
-        private interfaceSetting!: Interface.Setting;
+        private interfaceConfig!: Interface.Config;
         private elementMenuRootContainer!: HTMLElement;
 
         // Hooks
         protected created(): void {
             this.componentPrompt = new ComponentPrompt();
             this.componentWindow = new ComponentWindow();
-            this.interfaceSetting = Config.setting;
+            this.interfaceConfig = Config.data;
         }
 
         protected destroyed(): void {}
@@ -96,7 +96,7 @@
                     const elementWindowOpenerDataName = elementWindowOpener.getAttribute("data-name") as string;
 
                     if (elementWindowOpenerDataName === "VueJs") {
-                        const tab = window.open(`http://localhost:${Config.setting.vueJs.uiPort}`, "_blank");
+                        const tab = window.open(`http://localhost:${Config.data.vueJs.uiPort}`, "_blank");
 
                         if (tab) {
                             tab.focus();

@@ -97,12 +97,12 @@
             this.logicFindWindowElement(componentWindow);
 
             Sio.sendMessage("t_exec_i", {
-                closeEnabled: false,
+                closeActive: false,
                 tag: "sassInit",
-                cmd: `ls "${Config.setting.systemData.pathSetting}"/*${Config.setting.systemData.extensionSass} | sed 's#.*/##'`
+                cmd: `ls "${Config.data.systemData.pathSetting}"/*${Config.data.systemData.extensionSass} | sed 's#.*/##'`
             });
 
-            Sio.readMessage("t_exec_o_sassInit", (data: Interface.SocketData) => {
+            Sio.readMessage("t_exec_o_sassInit", (data: Interface.Socket) => {
                 if (data.out) {
                     Sio.stopRead("t_exec_o_sassInit");
 
@@ -113,7 +113,7 @@
                             if (value !== "" && value.indexOf("ls: ") === -1) {
                                 const option = document.createElement("option");
                                 option.value = value;
-                                option.text = value.replace(Config.setting.systemData.extensionSass, "");
+                                option.text = value.replace(Config.data.systemData.extensionSass, "");
                                 this.selectEdit.appendChild(option);
                             }
                         }
@@ -151,12 +151,12 @@
                         const command = `find "${output}" -name '*.css.map' -delete && find "${output}" -name '*.css' -delete && sass "${input}":"${output}" --style compressed && ls "${output}"`;
 
                         Sio.sendMessage("t_exec_i", {
-                            closeEnabled: false,
+                            closeActive: false,
                             tag: "sassCommand",
                             cmd: command
                         });
 
-                        Sio.readMessage("t_exec_o_sassCommand", (data: Interface.SocketData) => {
+                        Sio.readMessage("t_exec_o_sassCommand", (data: Interface.Socket) => {
                             const result = data.out ? data.out : data.err;
 
                             if (result) {
@@ -185,12 +185,12 @@
                         Sio.sendMessage("t_exec_stream_i", {
                             tag: "sassChangeLogicEdit",
                             cmd: "read",
-                            path: `${Config.setting.systemData.pathSetting}/${optionValue}`
+                            path: `${Config.data.systemData.pathSetting}/${optionValue}`
                         });
 
                         let buffer = "";
 
-                        Sio.readMessage("t_exec_stream_o_sassChangeLogicEdit", (data: Interface.SocketData) => {
+                        Sio.readMessage("t_exec_stream_o_sassChangeLogicEdit", (data: Interface.Socket) => {
                             if (data.chunk === "end") {
                                 Sio.stopRead("t_exec_stream_o_sassChangeLogicEdit");
 
@@ -238,16 +238,16 @@
             Sio.sendMessage("t_exec_stream_i", {
                 tag: "sassClickLogicSave",
                 cmd: "write",
-                path: `${Config.setting.systemData.pathSetting}/${projectName}${Config.setting.systemData.extensionSass}`,
+                path: `${Config.data.systemData.pathSetting}/${projectName}${Config.data.systemData.extensionSass}`,
                 content: JSON.stringify(content)
             });
 
-            Sio.readMessage("t_exec_stream_o_sassClickLogicSave", (data: Interface.SocketData) => {
+            Sio.readMessage("t_exec_stream_o_sassClickLogicSave", (data: Interface.Socket) => {
                 if (data.chunk === "end") {
                     Sio.stopRead("t_exec_stream_o_sassClickLogicSave");
 
                     if (this.selectEdit) {
-                        const optionValue = `${projectName}${Config.setting.systemData.extensionSass}`;
+                        const optionValue = `${projectName}${Config.data.systemData.extensionSass}`;
                         const elementOption = this.selectEdit.querySelector(`option[value="${optionValue}"`) as HTMLOptionElement;
 
                         if (!elementOption) {
@@ -271,7 +271,7 @@
 
             if (this.selectEdit) {
                 for (const option of this.selectEdit.options) {
-                    if (option.value === `${projectName}${Config.setting.systemData.extensionSass}`) {
+                    if (option.value === `${projectName}${Config.data.systemData.extensionSass}`) {
                         option.remove();
 
                         projectName = "";

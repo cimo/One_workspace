@@ -116,9 +116,9 @@
 
         private logicDeleteFileSetting(extension: string): void {
             Sio.sendMessage("t_exec_i", {
-                closeEnabled: false,
+                closeActive: false,
                 tag: "exploreDeleteToolFileSetting",
-                cmd: `rm "${Config.setting.systemData.pathSetting}/${inputNameReplace}${extension}"`
+                cmd: `rm "${Config.data.systemData.pathSetting}/${inputNameReplace}${extension}"`
             });
         }
 
@@ -144,12 +144,12 @@
             this.logicFindWindowElement(componentWindow);
 
             Sio.sendMessage("t_exec_i", {
-                closeEnabled: false,
+                closeActive: false,
                 tag: "exploreInit",
-                cmd: `ls "${Config.setting.systemData.pathSetting}"/*${Config.setting.systemData.extensionProject} | sed 's#.*/##'`
+                cmd: `ls "${Config.data.systemData.pathSetting}"/*${Config.data.systemData.extensionProject} | sed 's#.*/##'`
             });
 
-            Sio.readMessage("t_exec_o_exploreInit", (data: Interface.SocketData) => {
+            Sio.readMessage("t_exec_o_exploreInit", (data: Interface.Socket) => {
                 if (data.out) {
                     Sio.stopRead("t_exec_o_exploreInit");
 
@@ -160,7 +160,7 @@
                             if (value !== "" && value.indexOf("ls: ") === -1) {
                                 const option = document.createElement("option");
                                 option.value = value;
-                                option.text = value.replace(Config.setting.systemData.extensionProject, "");
+                                option.text = value.replace(Config.data.systemData.extensionProject, "");
                                 this.selectEdit.appendChild(option);
                             }
                         }
@@ -200,15 +200,15 @@
                         Sio.sendMessage("t_exec_stream_i", {
                             tag: "exploreClickLogicSave",
                             cmd: "write",
-                            path: `${Config.setting.systemData.pathSetting}/${inputNameReplace}${Config.setting.systemData.extensionProject}`,
+                            path: `${Config.data.systemData.pathSetting}/${inputNameReplace}${Config.data.systemData.extensionProject}`,
                             content: JSON.stringify(content)
                         });
 
-                        Sio.readMessage("t_exec_stream_o_exploreClickLogicSave", (data: Interface.SocketData) => {
+                        Sio.readMessage("t_exec_stream_o_exploreClickLogicSave", (data: Interface.Socket) => {
                             if (data.chunk === "end") {
                                 Sio.stopRead("t_exec_stream_o_exploreClickLogicSave");
 
-                                const optionValue = `${inputNameReplace}${Config.setting.systemData.extensionProject}`;
+                                const optionValue = `${inputNameReplace}${Config.data.systemData.extensionProject}`;
                                 const elementOption = this.selectEdit.querySelector(`option[value="${optionValue}"`) as HTMLOptionElement;
 
                                 if (!elementOption) {
@@ -223,28 +223,28 @@
 
                                 // Create folder root
                                 Sio.sendMessage("t_exec_i", {
-                                    closeEnabled: false,
+                                    closeActive: false,
                                     tag: "exploreClickLogicFolder",
-                                    cmd: `mkdir -p "${Config.setting.systemData.pathProject}/${this.inputFolderName.value}/root"`
+                                    cmd: `mkdir -p "${Config.data.systemData.pathProject}/${this.inputFolderName.value}/root"`
                                 });
 
                                 // Create git setting file
                                 if (this.checkboxGit.checked) {
                                     Sio.sendMessage("t_exec_i", {
-                                        closeEnabled: true,
+                                        closeActive: true,
                                         tag: "exploreGitClickLogicSetting",
-                                        cmd: `test -f "${Config.setting.systemData.pathSetting}/${inputNameReplace}${Config.setting.systemData.extensionGit}"`
+                                        cmd: `test -f "${Config.data.systemData.pathSetting}/${inputNameReplace}${Config.data.systemData.extensionGit}"`
                                     });
 
-                                    Sio.readMessage("t_exec_o_exploreGitClickLogicSetting", (data: Interface.SocketData) => {
+                                    Sio.readMessage("t_exec_o_exploreGitClickLogicSetting", (data: Interface.Socket) => {
                                         if (data.close === 1) {
                                             Sio.stopRead("t_exec_o_exploreGitClickLogicSetting");
 
-                                            this.componentToolGit.logicCreateFile(inputNameReplace, `${Config.setting.systemData.pathProject}/${this.inputFolderName.value}/root`);
+                                            this.componentToolGit.logicCreateFile(inputNameReplace, `${Config.data.systemData.pathProject}/${this.inputFolderName.value}/root`);
                                         }
                                     });
                                 } else {
-                                    this.logicDeleteFileSetting(Config.setting.systemData.extensionGit);
+                                    this.logicDeleteFileSetting(Config.data.systemData.extensionGit);
 
                                     this.componentToolGit.logicDeleteOption();
                                 }
@@ -252,20 +252,20 @@
                                 // Create sass setting file
                                 if (this.checkboxSass.checked) {
                                     Sio.sendMessage("t_exec_i", {
-                                        closeEnabled: true,
+                                        closeActive: true,
                                         tag: "exploreSassClickLogicSetting",
-                                        cmd: `test -f "${Config.setting.systemData.pathSetting}/${inputNameReplace}${Config.setting.systemData.extensionSass}"`
+                                        cmd: `test -f "${Config.data.systemData.pathSetting}/${inputNameReplace}${Config.data.systemData.extensionSass}"`
                                     });
 
-                                    Sio.readMessage("t_exec_o_exploreSassClickLogicSetting", (data: Interface.SocketData) => {
+                                    Sio.readMessage("t_exec_o_exploreSassClickLogicSetting", (data: Interface.Socket) => {
                                         if (data.close === 1) {
                                             Sio.stopRead("t_exec_o_exploreSassClickLogicSetting");
 
-                                            this.componentToolSass.logicCreateFile(inputNameReplace, `${Config.setting.systemData.pathProject}/${this.inputFolderName.value}/root`);
+                                            this.componentToolSass.logicCreateFile(inputNameReplace, `${Config.data.systemData.pathProject}/${this.inputFolderName.value}/root`);
                                         }
                                     });
                                 } else {
-                                    this.logicDeleteFileSetting(Config.setting.systemData.extensionSass);
+                                    this.logicDeleteFileSetting(Config.data.systemData.extensionSass);
 
                                     this.componentToolSass.logicDeleteOption();
                                 }
@@ -273,20 +273,20 @@
                                 // Create terser setting file
                                 if (this.checkboxTerser.checked) {
                                     Sio.sendMessage("t_exec_i", {
-                                        closeEnabled: true,
+                                        closeActive: true,
                                         tag: "exploreTerserClickLogicSetting",
-                                        cmd: `test -f "${Config.setting.systemData.pathSetting}/${inputNameReplace}${Config.setting.systemData.extensionTerser}"`
+                                        cmd: `test -f "${Config.data.systemData.pathSetting}/${inputNameReplace}${Config.data.systemData.extensionTerser}"`
                                     });
 
-                                    Sio.readMessage("t_exec_o_exploreTerserClickLogicSetting", (data: Interface.SocketData) => {
+                                    Sio.readMessage("t_exec_o_exploreTerserClickLogicSetting", (data: Interface.Socket) => {
                                         if (data.close === 1) {
                                             Sio.stopRead("t_exec_o_exploreTerserClickLogicSetting");
 
-                                            this.componentToolTerser.logicCreateFile(inputNameReplace, `${Config.setting.systemData.pathProject}/${this.inputFolderName.value}/root`);
+                                            this.componentToolTerser.logicCreateFile(inputNameReplace, `${Config.data.systemData.pathProject}/${this.inputFolderName.value}/root`);
                                         }
                                     });
                                 } else {
-                                    this.logicDeleteFileSetting(Config.setting.systemData.extensionTerser);
+                                    this.logicDeleteFileSetting(Config.data.systemData.extensionTerser);
 
                                     this.componentToolTerser.logicDeleteOption();
                                 }
@@ -299,18 +299,18 @@
                             .logicShow(componentWindow, "You really want to delete this project?<br>(The root folder will be preserved).")
                             .then(() => {
                                 Sio.sendMessage("t_exec_i", {
-                                    closeEnabled: true,
+                                    closeActive: true,
                                     tag: "exploreClickLogicDelete",
-                                    cmd: `rm "${Config.setting.systemData.pathSetting}/${inputNameReplace}${Config.setting.systemData.extensionProject}"`
+                                    cmd: `rm "${Config.data.systemData.pathSetting}/${inputNameReplace}${Config.data.systemData.extensionProject}"`
                                 });
 
-                                Sio.readMessage("t_exec_o_exploreClickLogicDelete", (data: Interface.SocketData) => {
+                                Sio.readMessage("t_exec_o_exploreClickLogicDelete", (data: Interface.Socket) => {
                                     if (data.close === 0 && this.selectEdit.options[this.selectEdit.selectedIndex].value) {
                                         Sio.stopRead("t_exec_o_exploreClickLogicDelete");
 
-                                        this.logicDeleteFileSetting(Config.setting.systemData.extensionGit);
-                                        this.logicDeleteFileSetting(Config.setting.systemData.extensionTerser);
-                                        this.logicDeleteFileSetting(Config.setting.systemData.extensionSass);
+                                        this.logicDeleteFileSetting(Config.data.systemData.extensionGit);
+                                        this.logicDeleteFileSetting(Config.data.systemData.extensionTerser);
+                                        this.logicDeleteFileSetting(Config.data.systemData.extensionSass);
 
                                         this.componentToolGit.logicDeleteOption();
                                         this.componentToolTerser.logicDeleteOption();
@@ -361,12 +361,12 @@
                         Sio.sendMessage("t_exec_stream_i", {
                             tag: "exploreChangeLogicEdit",
                             cmd: "read",
-                            path: `${Config.setting.systemData.pathSetting}/${optionValue}`
+                            path: `${Config.data.systemData.pathSetting}/${optionValue}`
                         });
 
                         let buffer = "";
 
-                        Sio.readMessage("t_exec_stream_o_exploreChangeLogicEdit", (data: Interface.SocketData) => {
+                        Sio.readMessage("t_exec_stream_o_exploreChangeLogicEdit", (data: Interface.Socket) => {
                             if (data.chunk === "end") {
                                 Sio.stopRead("t_exec_stream_o_exploreChangeLogicEdit");
 

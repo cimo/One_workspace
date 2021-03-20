@@ -21,6 +21,10 @@
                     <input type="text" name="username" value="" />
                 </div>
                 <div class="section">
+                    <p>Email:</p>
+                    <input type="text" name="email" value="" />
+                </div>
+                <div class="section">
                     <p>Password:</p>
                     <input type="password" name="password" value="" />
                 </div>
@@ -104,6 +108,7 @@
         private elementProjectLabel!: HTMLElement;
         private inputUrl!: HTMLInputElement;
         private inputUsername!: HTMLInputElement;
+        private inputEmail!: HTMLInputElement;
         private inputPassword!: HTMLInputElement;
         private inputBranchName1!: HTMLInputElement;
         private inputBranchName2!: HTMLInputElement;
@@ -125,6 +130,7 @@
                 this.elementProjectLabel = componentWindow.querySelector(".part_2_container .project_label") as HTMLElement;
                 this.inputUrl = componentWindow.querySelector(".part_1_container input[name='url']") as HTMLInputElement;
                 this.inputUsername = componentWindow.querySelector(".part_1_container input[name='username']") as HTMLInputElement;
+                this.inputEmail = componentWindow.querySelector(".part_1_container input[name='email']") as HTMLInputElement;
                 this.inputPassword = componentWindow.querySelector(".part_1_container input[name='password']") as HTMLInputElement;
                 this.inputBranchName1 = componentWindow.querySelector(".part_1_container input[name='branchName']") as HTMLInputElement;
                 this.inputBranchName2 = componentWindow.querySelector(".part_2_container input[name='branchName']") as HTMLInputElement;
@@ -138,6 +144,7 @@
                 this.elementProjectLabel = document.querySelector(".window_component:not(.empty) .git_component .part_2_container .project_label") as HTMLElement;
                 this.inputUrl = document.querySelector(".window_component:not(.empty) .git_component .part_1_container input[name='url']") as HTMLInputElement;
                 this.inputUsername = document.querySelector(".window_component:not(.empty) .git_component .part_1_container input[name='username']") as HTMLInputElement;
+                this.inputEmail = document.querySelector(".window_component:not(.empty) .git_component .part_1_container input[name='email']") as HTMLInputElement;
                 this.inputPassword = document.querySelector(".window_component:not(.empty) .git_component .part_1_container input[name='password']") as HTMLInputElement;
                 this.inputBranchName1 = document.querySelector(".window_component:not(.empty) .git_component .part_1_container input[name='branchName']") as HTMLInputElement;
                 this.inputBranchName2 = document.querySelector(".window_component:not(.empty) .git_component .part_2_container input[name='branchName']") as HTMLInputElement;
@@ -152,7 +159,7 @@
             const inputBranchNameMatch2 = /^[A-Za-z0-9-_/ ]+$/.test(this.inputBranchName2.value as string);
 
             if (!elementEventTarget || (!elementEventTarget.classList.contains("pull") && !elementEventTarget.classList.contains("reset") && !elementEventTarget.classList.contains("push") && !elementEventTarget.classList.contains("commit"))) {
-                if (this.inputUrl.value !== "" && this.inputUsername.value !== "" && this.inputPassword.value !== "") {
+                if (this.inputUrl.value !== "" && this.inputUsername.value !== "" && this.inputEmail.value !== "" && this.inputPassword.value !== "") {
                     isInputValid = true;
                 } else {
                     isInputValid = false;
@@ -162,13 +169,16 @@
                     }
                     if (this.inputUsername.value === "") {
                         this.inputUsername.style.borderColor = "#ff0000";
+                    }
+                    if (this.inputEmail.value === "") {
+                        this.inputEmail.style.borderColor = "#ff0000";
                     }
                     if (this.inputPassword.value === "") {
                         this.inputPassword.style.borderColor = "#ff0000";
                     }
                 }
             } else if (elementEventTarget.classList.contains("pull") || elementEventTarget.classList.contains("reset")) {
-                if (inputBranchNameMatch1 && this.inputUrl.value !== "" && this.inputUsername.value !== "" && this.inputPassword.value !== "") {
+                if (inputBranchNameMatch1 && this.inputUrl.value !== "" && this.inputUsername.value !== "" && this.inputEmail.value !== "" && this.inputPassword.value !== "") {
                     isInputValid = true;
                 } else {
                     isInputValid = false;
@@ -178,6 +188,9 @@
                     }
                     if (this.inputUsername.value === "") {
                         this.inputUsername.style.borderColor = "#ff0000";
+                    }
+                    if (this.inputEmail.value === "") {
+                        this.inputEmail.style.borderColor = "#ff0000";
                     }
                     if (this.inputPassword.value === "") {
                         this.inputPassword.style.borderColor = "#ff0000";
@@ -187,7 +200,7 @@
                     }
                 }
             } else if (elementEventTarget.classList.contains("push")) {
-                if (inputBranchNameMatch2 && this.inputUrl.value !== "" && this.inputUsername.value !== "" && this.inputPassword.value !== "") {
+                if (inputBranchNameMatch2 && this.inputUrl.value !== "" && this.inputUsername.value !== "" && this.inputEmail.value !== "" && this.inputPassword.value !== "") {
                     this.inputCommitDescription.value = "";
 
                     isInputValid = true;
@@ -199,6 +212,9 @@
                     }
                     if (this.inputUsername.value === "") {
                         this.inputUsername.style.borderColor = "#ff0000";
+                    }
+                    if (this.inputEmail.value === "") {
+                        this.inputEmail.style.borderColor = "#ff0000";
                     }
                     if (this.inputPassword.value === "") {
                         this.inputPassword.style.borderColor = "#ff0000";
@@ -226,12 +242,12 @@
             this.logicFindWindowElement(componentWindow);
 
             Sio.sendMessage("t_exec_i", {
-                closeEnabled: false,
+                closeActive: false,
                 tag: "gitInit",
-                cmd: `ls "${Config.setting.systemData.pathSetting}"/*${Config.setting.systemData.extensionGit} | sed 's#.*/##'`
+                cmd: `ls "${Config.data.systemData.pathSetting}"/*${Config.data.systemData.extensionGit} | sed 's#.*/##'`
             });
 
-            Sio.readMessage("t_exec_o_gitInit", (data: Interface.SocketData) => {
+            Sio.readMessage("t_exec_o_gitInit", (data: Interface.Socket) => {
                 if (data.out) {
                     Sio.stopRead("t_exec_o_gitInit");
 
@@ -242,7 +258,7 @@
                             if (value !== "" && value.indexOf("ls: ") === -1) {
                                 const option = document.createElement("option");
                                 option.value = value;
-                                option.text = value.replace(Config.setting.systemData.extensionGit, "");
+                                option.text = value.replace(Config.data.systemData.extensionGit, "");
                                 this.selectEdit.appendChild(option);
                             }
                         }
@@ -261,6 +277,7 @@
 
                 this.inputUrl.style.borderColor = "transparent";
                 this.inputUsername.style.borderColor = "transparent";
+                this.inputEmail.style.borderColor = "transparent";
                 this.inputPassword.style.borderColor = "transparent";
                 this.inputBranchName1.style.borderColor = "transparent";
                 this.inputBranchName2.style.borderColor = "transparent";
@@ -336,14 +353,14 @@
 
                         if (command !== "") {
                             Sio.sendMessage("t_exec_i", {
-                                closeEnabled: true,
+                                closeActive: true,
                                 tag: "gitCommand",
                                 cmd: command
                             });
 
                             let buffer = "";
 
-                            Sio.readMessage("t_exec_o_gitCommand", (data: Interface.SocketData) => {
+                            Sio.readMessage("t_exec_o_gitCommand", (data: Interface.Socket) => {
                                 if (data.close === 0 || data.close === 1 || data.close === 128) {
                                     Sio.stopRead("t_exec_o_gitCommand");
 
@@ -391,12 +408,12 @@
                         Sio.sendMessage("t_exec_stream_i", {
                             tag: "gitChangeLogicEdit",
                             cmd: "read",
-                            path: `${Config.setting.systemData.pathSetting}/${optionValue}`
+                            path: `${Config.data.systemData.pathSetting}/${optionValue}`
                         });
 
                         let buffer = "";
 
-                        Sio.readMessage("t_exec_stream_o_gitChangeLogicEdit", (data: Interface.SocketData) => {
+                        Sio.readMessage("t_exec_stream_o_gitChangeLogicEdit", (data: Interface.Socket) => {
                             if (data.chunk === "end") {
                                 Sio.stopRead("t_exec_stream_o_gitChangeLogicEdit");
 
@@ -408,6 +425,7 @@
                                     this.elementProjectLabel.innerHTML = result.name;
                                     this.inputUrl.value = result.url;
                                     this.inputUsername.value = result.username;
+                                    this.inputEmail.value = result.email;
                                     this.inputBranchName1.value = "";
                                     this.inputBranchName2.value = "";
                                     this.inputCommitDescription.value = "";
@@ -419,7 +437,7 @@
                                         hex: result.password
                                     });
 
-                                    Sio.readMessage("t_crypt_decrypt_o_gitSetting", (data: Interface.SocketData) => {
+                                    Sio.readMessage("t_crypt_decrypt_o_gitSetting", (data: Interface.Socket) => {
                                         Sio.stopRead("t_crypt_decrypt_o_gitSetting");
 
                                         this.inputPassword.value = data.out ? data.out : "";
@@ -435,6 +453,7 @@
                         this.elementProjectLabel.innerHTML = "";
                         this.inputUrl.value = "";
                         this.inputUsername.value = "";
+                        this.inputEmail.value = "";
                         this.inputPassword.value = "";
                         this.inputBranchName1.value = "";
                         this.inputBranchName2.value = "";
@@ -461,12 +480,13 @@
                 text: this.inputPassword ? this.inputPassword.value : ""
             });
 
-            Sio.readMessage("t_crypt_encrypt_o_gitSetting", (data: Interface.SocketData) => {
+            Sio.readMessage("t_crypt_encrypt_o_gitSetting", (data: Interface.Socket) => {
                 Sio.stopRead("t_crypt_encrypt_o_gitSetting");
 
                 const content = {
                     url: this.inputUrl ? this.inputUrl.value : "",
                     username: this.inputUsername ? this.inputUsername.value : "",
+                    email: this.inputEmail ? this.inputEmail.value : "",
                     password: data.out ? data.out : "",
                     name: projectName,
                     path: projectPath
@@ -475,16 +495,26 @@
                 Sio.sendMessage("t_exec_stream_i", {
                     tag: "gitClickLogicSave",
                     cmd: "write",
-                    path: `${Config.setting.systemData.pathSetting}/${projectName}${Config.setting.systemData.extensionGit}`,
+                    path: `${Config.data.systemData.pathSetting}/${projectName}${Config.data.systemData.extensionGit}`,
                     content: JSON.stringify(content)
                 });
 
-                Sio.readMessage("t_exec_stream_o_gitClickLogicSave", (data: Interface.SocketData) => {
+                Sio.readMessage("t_exec_stream_o_gitClickLogicSave", (data: Interface.Socket) => {
                     if (data.chunk === "end") {
                         Sio.stopRead("t_exec_stream_o_gitClickLogicSave");
 
+                        const command = `cd "${projectPath}" && git config user.name '${this.inputUsername.value}' && git config user.email ${this.inputEmail.value} && git commit --amend --reset-author`;
+
+                        if (command !== "") {
+                            Sio.sendMessage("t_exec_i", {
+                                closeActive: true,
+                                tag: "gitCommand",
+                                cmd: command
+                            });
+                        }
+
                         if (this.selectEdit) {
-                            const optionValue = `${projectName}${Config.setting.systemData.extensionGit}`;
+                            const optionValue = `${projectName}${Config.data.systemData.extensionGit}`;
                             const elementOption = this.selectEdit.querySelector(`option[value="${optionValue}"`) as HTMLOptionElement;
 
                             if (!elementOption) {
@@ -496,6 +526,7 @@
 
                                 this.inputUrl.value = "";
                                 this.inputUsername.value = "";
+                                this.inputEmail.value = "";
                                 this.inputPassword.value = "";
                                 this.inputBranchName1.value = "";
                                 this.inputBranchName2.value = "";
@@ -514,7 +545,7 @@
 
             if (this.selectEdit) {
                 for (const option of this.selectEdit.options) {
-                    if (option.value === `${projectName}${Config.setting.systemData.extensionGit}`) {
+                    if (option.value === `${projectName}${Config.data.systemData.extensionGit}`) {
                         option.remove();
 
                         projectName = "";
@@ -523,6 +554,7 @@
                         this.elementProjectLabel.innerHTML = "";
                         this.inputUrl.value = "";
                         this.inputUsername.value = "";
+                        this.inputEmail.value = "";
                         this.inputPassword.value = "";
                         this.inputBranchName1.value = "";
                         this.inputBranchName2.value = "";

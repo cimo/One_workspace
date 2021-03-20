@@ -40,8 +40,7 @@ Is a docker service container for have, in one space, a large and complete devel
          cd /home/cimo/One_workspace/root
          sudo cp .env.dist .env
          sudo nano .env
-         sudo cp core/Env.dist.js Env.js
-         sudo nano core/Env.js
+         sudo cp core/Config.dist.js core/Config.js
 
 3) Modify for your system configuration and save, close the file and write on terminal:
 

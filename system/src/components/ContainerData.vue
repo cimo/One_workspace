@@ -48,13 +48,13 @@
             if (Object.keys(this.componentWindowList).length > 0) {
                 intervalStatusList[containerName as any] = setInterval((): void => {
                     Sio.sendMessage("t_exec_i", {
-                        closeEnabled: false,
+                        closeActive: false,
                         tag: `${containerName}_data`,
                         cmd: `docker stats ${containerName} --no-stream --format "{{.CPUPerc}}[-]{{.MemUsage}}[-]{{.BlockIO}}[-]{{.NetIO}}"`
                     });
                 }, 1000);
 
-                Sio.readMessage(`t_exec_o_${containerName}_data`, (data: Interface.SocketData) => {
+                Sio.readMessage(`t_exec_o_${containerName}_data`, (data: Interface.Socket) => {
                     if (this.componentWindowList[containerName as any]) {
                         if (data.out) {
                             const resultList = data.out.split("[-]");

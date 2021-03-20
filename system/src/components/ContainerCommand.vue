@@ -78,13 +78,13 @@
             if (Object.keys(this.componentWindowList).length > 0) {
                 intervalStatusList[containerName as any] = setInterval((): void => {
                     Sio.sendMessage("t_exec_i", {
-                        closeEnabled: false,
+                        closeActive: false,
                         tag: `${containerName}_status`,
                         cmd: `docker ps --filter "name=${containerName}" --format "{{.Status}}"`
                     });
                 }, 1000);
 
-                Sio.readMessage(`t_exec_o_${containerName}_status`, (data: Interface.SocketData) => {
+                Sio.readMessage(`t_exec_o_${containerName}_status`, (data: Interface.Socket) => {
                     if (data.out && commandStatusList[containerName as any] === -1) {
                         this.elementStatusList[containerName as any].innerHTML = data.out;
                     }
@@ -126,7 +126,7 @@
 
                     if (index === 0) {
                         Sio.sendMessage("t_exec_i", {
-                            closeEnabled: true,
+                            closeActive: true,
                             tag: `${currentWindow.containerName}_command`,
                             cmd: `docker start ${currentWindow.containerName}`
                         });
@@ -135,7 +135,7 @@
                         commandStatusList[currentWindow.containerName as any] = index;
                     } else if (index === 1) {
                         Sio.sendMessage("t_exec_i", {
-                            closeEnabled: true,
+                            closeActive: true,
                             tag: `${currentWindow.containerName}_command`,
                             cmd: `docker restart ${currentWindow.containerName}`
                         });
@@ -144,7 +144,7 @@
                         commandStatusList[currentWindow.containerName as any] = index;
                     } else if (index === 2) {
                         Sio.sendMessage("t_exec_i", {
-                            closeEnabled: true,
+                            closeActive: true,
                             tag: `${currentWindow.containerName}_command`,
                             cmd: `docker stop ${currentWindow.containerName}`
                         });
@@ -153,7 +153,7 @@
                         commandStatusList[currentWindow.containerName as any] = index;
                     }
 
-                    Sio.readMessage(`t_exec_o_${currentWindow.containerName}_command`, (data: Interface.SocketData) => {
+                    Sio.readMessage(`t_exec_o_${currentWindow.containerName}_command`, (data: Interface.Socket) => {
                         if (data.close === 0) {
                             Sio.stopRead(`t_exec_o_${currentWindow.containerName}_command`);
 

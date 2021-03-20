@@ -266,7 +266,7 @@
         }
 
         public resizeLogic(): void {
-            if (window.innerWidth < Config.setting.systemData.desktopWidth) {
+            if (window.innerWidth < Config.data.systemData.desktopWidth) {
                 const elementComponentWindowList = (document.querySelectorAll(".window_component:not(.empty)") as any) as HTMLElement[];
 
                 for (const value of elementComponentWindowList) {

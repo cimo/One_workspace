@@ -126,7 +126,7 @@
                 size: [size.cols, size.rows]
             });
 
-            const pathKey = `${Config.setting.systemData.pathKey}/${this.inputKeyPublic.value}`;
+            const pathKey = `${Config.data.systemData.pathKey}/${this.inputKeyPublic.value}`;
 
             let command = "";
 
@@ -149,7 +149,7 @@
                     });
                 });
 
-                Sio.readMessage("t_pty_o_ssh", (data: Interface.SocketData) => {
+                Sio.readMessage("t_pty_o_ssh", (data: Interface.Socket) => {
                     if (data.cmd) {
                         if (data.cmd.indexOf("\u0007") === -1 && (data.cmd.indexOf("closed by") !== -1 || data.cmd.indexOf("logout") !== -1)) {
                             this.selectEdit.selectedIndex = 0;
@@ -200,12 +200,12 @@
                 Sio.sendMessage("t_exec_stream_i", {
                     tag: "sshChangeLogicEdit",
                     cmd: "read",
-                    path: `${Config.setting.systemData.pathSetting}/${optionValue}`
+                    path: `${Config.data.systemData.pathSetting}/${optionValue}`
                 });
 
                 let buffer = "";
 
-                Sio.readMessage("t_exec_stream_o_sshChangeLogicEdit", (data: Interface.SocketData) => {
+                Sio.readMessage("t_exec_stream_o_sshChangeLogicEdit", (data: Interface.Socket) => {
                     if (data.chunk === "end") {
                         Sio.stopRead("t_exec_stream_o_sshChangeLogicEdit");
 
@@ -226,7 +226,7 @@
                                 hex: result.password
                             });
 
-                            Sio.readMessage("t_crypt_decrypt_o_sshSetting", (data: Interface.SocketData) => {
+                            Sio.readMessage("t_crypt_decrypt_o_sshSetting", (data: Interface.Socket) => {
                                 Sio.stopRead("t_crypt_decrypt_o_sshSetting");
 
                                 this.inputPassword.value = data.out ? data.out : "";
@@ -275,12 +275,12 @@
             this.logicFindWindowElement(componentWindow);
 
             Sio.sendMessage("t_exec_i", {
-                closeEnabled: false,
+                closeActive: false,
                 tag: "sshInit",
-                cmd: `ls "${Config.setting.systemData.pathSetting}"/*${Config.setting.systemData.extensionSsh} | sed 's#.*/##'`
+                cmd: `ls "${Config.data.systemData.pathSetting}"/*${Config.data.systemData.extensionSsh} | sed 's#.*/##'`
             });
 
-            Sio.readMessage("t_exec_o_sshInit", (data: Interface.SocketData) => {
+            Sio.readMessage("t_exec_o_sshInit", (data: Interface.Socket) => {
                 if (data.out) {
                     Sio.stopRead("t_exec_o_sshInit");
 
@@ -291,7 +291,7 @@
                             if (value !== "" && value.indexOf("ls: ") === -1) {
                                 const option = document.createElement("option");
                                 option.value = value;
-                                option.text = value.replace(Config.setting.systemData.extensionSsh, "");
+                                option.text = value.replace(Config.data.systemData.extensionSsh, "");
                                 this.selectEdit.appendChild(option);
                             }
                         }
@@ -363,7 +363,7 @@
                             text: this.inputPassword ? this.inputPassword.value : ""
                         });
 
-                        Sio.readMessage("t_crypt_encrypt_o_sshSetting", (data: Interface.SocketData) => {
+                        Sio.readMessage("t_crypt_encrypt_o_sshSetting", (data: Interface.Socket) => {
                             Sio.stopRead("t_crypt_encrypt_o_sshSetting");
 
                             const content = {
@@ -379,15 +379,15 @@
                             Sio.sendMessage("t_exec_stream_i", {
                                 tag: "sshClickLogicSave",
                                 cmd: "write",
-                                path: `${Config.setting.systemData.pathSetting}/${inputNameReplace}${Config.setting.systemData.extensionSsh}`,
+                                path: `${Config.data.systemData.pathSetting}/${inputNameReplace}${Config.data.systemData.extensionSsh}`,
                                 content: JSON.stringify(content)
                             });
 
-                            Sio.readMessage("t_exec_stream_o_sshClickLogicSave", (data: Interface.SocketData) => {
+                            Sio.readMessage("t_exec_stream_o_sshClickLogicSave", (data: Interface.Socket) => {
                                 if (data.chunk === "end") {
                                     Sio.stopRead("t_exec_stream_o_sshClickLogicSave");
 
-                                    const optionValue = `${inputNameReplace}${Config.setting.systemData.extensionSsh}`;
+                                    const optionValue = `${inputNameReplace}${Config.data.systemData.extensionSsh}`;
                                     const elementOption = this.selectEdit.querySelector(`option[value="${optionValue}"`) as HTMLOptionElement;
 
                                     if (!elementOption) {
@@ -409,12 +409,12 @@
                             .logicShow(componentWindow, "You really want to delete this ssh?")
                             .then(() => {
                                 Sio.sendMessage("t_exec_i", {
-                                    closeEnabled: true,
+                                    closeActive: true,
                                     tag: "sshClickLogicDelete",
-                                    cmd: `rm "${Config.setting.systemData.pathSetting}/${inputNameReplace}${Config.setting.systemData.extensionSsh}"`
+                                    cmd: `rm "${Config.data.systemData.pathSetting}/${inputNameReplace}${Config.data.systemData.extensionSsh}"`
                                 });
 
-                                Sio.readMessage("t_exec_o_sshClickLogicDelete", (data: Interface.SocketData) => {
+                                Sio.readMessage("t_exec_o_sshClickLogicDelete", (data: Interface.Socket) => {
                                     if (data.close === 0 && this.selectEdit.options[this.selectEdit.selectedIndex].value !== "") {
                                         Sio.stopRead("t_exec_o_sshClickLogicDelete");
 

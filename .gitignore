@@ -20,7 +20,7 @@ pnpm-debug.log*
 *.sw?
 
 # cimo +
-core/Env.js
+core/Config.js
 key/*
 !key/.gitkeep
 project/*
@@ -31,8 +31,9 @@ project/*
 !project/robots.txt
 system/setting/*
 !system/setting/.gitkeep
-node_modules
-.env
+
 .digest_htpasswd
+.env
 error.log
 debug.log
+node_modules
