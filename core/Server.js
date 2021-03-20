@@ -40,7 +40,7 @@ var certificate = {
   key: Fs.readFileSync(Config.data.certificate.key),
   cert: Fs.readFileSync(Config.data.certificate.cert)
 };
-var originList = ["http://".concat(Config.data.socketIo.domain, ":").concat(Config.data.port.http), "https://".concat(Config.data.socketIo.domain, ":").concat(Config.data.port.https)];
+var originList = ["http://".concat(Config.data.socketIo.domain), "https://".concat(Config.data.socketIo.domain), "http://".concat(Config.data.socketIo.domain, ":").concat(Config.data.port.http), "https://".concat(Config.data.socketIo.domain, ":").concat(Config.data.port.https)];
 
 if (Config.data.port.vue) {
   originList.push("http://".concat(Config.data.socketIo.domain, ":").concat(Config.data.port.vue));
