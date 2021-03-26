@@ -82,10 +82,8 @@
                         this.logicRemoveXterm(currentWindow);
 
                         this.logicCreateXterm(componentWindow, currentWindow);
-                    } else {
-                        if (data.tag && xtermList[data.tag as any]) {
-                            xtermList[data.tag as any].write(data.cmd);
-                        }
+                    } else if (data.tag && xtermList[data.tag as any]) {
+                        xtermList[data.tag as any].write(data.cmd);
                     }
                 }
             });

@@ -1,9 +1,9 @@
-import { io } from "socket.io-client";
+import * as SocketIo from "socket.io-client";
 
 import * as Config from "./Config";
 import * as Interface from "./Interface";
 
-const socketIo: any = io(Config.data.websocket.url);
+const socketIo: SocketIo.Socket = SocketIo.io(Config.data.websocket.url, { transports: ["websocket"], upgrade: false });
 
 export const sendMessage = (tag: string, command: object, time: number = 0): number | null => {
     if (time > 0) {
