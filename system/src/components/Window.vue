@@ -35,12 +35,13 @@
     import ComponentContainerConsole from "./ContainerConsole.vue";
     import ComponentFooter from "./Footer.vue";
     import ComponentProject from "./Project.vue";
-    import ComponentProjectSsh from "./ProjectSsh.vue";
     import ComponentPrompt from "./Prompt.vue";
     import ComponentTool from "./Tool.vue";
+    import ComponentToolSsh from "./ToolSsh.vue";
+    import ComponentToolConsole from "./ToolConsole.vue";
 
-    let windowPositionList: Interface.Position[] = [];
-    let windowSizeList: Interface.Size[] = [];
+    const windowPositionList: Interface.PositionList = {};
+    const windowSizeList: Interface.SizeList = {};
 
     @Component({
         components: {
@@ -57,9 +58,10 @@
         private componentContainerConsole!: ComponentContainerConsole;
         private componentFooter!: ComponentFooter;
         private componentProject!: ComponentProject;
-        private componentProjectSsh!: ComponentProjectSsh;
         private componentPrompt!: ComponentPrompt;
         private componentTool!: ComponentTool;
+        private componentToolSsh!: ComponentToolSsh;
+        private componentToolConsole!: ComponentToolConsole;
 
         // Hooks
         protected created(): void {
@@ -69,9 +71,10 @@
             this.componentContainerConsole = new ComponentContainerConsole();
             this.componentFooter = new ComponentFooter();
             this.componentProject = new ComponentProject();
-            this.componentProjectSsh = new ComponentProjectSsh();
             this.componentPrompt = new ComponentPrompt();
             this.componentTool = new ComponentTool();
+            this.componentToolSsh = new ComponentToolSsh();
+            this.componentToolConsole = new ComponentToolConsole();
         }
 
         protected destroyed(): void {}
@@ -86,22 +89,20 @@
                 if (!componentWindow.classList.contains("maximized")) {
                     const computedStyle = window.getComputedStyle(componentWindow);
 
-                    windowPositionList[currentWindow.name as any].left = computedStyle.left;
-                    windowPositionList[currentWindow.name as any].top = computedStyle.top;
+                    windowPositionList[currentWindow.index].left = computedStyle.left;
+                    windowPositionList[currentWindow.index].top = computedStyle.top;
 
                     componentWindow.style.left = "0";
                     componentWindow.style.top = "0";
-
                     componentWindow.style.width = "calc(100% - 2px)";
                     componentWindow.style.height = "calc(100% - 44px)";
 
                     elementOverlay.classList.remove("drag");
                 } else {
-                    componentWindow.style.left = windowPositionList[currentWindow.name as any].left;
-                    componentWindow.style.top = windowPositionList[currentWindow.name as any].top;
-
-                    componentWindow.style.width = windowSizeList[currentWindow.name as any].width;
-                    componentWindow.style.height = windowSizeList[currentWindow.name as any].height;
+                    componentWindow.style.left = windowPositionList[currentWindow.index].left;
+                    componentWindow.style.top = windowPositionList[currentWindow.index].top;
+                    componentWindow.style.width = windowSizeList[currentWindow.index].width;
+                    componentWindow.style.height = windowSizeList[currentWindow.index].height;
 
                     elementOverlay.classList.add("drag");
                 }
@@ -116,8 +117,8 @@
             const currentWindow = Helper.currentWindow(componentWindow);
 
             if (currentWindow) {
-                delete windowPositionList[currentWindow.name as any];
-                delete windowSizeList[currentWindow.name as any];
+                delete windowPositionList[currentWindow.index];
+                delete windowSizeList[currentWindow.index];
             }
         }
 
@@ -127,67 +128,70 @@
 
             let elementComponentWindow = document.querySelector(`.window_component[data-name='${openerWindowDataName}']`) as HTMLElement;
 
-            if (!elementComponentWindow) {
+            if (!elementComponentWindow || openerWindowDataName === "Console") {
+                const index = Helper.lastWindowIndex();
+
                 const elementComponentWindowEmpty = document.querySelector(".window_component.empty") as HTMLElement;
 
-                const elementComponentWindowNew = elementComponentWindowEmpty.cloneNode(true) as HTMLElement;
-                elementComponentWindowNew.classList.remove("empty");
-                elementComponentWindowNew.classList.add("focused");
-                elementComponentWindowNew.setAttribute("data-name", openerWindowDataName);
-                elementComponentWindowNew.setAttribute("data-category", openerWindowDataCategory);
-                elementComponentWindowNew.style.display = "block";
+                if (elementComponentWindowEmpty) {
+                    const elementComponentWindowNew = elementComponentWindowEmpty.cloneNode(true) as HTMLElement;
+                    elementComponentWindowNew.classList.remove("empty");
+                    elementComponentWindowNew.classList.add("focused");
+                    elementComponentWindowNew.setAttribute("data-index", index.toString());
+                    elementComponentWindowNew.setAttribute("data-name", openerWindowDataName);
+                    elementComponentWindowNew.setAttribute("data-category", openerWindowDataCategory);
+                    elementComponentWindowNew.style.display = "block";
 
-                const elementComponentProject = elementComponentWindowNew.querySelector(".project_component") as HTMLElement;
-                const elementComponentTool = elementComponentWindowNew.querySelector(".tool_component") as HTMLElement;
-                const elementComponentContainer = elementComponentWindowNew.querySelector(".container_component") as HTMLElement;
+                    const elementComponentProject = elementComponentWindowNew.querySelector(".project_component") as HTMLElement;
+                    const elementComponentTool = elementComponentWindowNew.querySelector(".tool_component") as HTMLElement;
+                    const elementComponentContainer = elementComponentWindowNew.querySelector(".container_component") as HTMLElement;
 
-                if (openerWindowDataCategory === "project") {
-                    elementComponentTool.remove();
-                    elementComponentContainer.remove();
-                } else if (openerWindowDataCategory === "tool") {
-                    elementComponentProject.remove();
-                    elementComponentContainer.remove();
-                } else if (openerWindowDataCategory === "container") {
-                    elementComponentProject.remove();
-                    elementComponentTool.remove();
-                } else {
-                    elementComponentProject.remove();
-                    elementComponentTool.remove();
-                    elementComponentContainer.remove();
+                    if (openerWindowDataCategory === "project") {
+                        elementComponentTool.remove();
+                        elementComponentContainer.remove();
+                    } else if (openerWindowDataCategory === "tool") {
+                        elementComponentProject.remove();
+                        elementComponentContainer.remove();
+                    } else if (openerWindowDataCategory === "container") {
+                        elementComponentProject.remove();
+                        elementComponentTool.remove();
+                    } else {
+                        elementComponentProject.remove();
+                        elementComponentTool.remove();
+                        elementComponentContainer.remove();
+                    }
+
+                    const elementImage = openerWindow.querySelector("img") as HTMLElement;
+                    const elementImageDataSrc = elementImage.getAttribute("src") as string;
+
+                    const elementIcon = elementComponentWindowNew.querySelector(".left_column img") as HTMLElement;
+                    elementIcon.setAttribute("src", elementImageDataSrc);
+
+                    const elementTitle = elementComponentWindowNew.querySelector(".left_column p") as HTMLElement;
+                    elementTitle.innerHTML = openerWindowDataName;
+
+                    const computedStyle = window.getComputedStyle(elementComponentWindowNew);
+
+                    windowPositionList[index] = { left: "0", top: "0" };
+                    windowSizeList[index] = { width: computedStyle.width, height: computedStyle.height };
+
+                    const elementComponentBody = document.querySelector(".body_component") as HTMLElement;
+                    elementComponentBody.appendChild(elementComponentWindowNew);
+
+                    if (openerWindowDataCategory === "project") {
+                        this.componentProject.logicInit(elementComponentWindowNew);
+                    } else if (openerWindowDataCategory === "tool") {
+                        this.componentTool.logicInit(elementComponentWindowNew);
+                    } else if (openerWindowDataCategory === "container") {
+                        this.componentContainer.logicInit(elementComponentWindowNew);
+                    }
+
+                    elementComponentWindow = elementComponentWindowNew;
+
+                    Helper.dragInit(elementComponentWindowNew, ["window_component", "focused"]);
+
+                    this.componentFooter.logicInit(openerWindow, index);
                 }
-
-                const elementImage = openerWindow.querySelector("img") as HTMLElement;
-                const elementImageDataSrc = elementImage.getAttribute("src") as string;
-
-                const elementIcon = elementComponentWindowNew.querySelector(".left_column img") as HTMLElement;
-                elementIcon.setAttribute("src", elementImageDataSrc);
-
-                const elementTitle = elementComponentWindowNew.querySelector(".left_column p") as HTMLElement;
-                elementTitle.innerHTML = openerWindowDataName;
-
-                const computedStyle = window.getComputedStyle(elementComponentWindowNew);
-
-                windowPositionList[openerWindowDataName as any] = { left: "0", top: "0" };
-                windowSizeList[openerWindowDataName as any] = { width: computedStyle.width, height: computedStyle.height };
-
-                const elementComponentBody = document.querySelector(".body_component") as HTMLElement;
-                elementComponentBody.appendChild(elementComponentWindowNew);
-
-                if (openerWindowDataCategory === "project") {
-                    this.componentProject.logicInit(elementComponentWindowNew);
-                } else if (openerWindowDataCategory === "tool") {
-                    this.componentTool.logicInit(elementComponentWindowNew);
-                } else if (openerWindowDataCategory === "container") {
-                    this.componentContainer.logicInit(elementComponentWindowNew);
-                }
-
-                elementComponentWindow = elementComponentWindowNew;
-
-                Helper.dragInit(elementComponentWindowNew, ["window_component", "focused"]);
-
-                this.componentFooter.logicInit(openerWindow);
-            } else {
-                Helper.unMinimizeElement(openerWindowDataName);
             }
 
             Helper.focusCurrentWindow(elementComponentWindow);
@@ -204,7 +208,7 @@
                 if (componentWindow) {
                     const currentWindow = Helper.currentWindow(componentWindow);
 
-                    if (currentWindow) {
+                    if (currentWindow && !["button_cmd_window", "open_console"].every((value) => elementEventTarget.classList.contains(value))) {
                         Helper.focusCurrentWindow(componentWindow);
 
                         Helper.focusCurrentTaskbarElement();
@@ -221,10 +225,11 @@
                         } else if (elementEventTarget.classList.contains("button_maximize")) {
                             this.logicChangeAppearance(componentWindow);
                         } else if (elementEventTarget.classList.contains("button_close")) {
-                            this.componentProjectSsh.logicClose(componentWindow);
                             this.componentContainerCommand.logicClose(componentWindow);
                             this.componentContainerConsole.logicClose(componentWindow);
                             this.componentContainerData.logicClose(componentWindow);
+                            this.componentToolSsh.logicClose(componentWindow);
+                            this.componentToolConsole.logicClose(componentWindow);
 
                             const componentWindowParentNode = componentWindow.parentNode as HTMLElement;
                             componentWindowParentNode.removeChild(componentWindow);
@@ -237,15 +242,6 @@
 
                             this.logicClose(componentWindow);
                         }
-                    }
-                } else {
-                    const openerWindow = Helper.findElement(elementEventTarget, ["window_opener"]);
-                    const taskbar = Helper.findElement(elementEventTarget, ["taskbar_element", "program"]);
-
-                    if (openerWindow && taskbar) {
-                        Helper.focusCurrentWindow();
-
-                        Helper.focusCurrentTaskbarElement();
                     }
                 }
             }
@@ -267,15 +263,16 @@
 
         public resizeLogic(): void {
             if (window.innerWidth < Config.data.systemData.desktopWidth) {
-                const elementComponentWindowList = (document.querySelectorAll(".window_component:not(.empty)") as any) as HTMLElement[];
+                const elementComponentWindowList = (document.querySelectorAll(".window_component:not(.empty)") as unknown) as HTMLElement[];
 
                 for (const value of elementComponentWindowList) {
                     value.style.transform = "translate3d(0, 0, 0)";
                 }
             }
 
-            this.componentProjectSsh.logicResize();
             this.componentContainerConsole.logicResize();
+            this.componentToolSsh.logicResize();
+            this.componentToolConsole.logicResize();
         }
     }
 </script>

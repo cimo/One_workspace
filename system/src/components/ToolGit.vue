@@ -286,7 +286,7 @@
                 const elementMenu = Helper.findElement(elementEventTarget, ["menu_git"]);
 
                 if (elementMenu) {
-                    const elementButtonList = (elementMenu.querySelectorAll(".button") as any) as HTMLElement[];
+                    const elementButtonList = (elementMenu.querySelectorAll(".button") as unknown) as HTMLElement[];
 
                     const index = Array.from(elementButtonList).indexOf(elementEventTarget);
 
@@ -322,15 +322,13 @@
                         this.elementOutput1.innerHTML = "";
                         this.elementOutput2.innerHTML = "";
 
-                        let url = "";
+                        let url = this.inputUrl.value;
                         let command = "";
 
                         if (this.inputUrl.value.indexOf("https://") !== -1) {
                             const inputUrlValue = this.inputUrl.value.replace("https://", "");
 
                             url = `https://${this.inputUsername.value}:${this.inputPassword.value}@${inputUrlValue}`;
-                        } else {
-                            url = this.inputUrl.value;
                         }
 
                         if (elementEventTarget.classList.contains("clone")) {

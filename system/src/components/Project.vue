@@ -1,7 +1,6 @@
 <template>
     <div class="project_component">
         <ComponentProjectExplore />
-        <ComponentProjectSsh />
     </div>
 </template>
 
@@ -11,23 +10,19 @@
     import * as Helper from "../assets/js/Helper";
 
     import ComponentProjectExplore from "./ProjectExplore.vue";
-    import ComponentProjectSsh from "./ProjectSsh.vue";
 
     @Component({
         components: {
-            ComponentProjectExplore,
-            ComponentProjectSsh
+            ComponentProjectExplore
         }
     })
     export default class ComponentProject extends Vue {
         // Variables
         private componentProjectExplore!: ComponentProjectExplore;
-        private componentProjectSsh!: ComponentProjectSsh;
 
         // Hooks
         protected created(): void {
             this.componentProjectExplore = new ComponentProjectExplore();
-            this.componentProjectSsh = new ComponentProjectSsh();
         }
 
         protected destroyed(): void {}
@@ -51,8 +46,6 @@
                     if (exploreComponent) {
                         exploreComponent.remove();
                     }
-
-                    this.componentProjectSsh.logicInit(componentWindow);
                 }
             }
         }

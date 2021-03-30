@@ -13,9 +13,9 @@
     import ComponentContainerConsole from "./ContainerConsole.vue";
     import ComponentFooter from "./Footer.vue";
     import ComponentProjectExplore from "./ProjectExplore.vue";
-    import ComponentProjectSsh from "./ProjectSsh.vue";
     import ComponentPrompt from "./Prompt.vue";
     import ComponentTimeDate from "./TimeDate.vue";
+    import ComponentToolSsh from "./ToolSsh.vue";
     import ComponentToolGit from "./ToolGit.vue";
     import ComponentToolSass from "./ToolSass.vue";
     import ComponentToolTerser from "./ToolTerser.vue";
@@ -36,9 +36,9 @@
         private componentFooter!: ComponentFooter;
         private componentMenuRoot!: ComponentMenuRoot;
         private componentProjectExplore!: ComponentProjectExplore;
-        private componentProjectSsh!: ComponentProjectSsh;
         private componentPrompt!: ComponentPrompt;
         private componentTimeDate!: ComponentTimeDate;
+        private componentToolSsh!: ComponentToolSsh;
         private componentToolGit!: ComponentToolGit;
         private componentToolSass!: ComponentToolSass;
         private componentToolTerser!: ComponentToolTerser;
@@ -52,9 +52,9 @@
             this.componentFooter = new ComponentFooter();
             this.componentMenuRoot = new ComponentMenuRoot();
             this.componentProjectExplore = new ComponentProjectExplore();
-            this.componentProjectSsh = new ComponentProjectSsh();
             this.componentPrompt = new ComponentPrompt();
             this.componentTimeDate = new ComponentTimeDate();
+            this.componentToolSsh = new ComponentToolSsh();
             this.componentToolGit = new ComponentToolGit();
             this.componentToolSass = new ComponentToolSass();
             this.componentToolTerser = new ComponentToolTerser();
@@ -94,7 +94,7 @@
             this.componentFooter.logicClick(event);
             this.componentMenuRoot.logicClick(event);
             this.componentProjectExplore.logicClick(event);
-            this.componentProjectSsh.logicClick(event);
+            this.componentToolSsh.logicClick(event);
             this.componentToolGit.logicClick(event);
             this.componentToolSass.logicClick(event);
             this.componentToolTerser.logicClick(event);
@@ -107,7 +107,7 @@
 
         private logicChangeEvent(event: Event): void {
             this.componentProjectExplore.logicChange(event);
-            this.componentProjectSsh.logicChange(event);
+            this.componentToolSsh.logicChange(event);
             this.componentToolGit.logicChange(event);
             this.componentToolSass.logicChange(event);
             this.componentToolTerser.logicChange(event);

@@ -15,29 +15,29 @@
     import { Component, Vue } from "vue-property-decorator";
 
     import ComponentContainerCommand from "./ContainerCommand.vue";
-    import ComponentContainerData from "./ContainerData.vue";
     import ComponentContainerConsole from "./ContainerConsole.vue";
+    import ComponentContainerData from "./ContainerData.vue";
 
     import * as Helper from "../assets/js/Helper";
 
     @Component({
         components: {
             ComponentContainerCommand,
-            ComponentContainerData,
-            ComponentContainerConsole
+            ComponentContainerConsole,
+            ComponentContainerData
         }
     })
     export default class ComponentContainer extends Vue {
         // Variables
         private componentContainerCommand!: ComponentContainerCommand;
-        private componentContainerData!: ComponentContainerData;
         private componentContainerConsole!: ComponentContainerConsole;
+        private componentContainerData!: ComponentContainerData;
 
         // Hooks
         protected created(): void {
             this.componentContainerCommand = new ComponentContainerCommand();
-            this.componentContainerData = new ComponentContainerData();
             this.componentContainerConsole = new ComponentContainerConsole();
+            this.componentContainerData = new ComponentContainerData();
         }
 
         protected destroyed(): void {}
@@ -56,7 +56,7 @@
                 const componentWindow = Helper.findElement(elementMenu, ["window_component"]);
 
                 if (componentWindow) {
-                    const elementButtonList = (elementMenu.querySelectorAll(".button") as any) as HTMLElement[];
+                    const elementButtonList = (elementMenu.querySelectorAll(".button") as unknown) as HTMLElement[];
 
                     const index = Array.from(elementButtonList).indexOf(elementEventTarget);
 
@@ -68,8 +68,8 @@
                         elementButtonList[index].classList.add("focused");
 
                         const elementComponentCommand = componentWindow.querySelector(".container_component .command_component") as HTMLElement;
+                        const elementComponentConsole = componentWindow.querySelector(".container_component .component_container_console") as HTMLElement;
                         const elementComponentData = componentWindow.querySelector(".container_component .data_component") as HTMLElement;
-                        const elementComponentConsole = componentWindow.querySelector(".container_component .console_component") as HTMLElement;
 
                         if (index === 0) {
                             elementComponentCommand.style.display = "block";

@@ -39,17 +39,13 @@
         protected destroyed(): void {}
 
         // Logic
-        public logicInit(openerWindow: HTMLElement): void {
-            const openerWindowDataName = openerWindow.getAttribute("data-name") as string;
-            const openerWindowDataCategory = openerWindow.getAttribute("data-category") as string;
-
+        public logicInit(openerWindow: HTMLElement, index: number): void {
             const elementTaskbarEmpty = document.querySelector(".footer_component .left_column .taskbar_element.empty") as HTMLElement;
 
             const elementTaskbarNew = elementTaskbarEmpty.cloneNode(true) as HTMLElement;
             elementTaskbarNew.classList.remove("empty");
             elementTaskbarNew.classList.add("focused");
-            elementTaskbarNew.setAttribute("data-name", openerWindowDataName);
-            elementTaskbarNew.setAttribute("data-category", openerWindowDataCategory);
+            elementTaskbarNew.setAttribute("data-index", index.toString());
 
             const openerWindowElementImg = openerWindow.querySelector("img") as HTMLElement;
             const openerWindowElementImgSrc = openerWindowElementImg.getAttribute("src") as string;
@@ -71,15 +67,15 @@
             const elementTaskbar = Helper.findElement(elementEventTarget, ["taskbar_element"]);
 
             if (elementTaskbar) {
-                const elementTaskbarDataName = elementTaskbar.getAttribute("data-name") as string;
+                const elementTaskbarDataIndex = elementTaskbar.getAttribute("data-index") as string;
 
-                if (elementTaskbarDataName) {
-                    const componentWindow = document.querySelector(`.window_component[data-name="${elementTaskbarDataName}"]`) as HTMLElement;
+                if (elementTaskbarDataIndex) {
+                    const componentWindow = document.querySelector(`.window_component[data-index="${elementTaskbarDataIndex}"]`) as HTMLElement;
 
                     if (elementTaskbar.classList.contains("focused")) {
                         this.logicMinimize(componentWindow);
                     } else {
-                        Helper.unMinimizeElement(elementTaskbarDataName);
+                        Helper.unMinimizeElement(elementTaskbarDataIndex);
                     }
                 }
             }
@@ -88,20 +84,21 @@
         }
 
         public logicMinimize(openerWindow: HTMLElement): void {
-            const openerWindowDataName = openerWindow.getAttribute("data-name") as string;
+            if (openerWindow) {
+                const openerWindowDataIndex = openerWindow.getAttribute("data-index") as string;
 
-            const elementTaskbar = document.querySelector(`.footer_component .left_column .taskbar_element[data-name="${openerWindowDataName}"]`) as HTMLElement;
+                const elementTaskbar = document.querySelector(`.footer_component .left_column .taskbar_element[data-index="${openerWindowDataIndex}"]`) as HTMLElement;
 
-            elementTaskbar.classList.add("minimized");
+                elementTaskbar.classList.add("minimized");
 
-            const openerWindowElementButton = openerWindow.querySelector(".button_minimize") as HTMLButtonElement;
-            openerWindowElementButton.click();
+                const openerWindowElementButton = openerWindow.querySelector(".button_minimize") as HTMLButtonElement;
+                openerWindowElementButton.click();
+            }
         }
 
         public logicRemove(openerWindow: HTMLElement): void {
-            const openerWindowDataName = openerWindow.getAttribute("data-name") as string;
-
-            const elementTaskbar = document.querySelector(`.footer_component .left_column .taskbar_element[data-name="${openerWindowDataName}"]`) as HTMLElement;
+            const openerWindowDataIndex = openerWindow.getAttribute("data-index") as string;
+            const elementTaskbar = document.querySelector(`.footer_component .left_column .taskbar_element[data-index="${openerWindowDataIndex}"]`) as HTMLElement;
 
             const elementTaskbarParentNode = elementTaskbar.parentNode as HTMLElement;
             elementTaskbarParentNode.removeChild(elementTaskbar);

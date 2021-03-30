@@ -1,5 +1,4 @@
 import * as Interface from "./Interface";
-import * as Image from "./Image";
 
 const domain = "localhost";
 const nodeJsPort: number = window.location.protocol === "http:" ? 1080 : 1443;
@@ -30,7 +29,7 @@ export const data: Interface.Config = {
             {
                 category: "side",
                 name: "Setting",
-                imagePath: Image.setting,
+                imagePath: Interface.imageSetting,
                 imageName: "setting.svg"
             }
         ],
@@ -38,40 +37,46 @@ export const data: Interface.Config = {
             {
                 category: "project",
                 name: "Explore",
-                imagePath: Image.explore,
+                imagePath: Interface.imageExplore,
                 imageName: "explore.svg"
             },
             {
                 category: "project",
-                name: "Ssh",
-                imagePath: Image.ssh,
-                imageName: "ssh.svg"
-            },
-            {
-                category: "project",
                 name: "VueJs",
-                imagePath: Image.vueJs,
+                imagePath: Interface.imageVueJs,
                 imageName: "vuejs.svg"
             }
         ],
         toolItemList: [
             {
                 category: "tool",
+                name: "Ssh",
+                imagePath: Interface.imageSsh,
+                imageName: "ssh.svg"
+            },
+            {
+                category: "tool",
                 name: "Git",
-                imagePath: Image.git,
+                imagePath: Interface.imageGit,
                 imageName: "git.svg"
             },
             {
                 category: "tool",
                 name: "Terser",
-                imagePath: Image.terser,
+                imagePath: Interface.imageTerser,
                 imageName: "terser.svg"
             },
             {
                 category: "tool",
                 name: "Sass",
-                imagePath: Image.sass,
+                imagePath: Interface.imageSass,
                 imageName: "sass.svg"
+            },
+            {
+                category: "tool",
+                name: "Console",
+                imagePath: Interface.imageConsole,
+                imageName: "console.svg"
             }
         ],
         containerItemList: [
@@ -79,63 +84,63 @@ export const data: Interface.Config = {
                 category: "container",
                 name: "NodeJs",
                 containerName: "NodeJs_12.18.1",
-                imagePath: Image.nodeJs,
+                imagePath: Interface.imageNodeJs,
                 imageName: "nodejs.svg"
             },
             {
                 category: "container",
                 name: "Apache",
                 containerName: "Apache_2.4",
-                imagePath: Image.apache,
+                imagePath: Interface.imageApache,
                 imageName: "apache.svg"
             },
             {
                 category: "container",
                 name: "Php 7",
                 containerName: "Php_7.4-fpm",
-                imagePath: Image.php,
+                imagePath: Interface.imagePhp,
                 imageName: "php.svg"
             },
             {
                 category: "container",
                 name: "Php 5",
                 containerName: "Php_5.6-fpm",
-                imagePath: Image.php,
+                imagePath: Interface.imagePhp,
                 imageName: "php.svg"
             },
             {
                 category: "container",
                 name: "MySql 5.7",
                 containerName: "MySql_5.7",
-                imagePath: Image.mySql,
+                imagePath: Interface.imageMySql,
                 imageName: "mysql.svg"
             },
             {
                 category: "container",
                 name: "MySql 5.6",
                 containerName: "MySql_5.6",
-                imagePath: Image.mySql,
+                imagePath: Interface.imageMySql,
                 imageName: "mysql.svg"
             },
             {
                 category: "container",
                 name: "PostgreSql",
                 containerName: "PostgreSql_10.13",
-                imagePath: Image.postgreSql,
+                imagePath: Interface.imagePostgreSql,
                 imageName: "postgresql.svg"
             },
             {
                 category: "container",
                 name: "Redis",
                 containerName: "Redis_6.0.9",
-                imagePath: Image.redis,
+                imagePath: Interface.imageRedis,
                 imageName: "redis.svg"
             },
             {
                 category: "container",
                 name: "MongoDb",
                 containerName: "MongoDb_4.4.2",
-                imagePath: Image.mongoDb,
+                imagePath: Interface.imageMongoDb,
                 imageName: "mongodb.svg"
             }
         ]

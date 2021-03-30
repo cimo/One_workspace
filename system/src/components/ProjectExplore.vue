@@ -30,12 +30,15 @@
                 <div class="text">Git</div>
                 <div class="text">Terser</div>
                 <div class="text">Sass</div>
-                <div class="button_cmd_window open_url">Open url</div>
             </div>
             <div class="sub_right">
                 <input type="checkbox" name="git" value="" />
                 <input type="checkbox" name="terser" value="" />
                 <input type="checkbox" name="sass" value="" />
+            </div>
+            <div class="section">
+                <div class="button_cmd_window open_console">Open console</div>
+                <div class="button_cmd_window open_url">Open url</div>
             </div>
         </div>
         <div class="bottom">
@@ -53,6 +56,7 @@
     import * as Sio from "../assets/js/Sio";
 
     import ComponentPrompt from "./Prompt.vue";
+    import ComponentTool from "./Tool.vue";
     import ComponentToolGit from "./ToolGit.vue";
     import ComponentToolSass from "./ToolSass.vue";
     import ComponentToolTerser from "./ToolTerser.vue";
@@ -66,6 +70,7 @@
     export default class ComponentProjectExplore extends Vue {
         // Variables
         private componentPrompt!: ComponentPrompt;
+        private componentTool!: ComponentTool;
         private componentToolGit!: ComponentToolGit;
         private componentToolSass!: ComponentToolSass;
         private componentToolTerser!: ComponentToolTerser;
@@ -78,6 +83,7 @@
         private checkboxTerser!: HTMLInputElement;
         private checkboxSass!: HTMLInputElement;
         private buttonDelete!: HTMLButtonElement;
+        private buttonOpenConsole!: HTMLButtonElement;
 
         // Hooks
         protected created(): void {
@@ -85,6 +91,7 @@
             this.componentToolGit = new ComponentToolGit();
             this.componentToolSass = new ComponentToolSass();
             this.componentToolTerser = new ComponentToolTerser();
+            this.componentTool = new ComponentTool();
         }
 
         protected destroyed(): void {}
@@ -101,6 +108,7 @@
                 this.checkboxTerser = componentWindow.querySelector("input[name='terser']") as HTMLInputElement;
                 this.checkboxSass = componentWindow.querySelector("input[name='sass']") as HTMLInputElement;
                 this.buttonDelete = componentWindow.querySelector(".button_cmd_window.delete") as HTMLButtonElement;
+                this.buttonOpenConsole = componentWindow.querySelector(".button_cmd_window.open_console") as HTMLButtonElement;
             } else {
                 this.selectEdit = document.querySelector(".window_component:not(.empty) .explore_component select[name='edit']") as HTMLSelectElement;
                 this.inputName = document.querySelector(".window_component:not(.empty) .explore_component input[name='name']") as HTMLInputElement;
@@ -111,6 +119,7 @@
                 this.checkboxTerser = document.querySelector(".window_component:not(.empty) .explore_component input[name='terser']") as HTMLInputElement;
                 this.checkboxSass = document.querySelector(".window_component:not(.empty) .explore_component input[name='sass']") as HTMLInputElement;
                 this.buttonDelete = document.querySelector(".window_component:not(.empty) .explore_component .button_cmd_window.delete") as HTMLButtonElement;
+                this.buttonOpenConsole = document.querySelector(".window_component:not(.empty) .explore_component .button_cmd_window.open_console") as HTMLButtonElement;
             }
         }
 
@@ -334,6 +343,16 @@
                             })
                             .catch(() => {});
                     }
+                } else if (elementEventTarget.classList.contains("open_console")) {
+                    if (this.selectEdit.selectedIndex > 0) {
+                        const buttonConsole = document.querySelector(".menuRoot_container .menuRoot_panel .window_opener[data-name='Console']") as HTMLElement;
+
+                        if (buttonConsole) {
+                            Helper.setOpenWindowFromParent(true);
+
+                            buttonConsole.click();
+                        }
+                    }
                 } else if (elementEventTarget.classList.contains("open_url")) {
                     if (this.selectEdit.selectedIndex > 0 && this.inputUrlRoot.value !== "") {
                         const tab = window.open(this.inputUrlRoot.value, "_blank");
@@ -383,6 +402,8 @@
                                     this.checkboxSass.checked = result.sass;
 
                                     this.buttonDelete.style.display = "inline-block";
+
+                                    this.buttonOpenConsole.setAttribute("data-path", `${Config.data.systemData.pathProject}/${this.inputFolderName.value}/root`);
                                 }
                             } else {
                                 buffer += data.chunk;
@@ -464,6 +485,15 @@
                 input {
                     display: block;
                     margin: 18px auto;
+                }
+            }
+
+            .section {
+                text-align: center;
+
+                .button_cmd_window {
+                    display: inline-block;
+                    margin: 5px;
                 }
             }
         }

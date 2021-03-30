@@ -70,7 +70,7 @@
     @Component({
         components: {}
     })
-    export default class ComponentProjectSsh extends Vue {
+    export default class ComponentToolSsh extends Vue {
         // Variables
         private componentPrompt!: ComponentPrompt;
         private elementPart1Container!: HTMLElement;
@@ -319,7 +319,7 @@
                 const elementMenu = Helper.findElement(elementEventTarget, ["menu_ssh"]);
 
                 if (elementMenu) {
-                    const elementButtonList = (elementMenu.querySelectorAll(".button") as any) as HTMLElement[];
+                    const elementButtonList = (elementMenu.querySelectorAll(".button") as unknown) as HTMLElement[];
 
                     const index = Array.from(elementButtonList).indexOf(elementEventTarget);
 
@@ -330,7 +330,7 @@
                             value.classList.remove("focused");
                         }
 
-                        if (isChanged) {
+                        if (isInputValid) {
                             elementButtonList[index].classList.add("focused");
                         } else {
                             elementButtonList[0].classList.add("focused");
@@ -468,7 +468,7 @@
         }
 
         public logicResize(): void {
-            const elementTerminalList = (document.querySelectorAll(".ssh_component .container_terminal") as any) as HTMLElement[];
+            const elementTerminalList = (document.querySelectorAll(".ssh_component .container_terminal") as unknown) as HTMLElement[];
 
             for (const value of elementTerminalList) {
                 const componentWindow = Helper.findElement(value, ["window_component"]);
@@ -495,6 +495,11 @@
 
             if (currentWindow && currentWindow.name === "Ssh") {
                 this.logicRemoveXterm();
+
+                selectedIndexOld = 0;
+                isChanged = false;
+                isInputValid = false;
+                inputNameReplace = "";
             }
         }
     }

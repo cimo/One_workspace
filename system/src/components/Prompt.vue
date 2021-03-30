@@ -40,8 +40,8 @@
 
             if (this.element) {
                 this.elementBodyMessage = this.element.querySelector(".body .message") as HTMLElement;
-                this.elementButtonOk = this.element.querySelector(".button_cmd_window.ok") as HTMLElement;
-                this.elementButtonKo = this.element.querySelector(".button_cmd_window.ko") as HTMLElement;
+                this.elementButtonOk = this.element.querySelector(".button_cmd_window.ok") as EventTarget;
+                this.elementButtonKo = this.element.querySelector(".button_cmd_window.ko") as EventTarget;
             }
         }
 

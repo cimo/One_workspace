@@ -1,5 +1,5 @@
 <template>
-    <div class="component_container_console">
+    <div class="component_tool_console">
         <div class="container_terminal"></div>
     </div>
 </template>
@@ -7,6 +7,7 @@
 <script lang="ts">
     import { Component, Vue } from "vue-property-decorator";
 
+    import * as Config from "../assets/js/Config";
     import * as Interface from "../assets/js/Interface";
     import * as Helper from "../assets/js/Helper";
     import * as Sio from "../assets/js/Sio";
@@ -21,7 +22,7 @@
     @Component({
         components: {}
     })
-    export default class ComponentContainerConsole extends Vue {
+    export default class ComponentToolConsole extends Vue {
         // Variables
 
         // Hooks
@@ -52,19 +53,19 @@
                 size: [size.cols, size.rows]
             });
 
-            if (currentWindow.name !== "NodeJs") {
+            const buttonOpenConsole = document.querySelector(".window_component:not(.empty) .explore_component .button_cmd_window.open_console") as HTMLElement;
+
+            if (buttonOpenConsole) {
+                const workDir = Helper.getOpenWindowFromParent() ? buttonOpenConsole.getAttribute("data-path") : "~";
+                Helper.setOpenWindowFromParent(false);
+
                 Sio.sendMessage("t_pty_i", {
                     tag: indexTag,
-                    cmd: `history -c && history -w && clear && docker exec -it ${currentWindow.containerName} /bin/bash\r`
+                    cmd: `history -c && history -w && clear && docker exec -w ${workDir} -it ${Config.data.menuRoot.containerItemList[0].containerName} /bin/bash\r`
                 });
             }
 
-            Sio.sendMessage("t_pty_i", {
-                tag: indexTag,
-                cmd: `history -c && history -w && clear\r`
-            });
-
-            xtermList[indexTag].onData((data: string): void => {
+            xtermList[indexTag].onData((data: string) => {
                 Sio.sendMessage("t_pty_i", {
                     tag: indexTag,
                     cmd: data
@@ -73,18 +74,14 @@
 
             Sio.readMessage(`t_pty_o_${currentWindow.name}_${currentWindow.index}`, (data: Interface.Socket) => {
                 if (data.cmd) {
-                    if (data.cmd.indexOf("is not running") !== -1) {
-                        this.logicRemoveXterm(currentWindow);
-
-                        return;
-                    }
-
                     if (data.cmd.indexOf("\u0007") === -1 && (data.cmd.trim() === "exit" || data.cmd.trim() === "xterm_reset")) {
-                        this.logicRemoveXterm(currentWindow);
+                        const buttonClose = componentWindow.querySelector(".header .button_close") as HTMLElement;
 
-                        this.logicCreateXterm(componentWindow, currentWindow);
-                    } else if (data.tag && xtermList[data.tag]) {
-                        xtermList[data.tag].write(data.cmd);
+                        if (buttonClose) {
+                            buttonClose.click();
+                        }
+                    } else if (xtermList[indexTag]) {
+                        xtermList[indexTag].write(data.cmd);
                     }
                 }
             });
@@ -102,8 +99,8 @@
 
                 xtermList[indexTag]._core.element.remove();
 
-                delete xtermList[indexTag];
-                delete fitAddonList[indexTag];
+                xtermList[indexTag] = null;
+                fitAddonList[indexTag] = null;
             }
         }
 
@@ -122,7 +119,7 @@
         public logicClick(event: Event): void {
             const elementEventTarget = event.target as HTMLElement;
 
-            const componentWindow = Helper.findElement(elementEventTarget, ["component_container_console"], ["window_component"]);
+            const componentWindow = Helper.findElement(elementEventTarget, ["component_tool_console"], ["window_component"]);
             const currentWindow = Helper.currentWindow(componentWindow);
 
             if (currentWindow) {
@@ -135,7 +132,7 @@
         }
 
         public logicResize(): void {
-            const elementTerminalList = (document.querySelectorAll(".component_container_console .container_terminal") as unknown) as HTMLElement[];
+            const elementTerminalList = (document.querySelectorAll(".component_tool_console .container_terminal") as unknown) as HTMLElement[];
 
             for (const value of elementTerminalList) {
                 const componentWindow = Helper.findElement(value, ["window_component"]);
@@ -163,7 +160,7 @@
         public logicClose(componentWindow: HTMLElement): void {
             const currentWindow = Helper.currentWindow(componentWindow);
 
-            if (currentWindow && currentWindow.containerName) {
+            if (currentWindow && currentWindow.name === "Console") {
                 this.logicRemoveXterm(currentWindow);
             }
         }
@@ -171,15 +168,7 @@
 </script>
 
 <style lang="scss" scoped>
-    .component_container_console {
-        display: none;
-        position: absolute;
-        top: 29px;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        padding: 0;
-
+    .component_tool_console {
         .container_terminal {
             position: absolute;
             top: 0;

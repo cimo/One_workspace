@@ -26,7 +26,7 @@
     import * as Helper from "../assets/js/Helper";
     import * as Sio from "../assets/js/Sio";
 
-    let intervalStatusList: number[] = [];
+    const statusList: Interface.ContainerStatusList = {};
 
     @Component({
         components: {}
@@ -34,11 +34,11 @@
     export default class ComponentContainerData extends Vue {
         // Variables
 
-        private componentWindowList!: HTMLElement[];
+        private componentWindowList!: Interface.HtmlElementList;
 
         // Hooks
         protected created(): void {
-            this.componentWindowList = [];
+            this.componentWindowList = {};
         }
 
         protected destroyed(): void {}
@@ -46,7 +46,7 @@
         // Logic
         private logicCheckStatus(containerName: string): void {
             if (Object.keys(this.componentWindowList).length > 0) {
-                intervalStatusList[containerName as any] = setInterval((): void => {
+                statusList[containerName] = setInterval((): void => {
                     Sio.sendMessage("t_exec_i", {
                         closeActive: false,
                         tag: `${containerName}_data`,
@@ -55,15 +55,15 @@
                 }, 1000);
 
                 Sio.readMessage(`t_exec_o_${containerName}_data`, (data: Interface.Socket) => {
-                    if (this.componentWindowList[containerName as any]) {
+                    if (this.componentWindowList[containerName]) {
                         if (data.out) {
                             const resultList = data.out.split("[-]");
 
                             if (resultList.length > 1) {
-                                const squareValue1 = this.componentWindowList[containerName as any].querySelector(".data_component .square_1 .value") as HTMLElement;
-                                const squareValue2 = this.componentWindowList[containerName as any].querySelector(".data_component .square_2 .value") as HTMLElement;
-                                const squareValue3 = this.componentWindowList[containerName as any].querySelector(".data_component .square_3 .value") as HTMLElement;
-                                const squareValue4 = this.componentWindowList[containerName as any].querySelector(".data_component .square_4 .value") as HTMLElement;
+                                const squareValue1 = this.componentWindowList[containerName].querySelector(".data_component .square_1 .value") as HTMLElement;
+                                const squareValue2 = this.componentWindowList[containerName].querySelector(".data_component .square_2 .value") as HTMLElement;
+                                const squareValue3 = this.componentWindowList[containerName].querySelector(".data_component .square_3 .value") as HTMLElement;
+                                const squareValue4 = this.componentWindowList[containerName].querySelector(".data_component .square_4 .value") as HTMLElement;
 
                                 squareValue1.innerHTML = resultList[0];
                                 squareValue2.innerHTML = resultList[1];
@@ -80,7 +80,7 @@
             const currentWindow = Helper.currentWindow(componentWindow);
 
             if (currentWindow) {
-                this.componentWindowList[currentWindow.containerName as any] = componentWindow;
+                this.componentWindowList[currentWindow.containerName] = componentWindow;
 
                 this.logicCheckStatus(currentWindow.containerName);
             }
@@ -92,10 +92,10 @@
             if (currentWindow && currentWindow.containerName) {
                 Sio.stopRead(`t_exec_o_${currentWindow.containerName}_data`);
 
-                clearInterval(intervalStatusList[currentWindow.containerName as any]);
+                clearInterval(statusList[currentWindow.containerName]);
 
-                delete intervalStatusList[currentWindow.containerName as any];
-                delete this.componentWindowList[currentWindow.containerName as any];
+                delete statusList[currentWindow.containerName];
+                delete this.componentWindowList[currentWindow.containerName];
             }
         }
     }

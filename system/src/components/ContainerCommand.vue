@@ -40,8 +40,8 @@
 
     import ComponentContainerConsole from "./ContainerConsole.vue";
 
-    let intervalStatusList: number[] = [];
-    let commandStatusList: number[] = [];
+    const commandList: Interface.ContainerCommandList = {};
+    const statusList: Interface.ContainerStatusList = {};
 
     @Component({
         components: {}
@@ -49,34 +49,34 @@
     export default class ComponentContainerCommand extends Vue {
         // Variables
         private componentContainerConsole!: ComponentContainerConsole;
-        private componentWindowList!: HTMLElement[];
-        private elementCommandList!: HTMLElement[][];
-        private elementStatusList!: HTMLElement[];
+        private componentWindowList!: Interface.HtmlElementList;
+        private elementCommandList!: Interface.HtmlElementListMulti;
+        private elementStatusList!: Interface.HtmlElementList;
 
         // Hooks
         protected created(): void {
             this.componentContainerConsole = new ComponentContainerConsole();
-            this.componentWindowList = [];
-            this.elementCommandList = [];
-            this.elementStatusList = [];
+            this.componentWindowList = {};
+            this.elementCommandList = {};
+            this.elementStatusList = {};
         }
 
         protected destroyed(): void {}
 
         // Logic
         private logicFindWindowElement(componentWindow: HTMLElement, currentWindow: Interface.Window): void {
-            this.componentWindowList[currentWindow.containerName as any] = componentWindow;
+            this.componentWindowList[currentWindow.containerName] = componentWindow;
 
-            const buttonCmdList = (this.componentWindowList[currentWindow.containerName as any].querySelectorAll(".command_component .right .cmd") as any) as HTMLElement[];
-            const elementStatus = this.componentWindowList[currentWindow.containerName as any].querySelector(".command_component .status") as HTMLElement;
+            const buttonCmdList = (this.componentWindowList[currentWindow.containerName].querySelectorAll(".command_component .right .cmd") as unknown) as HTMLElement[];
+            const elementStatus = this.componentWindowList[currentWindow.containerName].querySelector(".command_component .status") as HTMLElement;
 
-            this.elementCommandList[currentWindow.containerName as any] = buttonCmdList;
-            this.elementStatusList[currentWindow.containerName as any] = elementStatus;
+            this.elementCommandList[currentWindow.containerName] = buttonCmdList;
+            this.elementStatusList[currentWindow.containerName] = elementStatus;
         }
 
         private logicCheckStatus(containerName: string): void {
             if (Object.keys(this.componentWindowList).length > 0) {
-                intervalStatusList[containerName as any] = setInterval((): void => {
+                statusList[containerName] = setInterval((): void => {
                     Sio.sendMessage("t_exec_i", {
                         closeActive: false,
                         tag: `${containerName}_status`,
@@ -85,8 +85,8 @@
                 }, 1000);
 
                 Sio.readMessage(`t_exec_o_${containerName}_status`, (data: Interface.Socket) => {
-                    if (data.out && commandStatusList[containerName as any] === -1) {
-                        this.elementStatusList[containerName as any].innerHTML = data.out;
+                    if (data.out && commandList[containerName] === -1) {
+                        this.elementStatusList[containerName].innerHTML = data.out;
                     }
                 });
             }
@@ -98,7 +98,7 @@
             if (currentWindow) {
                 this.logicFindWindowElement(componentWindow, currentWindow);
 
-                commandStatusList[currentWindow.containerName as any] = -1;
+                commandList[currentWindow.containerName] = -1;
 
                 this.logicCheckStatus(currentWindow.containerName);
             }
@@ -122,7 +122,7 @@
 
                     this.componentContainerConsole.logicClose(componentWindow);
 
-                    let index = Array.from(this.elementCommandList[currentWindow.containerName as any]).indexOf(elementEventTarget);
+                    let index = Array.from((this.elementCommandList[currentWindow.containerName] as unknown) as HTMLElement[]).indexOf(elementEventTarget);
 
                     if (index === 0) {
                         Sio.sendMessage("t_exec_i", {
@@ -131,8 +131,8 @@
                             cmd: `docker start ${currentWindow.containerName}`
                         });
 
-                        this.elementStatusList[currentWindow.containerName as any].innerHTML = "Starting...";
-                        commandStatusList[currentWindow.containerName as any] = index;
+                        this.elementStatusList[currentWindow.containerName].innerHTML = "Starting...";
+                        commandList[currentWindow.containerName] = index;
                     } else if (index === 1) {
                         Sio.sendMessage("t_exec_i", {
                             closeActive: true,
@@ -140,8 +140,8 @@
                             cmd: `docker restart ${currentWindow.containerName}`
                         });
 
-                        this.elementStatusList[currentWindow.containerName as any].innerHTML = "Restarting...";
-                        commandStatusList[currentWindow.containerName as any] = index;
+                        this.elementStatusList[currentWindow.containerName].innerHTML = "Restarting...";
+                        commandList[currentWindow.containerName] = index;
                     } else if (index === 2) {
                         Sio.sendMessage("t_exec_i", {
                             closeActive: true,
@@ -149,19 +149,19 @@
                             cmd: `docker stop ${currentWindow.containerName}`
                         });
 
-                        this.elementStatusList[currentWindow.containerName as any].innerHTML = "Stopping...";
-                        commandStatusList[currentWindow.containerName as any] = index;
+                        this.elementStatusList[currentWindow.containerName].innerHTML = "Stopping...";
+                        commandList[currentWindow.containerName] = index;
                     }
 
                     Sio.readMessage(`t_exec_o_${currentWindow.containerName}_command`, (data: Interface.Socket) => {
                         if (data.close === 0) {
                             Sio.stopRead(`t_exec_o_${currentWindow.containerName}_command`);
 
-                            if (commandStatusList[currentWindow.containerName as any] === 2) {
-                                this.elementStatusList[currentWindow.containerName as any].innerHTML = "Stopped.";
+                            if (commandList[currentWindow.containerName] === 2) {
+                                this.elementStatusList[currentWindow.containerName].innerHTML = "Stopped.";
                             }
 
-                            commandStatusList[currentWindow.containerName as any] = -1;
+                            commandList[currentWindow.containerName] = -1;
 
                             elementButtonConsole.classList.remove("disabled");
                             elementButtonData.classList.remove("disabled");
@@ -177,13 +177,13 @@
             if (currentWindow && currentWindow.containerName) {
                 Sio.stopRead(`t_exec_o_${currentWindow.containerName}_status`);
 
-                clearInterval(intervalStatusList[currentWindow.containerName as any]);
+                clearInterval(statusList[currentWindow.containerName]);
 
-                delete intervalStatusList[currentWindow.containerName as any];
-                delete commandStatusList[currentWindow.containerName as any];
-                delete this.componentWindowList[currentWindow.containerName as any];
-                delete this.elementCommandList[currentWindow.containerName as any];
-                delete this.elementStatusList[currentWindow.containerName as any];
+                delete statusList[currentWindow.containerName];
+                delete commandList[currentWindow.containerName];
+                delete this.componentWindowList[currentWindow.containerName];
+                delete this.elementCommandList[currentWindow.containerName];
+                delete this.elementStatusList[currentWindow.containerName];
             }
         }
     }
