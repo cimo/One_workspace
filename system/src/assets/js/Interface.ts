@@ -13,6 +13,7 @@ import ImageMySql from "../images/mysql.svg";
 import ImagePostgreSql from "../images/postgresql.svg";
 import ImageRedis from "../images/redis.svg";
 import ImageMongoDb from "../images/mongodb.svg";
+import ImagePython from "../images/python.svg";
 
 export interface ConfigItemList {
     category?: string;
@@ -116,3 +117,4 @@ export const imageMySql: string = ImageMySql;
 export const imagePostgreSql: string = ImagePostgreSql;
 export const imageRedis: string = ImageRedis;
 export const imageMongoDb: string = ImageMongoDb;
+export const imagePython: string = ImagePython;

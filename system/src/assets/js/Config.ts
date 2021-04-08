@@ -83,65 +83,58 @@ export const data: Interface.Config = {
             {
                 category: "container",
                 name: "NodeJs",
-                containerName: "NodeJs_12.18.1",
+                containerName: "NodeJs_14.16.0",
                 imagePath: Interface.imageNodeJs,
                 imageName: "nodejs.svg"
             },
             {
                 category: "container",
                 name: "Apache",
-                containerName: "Apache_2.4",
+                containerName: "Apache_2.4.46",
                 imagePath: Interface.imageApache,
                 imageName: "apache.svg"
             },
             {
                 category: "container",
-                name: "Php 7",
-                containerName: "Php_7.4-fpm",
+                name: "Php",
+                containerName: "Php_7.4.16-fpm",
                 imagePath: Interface.imagePhp,
                 imageName: "php.svg"
             },
             {
                 category: "container",
-                name: "Php 5",
-                containerName: "Php_5.6-fpm",
-                imagePath: Interface.imagePhp,
-                imageName: "php.svg"
-            },
-            {
-                category: "container",
-                name: "MySql 5.7",
+                name: "MySql",
                 containerName: "MySql_5.7",
                 imagePath: Interface.imageMySql,
                 imageName: "mysql.svg"
             },
             {
                 category: "container",
-                name: "MySql 5.6",
-                containerName: "MySql_5.6",
-                imagePath: Interface.imageMySql,
-                imageName: "mysql.svg"
-            },
-            {
-                category: "container",
                 name: "PostgreSql",
-                containerName: "PostgreSql_10.13",
+                containerName: "PostgreSql_10.16",
                 imagePath: Interface.imagePostgreSql,
                 imageName: "postgresql.svg"
             },
             {
                 category: "container",
                 name: "Redis",
-                containerName: "Redis_6.0.9",
+                containerName: "Redis_6.2.1",
                 imagePath: Interface.imageRedis,
                 imageName: "redis.svg"
             },
             {
                 category: "container",
                 name: "MongoDb",
-                containerName: "MongoDb_4.4.2",
+                containerName: "MongoDb_4.4.4",
                 imagePath: Interface.imageMongoDb,
                 imageName: "mongodb.svg"
+            },
+            {
+                category: "container",
+                name: "Python",
+                containerName: "Python_3.9.4",
+                imagePath: Interface.imagePython,
+                imageName: "python.svg"
             }
         ]
     }

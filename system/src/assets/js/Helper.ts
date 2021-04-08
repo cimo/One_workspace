@@ -7,12 +7,12 @@ let dragOffsetX: number = 0;
 let dragOffsetY: number = 0;
 let dragStartX: number = 0;
 let dragStartY: number = 0;
-let openWindowFromParent = false;
+let openWindowFromParent = "";
 
-export const getOpenWindowFromParent = (): boolean => {
+export const getOpenWindowFromParent = (): string => {
     return openWindowFromParent;
 };
-export const setOpenWindowFromParent = (value: boolean): void => {
+export const setOpenWindowFromParent = (value: string = ""): void => {
     openWindowFromParent = value;
 };
 

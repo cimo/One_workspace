@@ -7,7 +7,6 @@
 <script lang="ts">
     import { Component, Vue } from "vue-property-decorator";
 
-    import * as Config from "../assets/js/Config";
     import * as Interface from "../assets/js/Interface";
     import * as Helper from "../assets/js/Helper";
     import * as Sio from "../assets/js/Sio";
@@ -56,13 +55,15 @@
             const buttonOpenConsole = document.querySelector(".window_component:not(.empty) .explore_component .button_cmd_window.open_console") as HTMLElement;
 
             if (buttonOpenConsole) {
-                const workDir = Helper.getOpenWindowFromParent() ? buttonOpenConsole.getAttribute("data-path") : "~";
-                Helper.setOpenWindowFromParent(false);
+                const containerName = Helper.getOpenWindowFromParent();
+                const workDir = containerName !== "" ? buttonOpenConsole.getAttribute("data-path") : "~";
 
                 Sio.sendMessage("t_pty_i", {
                     tag: indexTag,
-                    cmd: `history -c && history -w && clear && docker exec -w ${workDir} -it ${Config.data.menuRoot.containerItemList[0].containerName} /bin/bash\r`
+                    cmd: `history -c && history -w && clear && docker exec -w ${workDir} -it ${containerName} /bin/bash\r`
                 });
+
+                Helper.setOpenWindowFromParent("");
             }
 
             xtermList[indexTag].onData((data: string) => {

@@ -30,14 +30,25 @@
                 <div class="text">Git</div>
                 <div class="text">Terser</div>
                 <div class="text">Sass</div>
+                <div class="text label_console">Console</div>
             </div>
             <div class="sub_right">
                 <input type="checkbox" name="git" value="" />
                 <input type="checkbox" name="terser" value="" />
                 <input type="checkbox" name="sass" value="" />
+                <div>
+                    <div class="container_console_checkbox">
+                        <label for="console_nodejs">NodeJs</label>
+                        <input id="console_nodejs" class="checkbox_console" type="checkbox" name="console_nodejs" value="" />
+                    </div>
+                    <div class="container_console_checkbox">
+                        <label for="console_python">Python</label>
+                        <input id="console_python" class="checkbox_console" type="checkbox" name="console_python" value="" />
+                    </div>
+                </div>
             </div>
             <div class="section">
-                <div class="button_cmd_window open_console">Open console</div>
+                <div class="button_cmd_window open_console" data-path="">Open console</div>
                 <div class="button_cmd_window open_url">Open url</div>
             </div>
         </div>
@@ -82,6 +93,8 @@
         private checkboxGit!: HTMLInputElement;
         private checkboxTerser!: HTMLInputElement;
         private checkboxSass!: HTMLInputElement;
+        private checkboxConsoleNodeJs!: HTMLInputElement;
+        private checkboxConsolePython!: HTMLInputElement;
         private buttonDelete!: HTMLButtonElement;
         private buttonOpenConsole!: HTMLButtonElement;
 
@@ -107,6 +120,8 @@
                 this.checkboxGit = componentWindow.querySelector("input[name='git']") as HTMLInputElement;
                 this.checkboxTerser = componentWindow.querySelector("input[name='terser']") as HTMLInputElement;
                 this.checkboxSass = componentWindow.querySelector("input[name='sass']") as HTMLInputElement;
+                this.checkboxConsoleNodeJs = componentWindow.querySelector("input[name='console_nodejs']") as HTMLInputElement;
+                this.checkboxConsolePython = componentWindow.querySelector("input[name='console_python']") as HTMLInputElement;
                 this.buttonDelete = componentWindow.querySelector(".button_cmd_window.delete") as HTMLButtonElement;
                 this.buttonOpenConsole = componentWindow.querySelector(".button_cmd_window.open_console") as HTMLButtonElement;
             } else {
@@ -118,6 +133,8 @@
                 this.checkboxGit = document.querySelector(".window_component:not(.empty) .explore_component input[name='git']") as HTMLInputElement;
                 this.checkboxTerser = document.querySelector(".window_component:not(.empty) .explore_component input[name='terser']") as HTMLInputElement;
                 this.checkboxSass = document.querySelector(".window_component:not(.empty) .explore_component input[name='sass']") as HTMLInputElement;
+                this.checkboxConsoleNodeJs = document.querySelector(".window_component:not(.empty) .explore_component input[name='console_nodejs']") as HTMLInputElement;
+                this.checkboxConsolePython = document.querySelector(".window_component:not(.empty) .explore_component input[name='console_python']") as HTMLInputElement;
                 this.buttonDelete = document.querySelector(".window_component:not(.empty) .explore_component .button_cmd_window.delete") as HTMLButtonElement;
                 this.buttonOpenConsole = document.querySelector(".window_component:not(.empty) .explore_component .button_cmd_window.open_console") as HTMLButtonElement;
             }
@@ -189,6 +206,14 @@
                 this.inputName.style.borderColor = "transparent";
                 this.inputFolderName.style.borderColor = "transparent";
 
+                if (elementEventTarget.classList.contains("checkbox_console")) {
+                    this.checkboxConsoleNodeJs.checked = false;
+                    this.checkboxConsolePython.checked = false;
+
+                    const elementCheckbox = elementEventTarget as HTMLInputElement;
+                    elementCheckbox.checked = true;
+                }
+
                 if (elementEventTarget.classList.contains("save")) {
                     this.logicCheckInputValue();
 
@@ -202,6 +227,8 @@
                             git: this.checkboxGit.checked,
                             terser: this.checkboxTerser.checked,
                             sass: this.checkboxSass.checked,
+                            consoleNodeJs: this.checkboxConsoleNodeJs.checked,
+                            consolePython: this.checkboxConsolePython.checked,
                             urlRoot: this.inputUrlRoot.value
                         };
 
@@ -299,6 +326,13 @@
 
                                     this.componentToolTerser.logicDeleteOption();
                                 }
+
+                                // Open console
+                                if (this.checkboxConsoleNodeJs.checked || this.checkboxConsolePython.checked) {
+                                    this.buttonOpenConsole.setAttribute("data-path", `${Config.data.systemData.pathProject}/${this.inputFolderName.value}/root`);
+                                } else {
+                                    this.buttonOpenConsole.setAttribute("data-path", "");
+                                }
                             }
                         });
                     }
@@ -336,6 +370,9 @@
                                         this.checkboxGit.checked = false;
                                         this.checkboxTerser.checked = false;
                                         this.checkboxSass.checked = false;
+                                        this.checkboxConsoleNodeJs.checked = false;
+                                        this.checkboxConsolePython.checked = false;
+                                        this.buttonOpenConsole.setAttribute("data-path", "");
 
                                         this.buttonDelete.style.display = "none";
                                     }
@@ -344,11 +381,19 @@
                             .catch(() => {});
                     }
                 } else if (elementEventTarget.classList.contains("open_console")) {
-                    if (this.selectEdit.selectedIndex > 0) {
+                    if (this.selectEdit.selectedIndex > 0 && this.buttonOpenConsole.getAttribute("data-path") !== "") {
                         const buttonConsole = document.querySelector(".menuRoot_container .menuRoot_panel .window_opener[data-name='Console']") as HTMLElement;
 
                         if (buttonConsole) {
-                            Helper.setOpenWindowFromParent(true);
+                            let containerName = "";
+
+                            if (this.checkboxConsoleNodeJs.checked) {
+                                containerName = Config.data.menuRoot.containerItemList[0].containerName as string;
+                            } else if (this.checkboxConsolePython.checked) {
+                                containerName = Config.data.menuRoot.containerItemList[7].containerName as string;
+                            }
+
+                            Helper.setOpenWindowFromParent(containerName);
 
                             buttonConsole.click();
                         }
@@ -400,10 +445,16 @@
                                     this.checkboxGit.checked = result.git;
                                     this.checkboxTerser.checked = result.terser;
                                     this.checkboxSass.checked = result.sass;
+                                    this.checkboxConsoleNodeJs.checked = result.consoleNodeJs;
+                                    this.checkboxConsolePython.checked = result.consolePython;
+
+                                    if (this.checkboxConsoleNodeJs.checked || this.checkboxConsolePython.checked) {
+                                        this.buttonOpenConsole.setAttribute("data-path", `${Config.data.systemData.pathProject}/${this.inputFolderName.value}/root`);
+                                    } else {
+                                        this.buttonOpenConsole.setAttribute("data-path", "");
+                                    }
 
                                     this.buttonDelete.style.display = "inline-block";
-
-                                    this.buttonOpenConsole.setAttribute("data-path", `${Config.data.systemData.pathProject}/${this.inputFolderName.value}/root`);
                                 }
                             } else {
                                 buffer += data.chunk;
@@ -418,6 +469,9 @@
                         this.checkboxGit.checked = false;
                         this.checkboxTerser.checked = false;
                         this.checkboxSass.checked = false;
+                        this.checkboxConsoleNodeJs.checked = false;
+                        this.checkboxConsolePython.checked = false;
+                        this.buttonOpenConsole.setAttribute("data-path", "");
 
                         this.buttonDelete.style.display = "none";
                     }
@@ -479,12 +533,23 @@
                 .text {
                     margin: 13px;
                 }
+                .label_console {
+                    margin-top: 35px;
+                }
             }
 
             .sub_right {
                 input {
                     display: block;
                     margin: 18px auto;
+                }
+
+                .container_console_checkbox {
+                    label,
+                    input {
+                        display: inline-block;
+                        margin: 5px;
+                    }
                 }
             }
 

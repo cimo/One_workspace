@@ -50,8 +50,7 @@ Is a docker service container for have, in one space, a large and complete devel
 
          127.0.0.1 localhost
          127.0.0.1 localhost-html
-         127.0.0.1 localhost-php5
-         127.0.0.1 localhost-php7
+         127.0.0.1 localhost-php
 
 5) Write on your browser "http://localhost".
 
