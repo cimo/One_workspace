@@ -3973,7 +3973,7 @@ var data = {
     url: "".concat(websocketProtocol, "//").concat(domain, ":").concat(nodeJsPort)
   },
   vueJs: {
-    uiPort: 8000
+    uiPort: 10000
   },
   systemData: {
     pathKey: "/home/user_1/root/key",
@@ -7605,4 +7605,4 @@ var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_
 /***/ })
 
 /******/ });
-//# sourceMappingURL=app.ffcaf375.js.map
+//# sourceMappingURL=app.8ff5e2fe.js.map
