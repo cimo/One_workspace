@@ -11,26 +11,26 @@ Is a docker service container for have, in one space, a large and complete devel
 | Project: |
 |:---|
 | Explore |
-| Ssh |
 | VueJs |
 
 | Tool: |
 |:---|
+| Ssh |
 | Git |
 | Terser |
 | Sass |
+| Console |
 
 | Conatiner: |
 |:---|
-| Php 7.4-fpm |
-| Php 5.6-fpm |
-| Apache 2.4 |
+| NodeJs 14.16.0 |
+| Apache 2.4.46 |
+| Php 7.4.16-fpm |
 | MySql 5.7 |
-| MySql 5.6 |
-| PostgreSql 10.13 |
-| NodeJs 12.18.1 |
-| Redis 6.0.9 |
-| MongoDb 4.4.2 |
+| PostgreSql 10.16 |
+| Redis 6.2.1 |
+| MongoDb 4.4.4 |
+| Python 3.9.4 |
 
 ## Instructions:
 1) Copy file in your folder (for example /home/cimo/One_workspace/root).
