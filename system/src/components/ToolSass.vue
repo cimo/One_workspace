@@ -270,7 +270,7 @@
             this.logicFindWindowElement();
 
             if (this.selectEdit) {
-                for (const option of this.selectEdit.options) {
+                for (const option of Array.from(this.selectEdit.options)) {
                     if (option.value === `${projectName}${Config.data.systemData.extensionSass}`) {
                         option.remove();
 
@@ -331,7 +331,8 @@
         .section {
             .output {
                 overflow-y: auto;
-                height: 250px;
+                overflow-x: hidden;
+                height: 240px;
             }
         }
 

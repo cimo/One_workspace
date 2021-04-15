@@ -43,7 +43,7 @@ IF "%runningA%"=="false" (
 		docker stop PostgreSql_10.16
 		docker stop Redis_6.2.1
 		docker stop MongoDb_4.4.4
-		docker stop Python_3.9.4
+		docker stop Python_3.6.13
 
 		ECHO "All stopped."
 	)

@@ -28,17 +28,17 @@
                     <p>Password:</p>
                     <input type="password" name="password" value="" />
                 </div>
-                <div class="section">
-                    <p>Branch name:</p>
-                    <input type="text" name="branchName" value="" />
-                </div>
             </div>
             <div class="right">
                 <div class="section">
                     <div class="button_cmd_window git_command clone">Clone</div>
-                    <div class="button_cmd_window git_command pull">Pull</div>
                     <div class="button_cmd_window git_command fetch">Fetch</div>
+                    <div class="button_cmd_window git_command pull">Pull</div>
                     <div class="button_cmd_window git_command reset">Reset</div>
+                </div>
+                <div class="section">
+                    <p>Branch name:</p>
+                    <input type="text" name="branchName" value="" />
                 </div>
             </div>
             <div class="section">
@@ -159,7 +159,7 @@
             const inputBranchNameMatch2 = /^[A-Za-z0-9-_/ ]+$/.test(this.inputBranchName2.value as string);
 
             if (!elementEventTarget || (!elementEventTarget.classList.contains("pull") && !elementEventTarget.classList.contains("reset") && !elementEventTarget.classList.contains("push") && !elementEventTarget.classList.contains("commit"))) {
-                if (this.inputUrl.value !== "" && this.inputUsername.value !== "" && this.inputEmail.value !== "" && this.inputPassword.value !== "") {
+                if (this.inputUrl.value !== "" && this.inputUsername.value !== "" && this.inputEmail.value !== "") {
                     isInputValid = true;
                 } else {
                     isInputValid = false;
@@ -172,13 +172,10 @@
                     }
                     if (this.inputEmail.value === "") {
                         this.inputEmail.style.borderColor = "#ff0000";
-                    }
-                    if (this.inputPassword.value === "") {
-                        this.inputPassword.style.borderColor = "#ff0000";
                     }
                 }
             } else if (elementEventTarget.classList.contains("pull") || elementEventTarget.classList.contains("reset")) {
-                if (inputBranchNameMatch1 && this.inputUrl.value !== "" && this.inputUsername.value !== "" && this.inputEmail.value !== "" && this.inputPassword.value !== "") {
+                if (inputBranchNameMatch1 && this.inputUrl.value !== "" && this.inputUsername.value !== "" && this.inputEmail.value !== "") {
                     isInputValid = true;
                 } else {
                     isInputValid = false;
@@ -191,16 +188,13 @@
                     }
                     if (this.inputEmail.value === "") {
                         this.inputEmail.style.borderColor = "#ff0000";
-                    }
-                    if (this.inputPassword.value === "") {
-                        this.inputPassword.style.borderColor = "#ff0000";
                     }
                     if (this.inputBranchName1.value === "" || !inputBranchNameMatch1) {
                         this.inputBranchName1.style.borderColor = "#ff0000";
                     }
                 }
             } else if (elementEventTarget.classList.contains("push")) {
-                if (inputBranchNameMatch2 && this.inputUrl.value !== "" && this.inputUsername.value !== "" && this.inputEmail.value !== "" && this.inputPassword.value !== "") {
+                if (inputBranchNameMatch2 && this.inputUrl.value !== "" && this.inputUsername.value !== "" && this.inputEmail.value !== "") {
                     this.inputCommitDescription.value = "";
 
                     isInputValid = true;
@@ -215,9 +209,6 @@
                     }
                     if (this.inputEmail.value === "") {
                         this.inputEmail.style.borderColor = "#ff0000";
-                    }
-                    if (this.inputPassword.value === "") {
-                        this.inputPassword.style.borderColor = "#ff0000";
                     }
                     if (this.inputBranchName2.value === "" || !inputBranchNameMatch2) {
                         this.inputBranchName2.style.borderColor = "#ff0000";
@@ -278,7 +269,6 @@
                 this.inputUrl.style.borderColor = "transparent";
                 this.inputUsername.style.borderColor = "transparent";
                 this.inputEmail.style.borderColor = "transparent";
-                this.inputPassword.style.borderColor = "transparent";
                 this.inputBranchName1.style.borderColor = "transparent";
                 this.inputBranchName2.style.borderColor = "transparent";
                 this.inputCommitDescription.style.borderColor = "transparent";
@@ -319,6 +309,7 @@
                     this.logicCheckInputValue(elementEventTarget);
 
                     if (isInputValid) {
+                        this.inputBranchName1.value = "";
                         this.elementOutput1.innerHTML = "";
                         this.elementOutput2.innerHTML = "";
 
@@ -328,15 +319,19 @@
                         if (this.inputUrl.value.indexOf("https://") !== -1) {
                             const inputUrlValue = this.inputUrl.value.replace("https://", "");
 
-                            url = `https://${this.inputUsername.value}:${this.inputPassword.value}@${inputUrlValue}`;
+                            if (this.inputPassword.value) {
+                                url = `https://${this.inputUsername.value}:${this.inputPassword.value}@${inputUrlValue}`;
+                            } else {
+                                url = `https://${this.inputUsername.value}@${inputUrlValue}`;
+                            }
                         }
 
                         if (elementEventTarget.classList.contains("clone")) {
                             command = `mkdir -p "${projectPath}" && cd "${projectPath}" && git clone ${url} .`;
-                        } else if (elementEventTarget.classList.contains("pull")) {
-                            command = `cd "${projectPath}" && git pull ${url} ${this.inputBranchName1.value}`;
                         } else if (elementEventTarget.classList.contains("fetch")) {
                             command = `cd "${projectPath}" && git fetch --all`;
+                        } else if (elementEventTarget.classList.contains("pull")) {
+                            command = `cd "${projectPath}" && git pull ${url} ${this.inputBranchName1.value}`;
                         } else if (elementEventTarget.classList.contains("reset")) {
                             command = `cd "${projectPath}" && git reset --hard ${this.inputBranchName1.value}`;
                         } else if (elementEventTarget.classList.contains("status")) {
@@ -542,7 +537,7 @@
             this.logicFindWindowElement();
 
             if (this.selectEdit) {
-                for (const option of this.selectEdit.options) {
+                for (const option of Array.from(this.selectEdit.options)) {
                     if (option.value === `${projectName}${Config.data.systemData.extensionGit}`) {
                         option.remove();
 
@@ -609,19 +604,13 @@
 
             .section {
                 .output {
-                    height: 100px;
+                    height: 95px;
                 }
             }
         }
 
         .part_2_container {
             display: none;
-
-            .section {
-                .output {
-                    height: 280px;
-                }
-            }
         }
 
         .left,
@@ -629,6 +618,10 @@
             vertical-align: top;
             display: inline-block;
             width: 50%;
+
+            input[name="branchName"] {
+                width: 40%;
+            }
         }
 
         .left {
@@ -637,10 +630,6 @@
 
                 input {
                     width: 90%;
-                }
-
-                input[name="branchName"] {
-                    width: 40%;
                 }
             }
         }
@@ -661,6 +650,8 @@
         .section {
             .output {
                 overflow-y: auto;
+                overflow-x: hidden;
+                height: 240px;
             }
         }
 

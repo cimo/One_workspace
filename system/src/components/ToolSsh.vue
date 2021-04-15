@@ -474,7 +474,7 @@
                 const componentWindow = Helper.findElement(value, ["window_component"]);
 
                 if (componentWindow) {
-                    if (xterm && fitAddon) {
+                    if (!componentWindow.classList.contains("minimized") && xterm && fitAddon) {
                         const computedStyle = window.getComputedStyle(value);
                         xterm._core.element.style.height = computedStyle.height;
                         fitAddon.fit();

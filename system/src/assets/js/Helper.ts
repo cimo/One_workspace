@@ -1,6 +1,7 @@
 import * as Interface from "./Interface";
 
 let dragTagList: string[][] = [];
+let dragParent: HTMLElement | null = null;
 let dragTarget: HTMLElement | null = null;
 let dragActive: boolean = false;
 let dragOffsetX: number = 0;
@@ -22,6 +23,7 @@ const dragStart = (event: Event): void => {
         const touchEvent = event as TouchEvent;
         const mouseEvent = event as MouseEvent;
 
+        dragParent = document.querySelector("#app") as HTMLElement;
         dragTarget = findElement(elementEvenTarget, value);
 
         if (dragTarget && elementEvenTarget.classList.contains("drag")) {
@@ -39,15 +41,19 @@ const dragStart = (event: Event): void => {
 };
 
 const dragMove = (event: Event): void => {
-    if (dragTarget && dragActive) {
+    if (dragParent && dragTarget && dragActive) {
         const touchEvent = event as TouchEvent;
         const mouseEvent = event as MouseEvent;
 
+        const boundX = dragTarget.offsetWidth - dragParent.offsetWidth;
+        const boundY = dragParent.offsetHeight - dragTarget.offsetHeight;
         const dragCurrentX = dragOffsetX + (event.type === "touchstart" ? touchEvent.touches[0].clientX : mouseEvent.clientX) - dragStartX;
         const dragCurrentY = dragOffsetY + (event.type === "touchstart" ? touchEvent.touches[0].clientY : mouseEvent.clientY) - dragStartY;
 
-        dragTarget.style.left = `${dragCurrentX}px`;
-        dragTarget.style.top = `${dragCurrentY}px`;
+        if (dragCurrentX > 0 && dragCurrentX < boundX && dragCurrentY > 0 && dragCurrentY < boundY) {
+            dragTarget.style.left = `${dragCurrentX}px`;
+            dragTarget.style.top = `${dragCurrentY}px`;
+        }
     }
 };
 

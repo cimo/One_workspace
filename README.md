@@ -30,7 +30,7 @@ Is a docker service container for have, in one space, a large and complete devel
 | PostgreSql 10.16 |
 | Redis 6.2.1 |
 | MongoDb 4.4.4 |
-| Python 3.9.4 |
+| Python 3.6.13 |
 
 ## Instructions:
 1) Copy file in your folder (for example /home/cimo/One_workspace/root).

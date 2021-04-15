@@ -109,6 +109,14 @@
         padding: 0;
     }
 
+    #app {
+        position: fixed;
+        top: 0;
+        let: 0;
+        right: 0;
+        bottom: 0;
+    }
+
     .button_cmd_window {
         cursor: pointer;
         color: #ffffff;

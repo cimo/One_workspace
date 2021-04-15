@@ -132,7 +132,7 @@ export const data: Interface.Config = {
             {
                 category: "container",
                 name: "Python",
-                containerName: "Python_3.9.4",
+                containerName: "Python_3.6.13",
                 imagePath: Interface.imagePython,
                 imageName: "python.svg"
             }

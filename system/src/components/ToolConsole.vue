@@ -139,10 +139,10 @@
                 const componentWindow = Helper.findElement(value, ["window_component"]);
                 const currentWindow = Helper.currentWindow(componentWindow);
 
-                if (currentWindow) {
+                if (componentWindow && currentWindow) {
                     const indexTag = `${currentWindow.name}_${currentWindow.index}`;
 
-                    if (xtermList[indexTag] && fitAddonList[indexTag]) {
+                    if (!componentWindow.classList.contains("minimized") && xtermList[indexTag] && fitAddonList[indexTag]) {
                         const computedStyle = window.getComputedStyle(value);
                         xtermList[indexTag]._core.element.style.height = computedStyle.height;
                         fitAddonList[indexTag].fit();

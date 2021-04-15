@@ -292,7 +292,7 @@
     .window_component {
         display: none;
         position: fixed;
-        height: 75%;
+        height: 550px;
         border: 1px solid #0078d7;
 
         box-shadow: 0px 0px 5px #000000;
