@@ -45,7 +45,7 @@ const dragMove = (event: Event): void => {
         const touchEvent = event as TouchEvent;
         const mouseEvent = event as MouseEvent;
 
-        const boundX = dragTarget.offsetWidth - dragParent.offsetWidth;
+        const boundX = dragParent.offsetWidth - dragTarget.offsetWidth;
         const boundY = dragParent.offsetHeight - dragTarget.offsetHeight;
         const dragCurrentX = dragOffsetX + (event.type === "touchstart" ? touchEvent.touches[0].clientX : mouseEvent.clientX) - dragStartX;
         const dragCurrentY = dragOffsetY + (event.type === "touchstart" ? touchEvent.touches[0].clientY : mouseEvent.clientY) - dragStartY;

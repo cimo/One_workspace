@@ -12,7 +12,9 @@
         "allowSyntheticDefaultImports": true,
         "sourceMap": true,
         "removeComments": true,
+        "noImplicitAny": false,
         "baseUrl": ".",
+        "outDir": "./dist",
         "types": [
             "webpack-env",
             "jest"
@@ -37,6 +39,9 @@
         "tests/**/*.tsx"
     ],
     "exclude": [
-        "node_modules"
+        "node_modules",
+        "dist",
+        "public",
+        "setting"
     ]
 }

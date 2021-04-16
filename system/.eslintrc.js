@@ -4,14 +4,13 @@ module.exports = {
         browser: true,
         node: true
     },
-    extends: ["eslint:recommended", "plugin:vue/essential", "@vue/typescript", "@vue/prettier", "@vue/prettier/@typescript-eslint"],
     parserOptions: {
         ecmaVersion: 2020
     },
+    extends: ["eslint:recommended", "plugin:vue/essential", "@vue/typescript", "@vue/prettier", "@vue/prettier/@typescript-eslint"],
     rules: {
         "no-console": process.env.NODE_ENV === "production" ? "warn" : "off",
         "no-debugger": process.env.NODE_ENV === "production" ? "warn" : "off",
-        curly: ["error"],
         "object-curly-spacing": "off",
         "sort-imports": "off",
         "no-unused-vars": "off",
@@ -40,7 +39,8 @@ module.exports = {
                 useTabs: false,
                 vueIndentScriptAndStyle: true
             }
-        ]
+        ],
+        curly: ["error"]
     },
     overrides: [
         {
