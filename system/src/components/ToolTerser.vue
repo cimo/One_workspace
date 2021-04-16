@@ -231,8 +231,8 @@
             }
 
             const content = {
-                input: this.inputFolderIn ? this.inputFolderIn.value : "",
-                output: this.inputFolderOut ? this.inputFolderOut.value : "",
+                input: this.inputFolderIn.value,
+                output: this.inputFolderOut.value,
                 name: projectName,
                 path: projectPath
             };

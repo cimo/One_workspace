@@ -470,16 +470,16 @@
 
             Sio.sendMessage("t_crypt_encrypt_i", {
                 tag: "gitSetting",
-                text: this.inputPassword ? this.inputPassword.value : ""
+                text: this.inputPassword.value
             });
 
             Sio.readMessage("t_crypt_encrypt_o_gitSetting", (data: Interface.Socket) => {
                 Sio.stopRead("t_crypt_encrypt_o_gitSetting");
 
                 const content = {
-                    url: this.inputUrl ? this.inputUrl.value : "",
-                    username: this.inputUsername ? this.inputUsername.value : "",
-                    email: this.inputEmail ? this.inputEmail.value : "",
+                    url: this.inputUrl.value,
+                    username: this.inputUsername.value,
+                    email: this.inputEmail.value,
                     password: data.out ? data.out : "",
                     name: projectName,
                     path: projectPath
