@@ -123,7 +123,7 @@
 
             Sio.sendMessage("t_pty_start", {
                 tag: "ssh",
-                size: [size.cols, size.rows]
+                sizeList: [size.cols, size.rows]
             });
 
             const pathKey = `${Config.data.systemData.pathKey}/${this.inputKeyPublic.value}`;
@@ -483,7 +483,7 @@
 
                         Sio.sendMessage("t_pty_resize", {
                             tag: "ssh",
-                            size: [size.cols, size.rows]
+                            sizeList: [size.cols, size.rows]
                         });
                     }
                 }

@@ -49,7 +49,7 @@
 
             Sio.sendMessage("t_pty_start", {
                 tag: indexTag,
-                size: [size.cols, size.rows]
+                sizeList: [size.cols, size.rows]
             });
 
             if (currentWindow.name !== "NodeJs") {
