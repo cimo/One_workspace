@@ -1,5 +1,5 @@
 <template>
-    <div class="tool_component">
+    <div class="component_tool">
         <ComponentToolSsh />
         <ComponentToolGit />
         <ComponentToolSass />
@@ -10,9 +10,8 @@
 
 <script lang="ts">
     import { Component, Vue } from "vue-property-decorator";
-
+    // Source
     import * as Helper from "../assets/js/Helper";
-
     import ComponentToolSsh from "./ToolSsh.vue";
     import ComponentToolGit from "./ToolGit.vue";
     import ComponentToolSass from "./ToolSass.vue";
@@ -53,9 +52,9 @@
 
             if (currentWindow) {
                 if (currentWindow.name === "Ssh") {
-                    const elementComponentGit = componentWindow.querySelector(".git_component") as HTMLElement;
-                    const elementComponentTerser = componentWindow.querySelector(".terser_component") as HTMLElement;
-                    const elementComponentSass = componentWindow.querySelector(".sass_component") as HTMLElement;
+                    const elementComponentGit = componentWindow.querySelector(".component_git") as HTMLElement;
+                    const elementComponentTerser = componentWindow.querySelector(".component_terser") as HTMLElement;
+                    const elementComponentSass = componentWindow.querySelector(".component_sass") as HTMLElement;
                     const elementComponentConsole = componentWindow.querySelector(".component_tool_console") as HTMLElement;
 
                     if (elementComponentGit) {
@@ -73,9 +72,9 @@
 
                     this.componentToolSsh.logicInit(componentWindow);
                 } else if (currentWindow.name === "Git") {
-                    const elementComponentSsh = componentWindow.querySelector(".ssh_component") as HTMLElement;
-                    const elementComponentTerser = componentWindow.querySelector(".terser_component") as HTMLElement;
-                    const elementComponentSass = componentWindow.querySelector(".sass_component") as HTMLElement;
+                    const elementComponentSsh = componentWindow.querySelector(".component_ssh") as HTMLElement;
+                    const elementComponentTerser = componentWindow.querySelector(".component_terser") as HTMLElement;
+                    const elementComponentSass = componentWindow.querySelector(".component_sass") as HTMLElement;
                     const elementComponentConsole = componentWindow.querySelector(".component_tool_console") as HTMLElement;
 
                     if (elementComponentSsh) {
@@ -93,9 +92,9 @@
 
                     this.componentToolGit.logicInit(componentWindow);
                 } else if (currentWindow.name === "Sass") {
-                    const elementComponentSsh = componentWindow.querySelector(".ssh_component") as HTMLElement;
-                    const elementComponentGit = componentWindow.querySelector(".git_component") as HTMLElement;
-                    const elementComponentTerser = componentWindow.querySelector(".terser_component") as HTMLElement;
+                    const elementComponentSsh = componentWindow.querySelector(".component_ssh") as HTMLElement;
+                    const elementComponentGit = componentWindow.querySelector(".component_git") as HTMLElement;
+                    const elementComponentTerser = componentWindow.querySelector(".component_terser") as HTMLElement;
                     const elementComponentConsole = componentWindow.querySelector(".component_tool_console") as HTMLElement;
 
                     if (elementComponentSsh) {
@@ -113,9 +112,9 @@
 
                     this.componentToolSass.logicInit(componentWindow);
                 } else if (currentWindow.name === "Terser") {
-                    const elementComponentSsh = componentWindow.querySelector(".ssh_component") as HTMLElement;
-                    const elementComponentGit = componentWindow.querySelector(".git_component") as HTMLElement;
-                    const elementComponentSass = componentWindow.querySelector(".sass_component") as HTMLElement;
+                    const elementComponentSsh = componentWindow.querySelector(".component_ssh") as HTMLElement;
+                    const elementComponentGit = componentWindow.querySelector(".component_git") as HTMLElement;
+                    const elementComponentSass = componentWindow.querySelector(".component_sass") as HTMLElement;
                     const elementComponentConsole = componentWindow.querySelector(".component_tool_console") as HTMLElement;
 
                     if (elementComponentSsh) {
@@ -133,10 +132,10 @@
 
                     this.componentToolTerser.logicInit(componentWindow);
                 } else if (currentWindow.name === "Console") {
-                    const elementComponentSsh = componentWindow.querySelector(".ssh_component");
-                    const elementComponentGit = componentWindow.querySelector(".git_component");
-                    const elementComponentSass = componentWindow.querySelector(".sass_component");
-                    const elementComponentTerser = componentWindow.querySelector(".terser_component");
+                    const elementComponentSsh = componentWindow.querySelector(".component_ssh");
+                    const elementComponentGit = componentWindow.querySelector(".component_git");
+                    const elementComponentSass = componentWindow.querySelector(".component_sass");
+                    const elementComponentTerser = componentWindow.querySelector(".component_terser");
 
                     if (elementComponentSsh) {
                         elementComponentSsh.remove();
@@ -161,6 +160,6 @@
 </script>
 
 <style lang="scss" scoped>
-    .tool_component {
+    .component_tool {
     }
 </style>

@@ -1,11 +1,11 @@
 <template>
-    <div class="window_component empty">
+    <div class="component_window empty">
         <div class="header">
-            <div class="left_column">
+            <div class="column_left">
                 <img src="../assets/images/empty.png" alt="empty.png" />
                 <p></p>
             </div>
-            <div class="right_column">
+            <div class="column_right">
                 <img src="../assets/images/window_minimize.svg" class="button_minimize button" alt="window_minimize.svg" />
                 <img src="../assets/images/window_maximize.svg" class="button_maximize button" alt="window_maximize.svg" />
                 <img src="../assets/images/window_close.svg" class="button_close button" alt="window_close.svg" />
@@ -24,11 +24,10 @@
 
 <script lang="ts">
     import { Component, Vue } from "vue-property-decorator";
-
+    // Source
     import * as Config from "../assets/js/Config";
     import * as Interface from "../assets/js/Interface";
     import * as Helper from "../assets/js/Helper";
-
     import ComponentContainer from "./Container.vue";
     import ComponentContainerCommand from "./ContainerCommand.vue";
     import ComponentContainerData from "./ContainerData.vue";
@@ -126,12 +125,12 @@
             const openerWindowDataName = openerWindow.getAttribute("data-name") as string;
             const openerWindowDataCategory = openerWindow.getAttribute("data-category") as string;
 
-            let elementComponentWindow = document.querySelector(`.window_component[data-name='${openerWindowDataName}']`) as HTMLElement;
+            let elementComponentWindow = document.querySelector(`.component_window[data-name='${openerWindowDataName}']`) as HTMLElement;
 
             if (!elementComponentWindow || openerWindowDataName === "Console") {
                 const index = Helper.lastWindowIndex();
 
-                const elementComponentWindowEmpty = document.querySelector(".window_component.empty") as HTMLElement;
+                const elementComponentWindowEmpty = document.querySelector(".component_window.empty") as HTMLElement;
 
                 if (elementComponentWindowEmpty) {
                     const elementComponentWindowNew = elementComponentWindowEmpty.cloneNode(true) as HTMLElement;
@@ -142,9 +141,9 @@
                     elementComponentWindowNew.setAttribute("data-category", openerWindowDataCategory);
                     elementComponentWindowNew.style.display = "block";
 
-                    const elementComponentProject = elementComponentWindowNew.querySelector(".project_component") as HTMLElement;
-                    const elementComponentTool = elementComponentWindowNew.querySelector(".tool_component") as HTMLElement;
-                    const elementComponentContainer = elementComponentWindowNew.querySelector(".container_component") as HTMLElement;
+                    const elementComponentProject = elementComponentWindowNew.querySelector(".component_project") as HTMLElement;
+                    const elementComponentTool = elementComponentWindowNew.querySelector(".component_tool") as HTMLElement;
+                    const elementComponentContainer = elementComponentWindowNew.querySelector(".component_container") as HTMLElement;
 
                     if (openerWindowDataCategory === "project") {
                         elementComponentTool.remove();
@@ -164,10 +163,10 @@
                     const elementImage = openerWindow.querySelector("img") as HTMLElement;
                     const elementImageDataSrc = elementImage.getAttribute("src") as string;
 
-                    const elementIcon = elementComponentWindowNew.querySelector(".left_column img") as HTMLElement;
+                    const elementIcon = elementComponentWindowNew.querySelector(".column_left img") as HTMLElement;
                     elementIcon.setAttribute("src", elementImageDataSrc);
 
-                    const elementTitle = elementComponentWindowNew.querySelector(".left_column p") as HTMLElement;
+                    const elementTitle = elementComponentWindowNew.querySelector(".column_left p") as HTMLElement;
                     elementTitle.innerHTML = openerWindowDataName;
 
                     const computedStyle = window.getComputedStyle(elementComponentWindowNew);
@@ -175,7 +174,7 @@
                     windowPositionList[index] = { left: "0", top: "0" };
                     windowSizeList[index] = { width: computedStyle.width, height: computedStyle.height };
 
-                    const elementComponentBody = document.querySelector(".body_component") as HTMLElement;
+                    const elementComponentBody = document.querySelector(".component_body") as HTMLElement;
                     elementComponentBody.appendChild(elementComponentWindowNew);
 
                     if (openerWindowDataCategory === "project") {
@@ -188,7 +187,7 @@
 
                     elementComponentWindow = elementComponentWindowNew;
 
-                    Helper.dragInit(elementComponentWindowNew, ["window_component", "focused"]);
+                    Helper.dragInit(elementComponentWindowNew, ["component_window", "focused"]);
 
                     this.componentFooter.logicInit(openerWindow, index);
                 }
@@ -203,7 +202,7 @@
             if (!this.componentPrompt.logicCheck()) {
                 const elementEventTarget = event.target as HTMLElement;
 
-                const componentWindow = Helper.findElement(elementEventTarget, ["window_component"]);
+                const componentWindow = Helper.findElement(elementEventTarget, ["component_window"]);
 
                 if (componentWindow) {
                     const currentWindow = Helper.currentWindow(componentWindow);
@@ -251,7 +250,7 @@
             if (!this.componentPrompt.logicCheck()) {
                 const elementEventTarget = event.target as HTMLElement;
 
-                const componentWindow = Helper.findElement(elementEventTarget, ["window_component"]);
+                const componentWindow = Helper.findElement(elementEventTarget, ["component_window"]);
 
                 const overlay = elementEventTarget ? Helper.findElement(elementEventTarget, ["overlay"]) : null;
 
@@ -263,7 +262,7 @@
 
         public resizeLogic(): void {
             if (window.innerWidth < Config.data.systemData.desktopWidth) {
-                const elementComponentWindowList = (document.querySelectorAll(".window_component:not(.empty)") as unknown) as HTMLElement[];
+                const elementComponentWindowList = (document.querySelectorAll(".component_window:not(.empty)") as unknown) as HTMLElement[];
 
                 for (const value of elementComponentWindowList) {
                     value.style.transform = "translate3d(0, 0, 0)";
@@ -279,17 +278,17 @@
 
 <style lang="scss" scoped>
     @media (max-width: $mobileWidth) {
-        .window_component {
+        .component_window {
             width: 80%;
         }
     }
     @media (min-width: $desktopWidth) {
-        .window_component {
+        .component_window {
             width: 50%;
         }
     }
 
-    .window_component {
+    .component_window {
         display: none;
         position: fixed;
         height: 550px;
@@ -335,7 +334,7 @@
                 opacity: 0.5;
             }
 
-            .left_column {
+            .column_left {
                 cursor: default;
 
                 img {
@@ -356,7 +355,7 @@
                 }
             }
 
-            .right_column {
+            .column_right {
                 .button {
                     width: 18px;
                     height: 18px;

@@ -1,6 +1,6 @@
 <template>
-    <div class="container_component">
-        <div class="menu_container">
+    <div class="component_container">
+        <div class="parent_menu">
             <p class="button focused">Command</p>
             <p class="button">Console</p>
             <p class="button">Data</p>
@@ -13,12 +13,11 @@
 
 <script lang="ts">
     import { Component, Vue } from "vue-property-decorator";
-
+    // Source
+    import * as Helper from "../assets/js/Helper";
     import ComponentContainerCommand from "./ContainerCommand.vue";
     import ComponentContainerConsole from "./ContainerConsole.vue";
     import ComponentContainerData from "./ContainerData.vue";
-
-    import * as Helper from "../assets/js/Helper";
 
     @Component({
         components: {
@@ -50,10 +49,10 @@
         public logicClick(event: Event): void {
             const elementEventTarget = event.target as HTMLElement;
 
-            const elementMenu = Helper.findElement(elementEventTarget, ["menu_container"]);
+            const elementMenu = Helper.findElement(elementEventTarget, ["parent_menu"]);
 
             if (elementMenu) {
-                const componentWindow = Helper.findElement(elementMenu, ["window_component"]);
+                const componentWindow = Helper.findElement(elementMenu, ["component_window"]);
 
                 if (componentWindow) {
                     const elementButtonList = (elementMenu.querySelectorAll(".button") as unknown) as HTMLElement[];
@@ -67,9 +66,9 @@
 
                         elementButtonList[index].classList.add("focused");
 
-                        const elementComponentCommand = componentWindow.querySelector(".container_component .command_component") as HTMLElement;
-                        const elementComponentConsole = componentWindow.querySelector(".container_component .component_container_console") as HTMLElement;
-                        const elementComponentData = componentWindow.querySelector(".container_component .data_component") as HTMLElement;
+                        const elementComponentCommand = componentWindow.querySelector(".component_container .component_command") as HTMLElement;
+                        const elementComponentConsole = componentWindow.querySelector(".component_container .component_container_console") as HTMLElement;
+                        const elementComponentData = componentWindow.querySelector(".component_container .component_data") as HTMLElement;
 
                         if (index === 0) {
                             elementComponentCommand.style.display = "block";
@@ -98,8 +97,8 @@
 </script>
 
 <style lang="scss" scoped>
-    .container_component {
-        .menu_container {
+    .component_container {
+        .parent_menu {
             height: 28px;
             background-color: #2b2b2b;
             border-bottom: 1px solid #a0a0a0;

@@ -3,11 +3,11 @@
 SET "runningA=false"
 SET "runningB=false"
 
-FOR /f %%i IN ('docker ps --filter "name=NodeJs_14.16.0" --format "{{.Status}}"') DO SET outputA=%%i
+FOR /f %%i IN ('docker ps --filter "name=NodeJs_14.16.1" --format "{{.Status}}"') DO SET outputA=%%i
 FOR /f %%i IN ('docker ps --filter "name=Apache_2.4.46" --format "{{.Status}}"') DO SET outputB=%%i
 
 IF "%outputA%"=="" (
-	docker start NodeJs_14.16.0
+	docker start NodeJs_14.16.1
 
 	SET "runningA=true"
 
@@ -24,7 +24,7 @@ IF "%outputB%"=="" (
 
 IF "%outputA%"=="Up" (
 	IF "%outputB%"=="Up" (
-		docker stop NodeJs_14.16.0
+		docker stop NodeJs_14.16.1
 
 		SET "runningA=false"
 

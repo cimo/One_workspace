@@ -1,10 +1,10 @@
 <template>
-    <div class="git_component">
+    <div class="component_git">
         <div class="menu_git">
             <p class="button focused">Receive</p>
             <p class="button">Send</p>
         </div>
-        <div class="part_1_container">
+        <div class="part_1_parent">
             <div class="left">
                 <div class="section">
                     <p>List:</p>
@@ -49,7 +49,7 @@
                 <div class="button_cmd_window save">Save</div>
             </div>
         </div>
-        <div class="part_2_container">
+        <div class="part_2_parent">
             <div class="left">
                 <div class="section">
                     <p>Project: <span class="project_label"></span></p>
@@ -87,7 +87,7 @@
 
 <script lang="ts">
     import { Component, Vue } from "vue-property-decorator";
-
+    // Source
     import * as Config from "../assets/js/Config";
     import * as Interface from "../assets/js/Interface";
     import * as Helper from "../assets/js/Helper";
@@ -124,33 +124,33 @@
         // Logic
         private logicFindWindowElement(componentWindow?: HTMLElement): void {
             if (componentWindow) {
-                this.elementPart1Container = componentWindow.querySelector(".part_1_container") as HTMLElement;
-                this.elementPart2Container = componentWindow.querySelector(".part_2_container") as HTMLElement;
-                this.selectEdit = componentWindow.querySelector(".part_1_container select[name='edit']") as HTMLSelectElement;
-                this.elementProjectLabel = componentWindow.querySelector(".part_2_container .project_label") as HTMLElement;
-                this.inputUrl = componentWindow.querySelector(".part_1_container input[name='url']") as HTMLInputElement;
-                this.inputUsername = componentWindow.querySelector(".part_1_container input[name='username']") as HTMLInputElement;
-                this.inputEmail = componentWindow.querySelector(".part_1_container input[name='email']") as HTMLInputElement;
-                this.inputPassword = componentWindow.querySelector(".part_1_container input[name='password']") as HTMLInputElement;
-                this.inputBranchName1 = componentWindow.querySelector(".part_1_container input[name='branchName']") as HTMLInputElement;
-                this.inputBranchName2 = componentWindow.querySelector(".part_2_container input[name='branchName']") as HTMLInputElement;
-                this.inputCommitDescription = componentWindow.querySelector(".part_2_container input[name='commitDescription']") as HTMLInputElement;
-                this.elementOutput1 = componentWindow.querySelector(".part_1_container .output") as HTMLElement;
-                this.elementOutput2 = componentWindow.querySelector(".part_2_container .output") as HTMLElement;
+                this.elementPart1Container = componentWindow.querySelector(".part_1_parent") as HTMLElement;
+                this.elementPart2Container = componentWindow.querySelector(".part_2_parent") as HTMLElement;
+                this.selectEdit = componentWindow.querySelector(".part_1_parent select[name='edit']") as HTMLSelectElement;
+                this.elementProjectLabel = componentWindow.querySelector(".part_2_parent .project_label") as HTMLElement;
+                this.inputUrl = componentWindow.querySelector(".part_1_parent input[name='url']") as HTMLInputElement;
+                this.inputUsername = componentWindow.querySelector(".part_1_parent input[name='username']") as HTMLInputElement;
+                this.inputEmail = componentWindow.querySelector(".part_1_parent input[name='email']") as HTMLInputElement;
+                this.inputPassword = componentWindow.querySelector(".part_1_parent input[name='password']") as HTMLInputElement;
+                this.inputBranchName1 = componentWindow.querySelector(".part_1_parent input[name='branchName']") as HTMLInputElement;
+                this.inputBranchName2 = componentWindow.querySelector(".part_2_parent input[name='branchName']") as HTMLInputElement;
+                this.inputCommitDescription = componentWindow.querySelector(".part_2_parent input[name='commitDescription']") as HTMLInputElement;
+                this.elementOutput1 = componentWindow.querySelector(".part_1_parent .output") as HTMLElement;
+                this.elementOutput2 = componentWindow.querySelector(".part_2_parent .output") as HTMLElement;
             } else {
-                this.elementPart1Container = document.querySelector(".window_component:not(.empty) .git_component .part_1_container") as HTMLElement;
-                this.elementPart2Container = document.querySelector(".window_component:not(.empty) .git_component .part_2_container") as HTMLElement;
-                this.selectEdit = document.querySelector(".window_component:not(.empty) .git_component .part_1_container select[name='edit']") as HTMLSelectElement;
-                this.elementProjectLabel = document.querySelector(".window_component:not(.empty) .git_component .part_2_container .project_label") as HTMLElement;
-                this.inputUrl = document.querySelector(".window_component:not(.empty) .git_component .part_1_container input[name='url']") as HTMLInputElement;
-                this.inputUsername = document.querySelector(".window_component:not(.empty) .git_component .part_1_container input[name='username']") as HTMLInputElement;
-                this.inputEmail = document.querySelector(".window_component:not(.empty) .git_component .part_1_container input[name='email']") as HTMLInputElement;
-                this.inputPassword = document.querySelector(".window_component:not(.empty) .git_component .part_1_container input[name='password']") as HTMLInputElement;
-                this.inputBranchName1 = document.querySelector(".window_component:not(.empty) .git_component .part_1_container input[name='branchName']") as HTMLInputElement;
-                this.inputBranchName2 = document.querySelector(".window_component:not(.empty) .git_component .part_2_container input[name='branchName']") as HTMLInputElement;
-                this.inputCommitDescription = document.querySelector(".window_component:not(.empty) .git_component .part_2_container input[name='commitDescription']") as HTMLInputElement;
-                this.elementOutput1 = document.querySelector(".window_component:not(.empty) .git_component .part_1_container .output") as HTMLElement;
-                this.elementOutput2 = document.querySelector(".window_component:not(.empty) .git_component .part_2_container .output") as HTMLElement;
+                this.elementPart1Container = document.querySelector(".component_window:not(.empty) .component_git .part_1_parent") as HTMLElement;
+                this.elementPart2Container = document.querySelector(".component_window:not(.empty) .component_git .part_2_parent") as HTMLElement;
+                this.selectEdit = document.querySelector(".component_window:not(.empty) .component_git .part_1_parent select[name='edit']") as HTMLSelectElement;
+                this.elementProjectLabel = document.querySelector(".component_window:not(.empty) .component_git .part_2_parent .project_label") as HTMLElement;
+                this.inputUrl = document.querySelector(".component_window:not(.empty) .component_git .part_1_parent input[name='url']") as HTMLInputElement;
+                this.inputUsername = document.querySelector(".component_window:not(.empty) .component_git .part_1_parent input[name='username']") as HTMLInputElement;
+                this.inputEmail = document.querySelector(".component_window:not(.empty) .component_git .part_1_parent input[name='email']") as HTMLInputElement;
+                this.inputPassword = document.querySelector(".component_window:not(.empty) .component_git .part_1_parent input[name='password']") as HTMLInputElement;
+                this.inputBranchName1 = document.querySelector(".component_window:not(.empty) .component_git .part_1_parent input[name='branchName']") as HTMLInputElement;
+                this.inputBranchName2 = document.querySelector(".component_window:not(.empty) .component_git .part_2_parent input[name='branchName']") as HTMLInputElement;
+                this.inputCommitDescription = document.querySelector(".component_window:not(.empty) .component_git .part_2_parent input[name='commitDescription']") as HTMLInputElement;
+                this.elementOutput1 = document.querySelector(".component_window:not(.empty) .component_git .part_1_parent .output") as HTMLElement;
+                this.elementOutput2 = document.querySelector(".component_window:not(.empty) .component_git .part_2_parent .output") as HTMLElement;
             }
         }
 
@@ -261,7 +261,7 @@
         public logicClick(event: Event): void {
             const elementEventTarget = event.target as HTMLElement;
 
-            const componentWindow = Helper.findElement(elementEventTarget, ["git_component"], ["window_component"]);
+            const componentWindow = Helper.findElement(elementEventTarget, ["component_git"], ["component_window"]);
 
             if (componentWindow) {
                 this.logicFindWindowElement(componentWindow);
@@ -389,7 +389,7 @@
         public logicChange(event: Event): void {
             const elementEventTarget = event.target as HTMLElement;
 
-            const componentWindow = Helper.findElement(elementEventTarget, ["git_component"], ["window_component"]);
+            const componentWindow = Helper.findElement(elementEventTarget, ["component_git"], ["component_window"]);
 
             if (componentWindow) {
                 this.logicFindWindowElement(componentWindow);
@@ -564,7 +564,7 @@
 </script>
 
 <style lang="scss" scoped>
-    .git_component {
+    .component_git {
         .menu_git {
             height: 28px;
             background-color: #2b2b2b;
@@ -589,8 +589,8 @@
             }
         }
 
-        .part_1_container,
-        .part_2_container {
+        .part_1_parent,
+        .part_2_parent {
             position: absolute;
             top: 28px;
             bottom: 0;
@@ -599,7 +599,7 @@
             padding: 10px;
         }
 
-        .part_1_container {
+        .part_1_parent {
             display: block;
 
             .section {
@@ -609,7 +609,7 @@
             }
         }
 
-        .part_2_container {
+        .part_2_parent {
             display: none;
         }
 
@@ -649,8 +649,8 @@
 
         .section {
             .output {
-                overflow-y: auto;
-                overflow-x: hidden;
+                overflow-y: scroll;
+                overflow-x: auto;
                 height: 240px;
             }
         }

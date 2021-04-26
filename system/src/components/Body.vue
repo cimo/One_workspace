@@ -1,5 +1,5 @@
 <template>
-    <div class="body_component">
+    <div class="component_body">
         <ComponentPrompt />
         <ComponentWindow />
     </div>
@@ -7,7 +7,7 @@
 
 <script lang="ts">
     import { Component, Vue } from "vue-property-decorator";
-
+    // Source
     import ComponentContainer from "./Container.vue";
     import ComponentContainerCommand from "./ContainerCommand.vue";
     import ComponentContainerConsole from "./ContainerConsole.vue";
@@ -116,7 +116,7 @@
 </script>
 
 <style lang="scss" scoped>
-    .body_component {
+    .component_body {
         background-color: #000000;
         position: fixed;
         top: 0;

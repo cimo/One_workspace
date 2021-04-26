@@ -6,14 +6,13 @@
 
 <script lang="ts">
     import { Component, Vue } from "vue-property-decorator";
-
-    import * as Interface from "../assets/js/Interface";
-    import * as Helper from "../assets/js/Helper";
-    import * as Sio from "../assets/js/Sio";
-
     import { Terminal } from "xterm";
     import { FitAddon } from "xterm-addon-fit";
     import "xterm/css/xterm.css";
+    // Source
+    import * as Interface from "../assets/js/Interface";
+    import * as Helper from "../assets/js/Helper";
+    import * as Sio from "../assets/js/Sio";
 
     const xtermList: Interface.XtermList = {};
     const fitAddonList: Interface.FitAddonList = {};
@@ -52,7 +51,7 @@
                 sizeList: [size.cols, size.rows]
             });
 
-            const buttonOpenConsole = document.querySelector(".window_component:not(.empty) .explore_component .button_cmd_window.open_console") as HTMLElement;
+            const buttonOpenConsole = document.querySelector(".component_window:not(.empty) .component_explore .button_cmd_window.open_console") as HTMLElement;
 
             if (buttonOpenConsole) {
                 const containerName = Helper.getOpenWindowFromParent();
@@ -120,7 +119,7 @@
         public logicClick(event: Event): void {
             const elementEventTarget = event.target as HTMLElement;
 
-            const componentWindow = Helper.findElement(elementEventTarget, ["component_tool_console"], ["window_component"]);
+            const componentWindow = Helper.findElement(elementEventTarget, ["component_tool_console"], ["component_window"]);
             const currentWindow = Helper.currentWindow(componentWindow);
 
             if (currentWindow) {
@@ -136,7 +135,7 @@
             const elementTerminalList = (document.querySelectorAll(".component_tool_console .container_terminal") as unknown) as HTMLElement[];
 
             for (const value of elementTerminalList) {
-                const componentWindow = Helper.findElement(value, ["window_component"]);
+                const componentWindow = Helper.findElement(value, ["component_window"]);
                 const currentWindow = Helper.currentWindow(componentWindow);
 
                 if (componentWindow && currentWindow) {

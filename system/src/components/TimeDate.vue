@@ -1,5 +1,5 @@
 <template>
-    <div class="timeDate_component taskbar_element">
+    <div class="component_timeDate element_taskbar">
         <p class="time"></p>
         <p class="date"></p>
     </div>
@@ -47,8 +47,8 @@
         }
 
         public logicInit(): void {
-            this.elementTime = document.querySelector(".timeDate_component .time") as HTMLElement;
-            this.elementDate = document.querySelector(".timeDate_component .date") as HTMLElement;
+            this.elementTime = document.querySelector(".component_timeDate .time") as HTMLElement;
+            this.elementDate = document.querySelector(".component_timeDate .date") as HTMLElement;
 
             this.logicExecute();
 
@@ -60,7 +60,7 @@
 </script>
 
 <style lang="scss" scoped>
-    .timeDate_component {
+    .component_timeDate {
         width: 90px !important;
         padding-top: 6px !important;
 

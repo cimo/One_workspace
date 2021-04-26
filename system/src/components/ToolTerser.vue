@@ -1,5 +1,5 @@
 <template>
-    <div class="terser_component">
+    <div class="component_terser">
         <div class="left">
             <div class="section">
                 <p>List:</p>
@@ -35,7 +35,7 @@
 
 <script lang="ts">
     import { Component, Vue } from "vue-property-decorator";
-
+    // Source
     import * as Config from "../assets/js/Config";
     import * as Interface from "../assets/js/Interface";
     import * as Helper from "../assets/js/Helper";
@@ -68,10 +68,10 @@
                 this.inputFolderOut = componentWindow.querySelector("input[name='folder_output']") as HTMLInputElement;
                 this.elementOutput = componentWindow.querySelector(".output") as HTMLElement;
             } else {
-                this.selectEdit = document.querySelector(".window_component:not(.empty) .terser_component select[name='edit']") as HTMLSelectElement;
-                this.inputFolderIn = document.querySelector(".window_component:not(.empty) .terser_component input[name='folder_input']") as HTMLInputElement;
-                this.inputFolderOut = document.querySelector(".window_component:not(.empty) .terser_component input[name='folder_output']") as HTMLInputElement;
-                this.elementOutput = document.querySelector(".window_component:not(.empty) .terser_component .output") as HTMLElement;
+                this.selectEdit = document.querySelector(".component_window:not(.empty) .component_terser select[name='edit']") as HTMLSelectElement;
+                this.inputFolderIn = document.querySelector(".component_window:not(.empty) .component_terser input[name='folder_input']") as HTMLInputElement;
+                this.inputFolderOut = document.querySelector(".component_window:not(.empty) .component_terser input[name='folder_output']") as HTMLInputElement;
+                this.elementOutput = document.querySelector(".component_window:not(.empty) .component_terser .output") as HTMLElement;
             }
         }
 
@@ -125,7 +125,7 @@
         public logicClick(event: Event): void {
             const elementEventTarget = event.target as HTMLElement;
 
-            const componentWindow = Helper.findElement(elementEventTarget, ["terser_component"], ["window_component"]);
+            const componentWindow = Helper.findElement(elementEventTarget, ["component_terser"], ["component_window"]);
 
             if (componentWindow) {
                 this.logicFindWindowElement(componentWindow);
@@ -175,7 +175,7 @@
         public logicChange(event: Event): void {
             const elementEventTarget = event.target as HTMLElement;
 
-            const componentWindow = Helper.findElement(elementEventTarget, ["terser_component"], ["window_component"]);
+            const componentWindow = Helper.findElement(elementEventTarget, ["component_terser"], ["component_window"]);
 
             if (componentWindow) {
                 this.logicFindWindowElement(componentWindow);
@@ -292,7 +292,7 @@
 </script>
 
 <style lang="scss" scoped>
-    .terser_component {
+    .component_terser {
         position: absolute;
         top: 0;
         bottom: 0;
@@ -332,8 +332,8 @@
 
         .section {
             .output {
-                overflow-y: auto;
-                overflow-x: hidden;
+                overflow-y: scroll;
+                overflow-x: auto;
                 height: 240px;
             }
         }

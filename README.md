@@ -23,7 +23,7 @@ Is a docker service container for have, in one space, a large and complete devel
 
 | Conatiner: |
 |:---|
-| NodeJs 14.16.0 |
+| NodeJs 14.16.1 |
 | Apache 2.4.46 |
 | Php 7.4.16-fpm |
 | MySql 5.7 |

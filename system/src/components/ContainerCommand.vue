@@ -1,11 +1,11 @@
 <template>
-    <div class="command_component">
+    <div class="component_command">
         <div class="section">
             <div class="left">
                 <p>Start a container</p>
             </div>
             <div class="right">
-                <div class="button_cmd_window cmd">Start</div>
+                <div class="button_cmd_window docker">Start</div>
             </div>
         </div>
         <div class="section">
@@ -13,7 +13,7 @@
                 <p>Restart a container</p>
             </div>
             <div class="right">
-                <div class="button_cmd_window cmd">Restart</div>
+                <div class="button_cmd_window docker">Restart</div>
             </div>
         </div>
         <div class="section">
@@ -21,7 +21,7 @@
                 <p>Stop a container</p>
             </div>
             <div class="right">
-                <div class="button_cmd_window cmd">Stop</div>
+                <div class="button_cmd_window docker">Stop</div>
             </div>
         </div>
         <div class="section">
@@ -33,11 +33,10 @@
 
 <script lang="ts">
     import { Component, Vue } from "vue-property-decorator";
-
+    // Source
     import * as Interface from "../assets/js/Interface";
     import * as Helper from "../assets/js/Helper";
     import * as Sio from "../assets/js/Sio";
-
     import ComponentContainerConsole from "./ContainerConsole.vue";
 
     const commandList: Interface.ContainerCommandList = {};
@@ -67,8 +66,8 @@
         private logicFindWindowElement(componentWindow: HTMLElement, currentWindow: Interface.Window): void {
             this.componentWindowList[currentWindow.containerName] = componentWindow;
 
-            const buttonCmdList = (this.componentWindowList[currentWindow.containerName].querySelectorAll(".command_component .right .cmd") as unknown) as HTMLElement[];
-            const elementStatus = this.componentWindowList[currentWindow.containerName].querySelector(".command_component .status") as HTMLElement;
+            const buttonCmdList = (this.componentWindowList[currentWindow.containerName].querySelectorAll(".component_command .right .docker") as unknown) as HTMLElement[];
+            const elementStatus = this.componentWindowList[currentWindow.containerName].querySelector(".component_command .status") as HTMLElement;
 
             this.elementCommandList[currentWindow.containerName] = buttonCmdList;
             this.elementStatusList[currentWindow.containerName] = elementStatus;
@@ -107,15 +106,15 @@
         public logicClick(event: Event): void {
             const elementEventTarget = event.target as HTMLElement;
 
-            const componentWindow = Helper.findElement(elementEventTarget, ["command_component"], ["window_component"]);
+            const componentWindow = Helper.findElement(elementEventTarget, ["component_command"], ["component_window"]);
             const currentWindow = Helper.currentWindow(componentWindow);
 
             if (componentWindow && currentWindow) {
                 this.logicFindWindowElement(componentWindow, currentWindow);
 
-                if (elementEventTarget.classList.contains("cmd")) {
-                    const elementButtonConsole = componentWindow.querySelector(".container_component .menu_container .button:nth-child(2)") as HTMLElement;
-                    const elementButtonData = componentWindow.querySelector(".container_component .menu_container .button:nth-child(3)") as HTMLElement;
+                if (elementEventTarget.classList.contains("docker")) {
+                    const elementButtonConsole = componentWindow.querySelector(".component_container .parent_menu .button:nth-child(2)") as HTMLElement;
+                    const elementButtonData = componentWindow.querySelector(".component_container .parent_menu .button:nth-child(3)") as HTMLElement;
 
                     elementButtonConsole.classList.add("disabled");
                     elementButtonData.classList.add("disabled");
@@ -190,7 +189,7 @@
 </script>
 
 <style lang="scss" scoped>
-    .command_component {
+    .component_command {
         display: block;
         position: absolute;
         top: 28px;

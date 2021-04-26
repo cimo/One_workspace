@@ -1,14 +1,13 @@
 <template>
-    <div class="project_component">
+    <div class="component_project">
         <ComponentProjectExplore />
     </div>
 </template>
 
 <script lang="ts">
     import { Component, Vue } from "vue-property-decorator";
-
+    // Source
     import * as Helper from "../assets/js/Helper";
-
     import ComponentProjectExplore from "./ProjectExplore.vue";
 
     @Component({
@@ -33,18 +32,18 @@
 
             if (currentWindow) {
                 if (currentWindow.name === "Explore") {
-                    const sshComponent = componentWindow.querySelector(".ssh_component") as HTMLElement;
+                    const componentSsh = componentWindow.querySelector(".component_ssh") as HTMLElement;
 
-                    if (sshComponent) {
-                        sshComponent.remove();
+                    if (componentSsh) {
+                        componentSsh.remove();
                     }
 
                     this.componentProjectExplore.logicInit(componentWindow);
                 } else if (currentWindow.name === "Ssh") {
-                    const exploreComponent = componentWindow.querySelector(".explore_component") as HTMLElement;
+                    const componentExplore = componentWindow.querySelector(".component_explore") as HTMLElement;
 
-                    if (exploreComponent) {
-                        exploreComponent.remove();
+                    if (componentExplore) {
+                        componentExplore.remove();
                     }
                 }
             }
@@ -53,6 +52,6 @@
 </script>
 
 <style lang="scss" scoped>
-    .project_component {
+    .component_project {
     }
 </style>

@@ -1,5 +1,5 @@
 <template>
-    <div class="explore_component">
+    <div class="component_explore">
         <div class="left">
             <div class="section">
                 <p>List:</p>
@@ -60,12 +60,11 @@
 
 <script lang="ts">
     import { Component, Vue } from "vue-property-decorator";
-
+    // Source
     import * as Config from "../assets/js/Config";
     import * as Interface from "../assets/js/Interface";
     import * as Helper from "../assets/js/Helper";
     import * as Sio from "../assets/js/Sio";
-
     import ComponentPrompt from "./Prompt.vue";
     import ComponentTool from "./Tool.vue";
     import ComponentToolGit from "./ToolGit.vue";
@@ -125,18 +124,18 @@
                 this.buttonDelete = componentWindow.querySelector(".button_cmd_window.delete") as HTMLButtonElement;
                 this.buttonOpenConsole = componentWindow.querySelector(".button_cmd_window.open_console") as HTMLButtonElement;
             } else {
-                this.selectEdit = document.querySelector(".window_component:not(.empty) .explore_component select[name='edit']") as HTMLSelectElement;
-                this.inputName = document.querySelector(".window_component:not(.empty) .explore_component input[name='name']") as HTMLInputElement;
-                this.inputFolderName = document.querySelector(".window_component:not(.empty) .explore_component input[name='folder_name']") as HTMLInputElement;
-                this.inputUrlRoot = document.querySelector(".window_component:not(.empty) .explore_component input[name='url_root']") as HTMLInputElement;
+                this.selectEdit = document.querySelector(".component_window:not(.empty) .component_explore select[name='edit']") as HTMLSelectElement;
+                this.inputName = document.querySelector(".component_window:not(.empty) .component_explore input[name='name']") as HTMLInputElement;
+                this.inputFolderName = document.querySelector(".component_window:not(.empty) .component_explore input[name='folder_name']") as HTMLInputElement;
+                this.inputUrlRoot = document.querySelector(".component_window:not(.empty) .component_explore input[name='url_root']") as HTMLInputElement;
                 this.textareaDescription = document.querySelector("textarea[name='description']") as HTMLTextAreaElement;
-                this.checkboxGit = document.querySelector(".window_component:not(.empty) .explore_component input[name='git']") as HTMLInputElement;
-                this.checkboxTerser = document.querySelector(".window_component:not(.empty) .explore_component input[name='terser']") as HTMLInputElement;
-                this.checkboxSass = document.querySelector(".window_component:not(.empty) .explore_component input[name='sass']") as HTMLInputElement;
-                this.checkboxConsoleNodeJs = document.querySelector(".window_component:not(.empty) .explore_component input[name='console_nodejs']") as HTMLInputElement;
-                this.checkboxConsolePython = document.querySelector(".window_component:not(.empty) .explore_component input[name='console_python']") as HTMLInputElement;
-                this.buttonDelete = document.querySelector(".window_component:not(.empty) .explore_component .button_cmd_window.delete") as HTMLButtonElement;
-                this.buttonOpenConsole = document.querySelector(".window_component:not(.empty) .explore_component .button_cmd_window.open_console") as HTMLButtonElement;
+                this.checkboxGit = document.querySelector(".component_window:not(.empty) .component_explore input[name='git']") as HTMLInputElement;
+                this.checkboxTerser = document.querySelector(".component_window:not(.empty) .component_explore input[name='terser']") as HTMLInputElement;
+                this.checkboxSass = document.querySelector(".component_window:not(.empty) .component_explore input[name='sass']") as HTMLInputElement;
+                this.checkboxConsoleNodeJs = document.querySelector(".component_window:not(.empty) .component_explore input[name='console_nodejs']") as HTMLInputElement;
+                this.checkboxConsolePython = document.querySelector(".component_window:not(.empty) .component_explore input[name='console_python']") as HTMLInputElement;
+                this.buttonDelete = document.querySelector(".component_window:not(.empty) .component_explore .button_cmd_window.delete") as HTMLButtonElement;
+                this.buttonOpenConsole = document.querySelector(".component_window:not(.empty) .component_explore .button_cmd_window.open_console") as HTMLButtonElement;
             }
         }
 
@@ -198,7 +197,7 @@
         public logicClick(event: Event): void {
             const elementEventTarget = event.target as HTMLElement;
 
-            const componentWindow = Helper.findElement(elementEventTarget, ["explore_component"], ["window_component"]);
+            const componentWindow = Helper.findElement(elementEventTarget, ["component_explore"], ["component_window"]);
 
             if (componentWindow) {
                 this.logicFindWindowElement(componentWindow);
@@ -382,7 +381,7 @@
                     }
                 } else if (elementEventTarget.classList.contains("open_console")) {
                     if (this.selectEdit.selectedIndex > 0 && this.buttonOpenConsole.getAttribute("data-path") !== "") {
-                        const buttonConsole = document.querySelector(".menuRoot_container .menuRoot_panel .window_opener[data-name='Console']") as HTMLElement;
+                        const buttonConsole = document.querySelector(".menuRoot_parent .menuRoot_panel .window_opener[data-name='Console']") as HTMLElement;
 
                         if (buttonConsole) {
                             let containerName = "";
@@ -413,7 +412,7 @@
         public logicChange(event: Event): void {
             const elementEventTarget = event.target as HTMLElement;
 
-            const componentWindow = Helper.findElement(elementEventTarget, ["explore_component"], ["window_component"]);
+            const componentWindow = Helper.findElement(elementEventTarget, ["component_explore"], ["component_window"]);
 
             if (componentWindow) {
                 this.logicFindWindowElement(componentWindow);
@@ -482,7 +481,7 @@
 </script>
 
 <style lang="scss" scoped>
-    .explore_component {
+    .component_explore {
         position: absolute;
         top: 0;
         bottom: 0;

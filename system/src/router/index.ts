@@ -1,5 +1,6 @@
 import Vue from "vue";
 import VueRouter, { RouteConfig } from "vue-router";
+// Source
 import Body from "../components/Body.vue";
 
 Vue.use(VueRouter);

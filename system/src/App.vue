@@ -7,7 +7,7 @@
 
 <script lang="ts">
     import { Component, Vue } from "vue-property-decorator";
-
+    // Source
     import ComponentBody from "./components/Body.vue";
     import ComponentFooter from "./components/Footer.vue";
 

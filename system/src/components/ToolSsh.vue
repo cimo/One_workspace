@@ -1,10 +1,10 @@
 <template>
-    <div class="ssh_component">
+    <div class="component_ssh">
         <div class="menu_ssh">
             <p class="button focused">Data</p>
             <p class="button">Console</p>
         </div>
-        <div class="part_1_container">
+        <div class="part_1_parent">
             <div class="section">
                 <p>List:</p>
                 <select class="edit" name="edit">
@@ -40,7 +40,7 @@
                 <div class="button_cmd_window save">Save</div>
             </div>
         </div>
-        <div class="part_2_container">
+        <div class="part_2_parent">
             <div class="container_terminal"></div>
         </div>
     </div>
@@ -48,17 +48,15 @@
 
 <script lang="ts">
     import { Component, Vue } from "vue-property-decorator";
-
+    import { Terminal } from "xterm";
+    import { FitAddon } from "xterm-addon-fit";
+    import "xterm/css/xterm.css";
+    // Source
     import * as Config from "../assets/js/Config";
     import * as Interface from "../assets/js/Interface";
     import * as Helper from "../assets/js/Helper";
     import * as Sio from "../assets/js/Sio";
-
     import ComponentPrompt from "./Prompt.vue";
-
-    import { Terminal } from "xterm";
-    import { FitAddon } from "xterm-addon-fit";
-    import "xterm/css/xterm.css";
 
     let xterm: any = null;
     let fitAddon: any = null;
@@ -93,14 +91,14 @@
 
         // Logic
         private logicFindWindowElement(componentWindow: HTMLElement): void {
-            this.elementPart1Container = componentWindow.querySelector(".part_1_container") as HTMLElement;
-            this.elementPart2Container = componentWindow.querySelector(".part_2_container") as HTMLElement;
-            this.selectEdit = componentWindow.querySelector(".part_1_container select[name='edit']") as HTMLSelectElement;
-            this.inputName = componentWindow.querySelector(".part_1_container input[name='name']") as HTMLInputElement;
-            this.inputServer = componentWindow.querySelector(".part_1_container input[name='server']") as HTMLInputElement;
-            this.inputUsername = componentWindow.querySelector(".part_1_container input[name='username']") as HTMLInputElement;
-            this.inputPassword = componentWindow.querySelector(".part_1_container input[name='password']") as HTMLInputElement;
-            this.inputKeyPublic = componentWindow.querySelector(".part_1_container input[name='key_public']") as HTMLInputElement;
+            this.elementPart1Container = componentWindow.querySelector(".part_1_parent") as HTMLElement;
+            this.elementPart2Container = componentWindow.querySelector(".part_2_parent") as HTMLElement;
+            this.selectEdit = componentWindow.querySelector(".part_1_parent select[name='edit']") as HTMLSelectElement;
+            this.inputName = componentWindow.querySelector(".part_1_parent input[name='name']") as HTMLInputElement;
+            this.inputServer = componentWindow.querySelector(".part_1_parent input[name='server']") as HTMLInputElement;
+            this.inputUsername = componentWindow.querySelector(".part_1_parent input[name='username']") as HTMLInputElement;
+            this.inputPassword = componentWindow.querySelector(".part_1_parent input[name='password']") as HTMLInputElement;
+            this.inputKeyPublic = componentWindow.querySelector(".part_1_parent input[name='key_public']") as HTMLInputElement;
             this.textareaDescription = componentWindow.querySelector("textarea[name='description']") as HTMLTextAreaElement;
             this.buttonDelete = componentWindow.querySelector(".button_cmd_window.delete") as HTMLButtonElement;
         }
@@ -303,7 +301,7 @@
         public logicClick(event: Event): void {
             const elementEventTarget = event.target as HTMLElement;
 
-            const componentWindow = Helper.findElement(elementEventTarget, ["ssh_component"], ["window_component"]);
+            const componentWindow = Helper.findElement(elementEventTarget, ["component_ssh"], ["component_window"]);
 
             if (componentWindow) {
                 if (xterm) {
@@ -445,7 +443,7 @@
         public logicChange(event: Event): void {
             const elementEventTarget = event.target as HTMLElement;
 
-            const componentWindow = Helper.findElement(elementEventTarget, ["ssh_component"], ["window_component"]);
+            const componentWindow = Helper.findElement(elementEventTarget, ["component_ssh"], ["component_window"]);
 
             if (componentWindow) {
                 this.logicFindWindowElement(componentWindow);
@@ -468,10 +466,10 @@
         }
 
         public logicResize(): void {
-            const elementTerminalList = (document.querySelectorAll(".ssh_component .container_terminal") as unknown) as HTMLElement[];
+            const elementTerminalList = (document.querySelectorAll(".component_ssh .container_terminal") as unknown) as HTMLElement[];
 
             for (const value of elementTerminalList) {
-                const componentWindow = Helper.findElement(value, ["window_component"]);
+                const componentWindow = Helper.findElement(value, ["component_window"]);
 
                 if (componentWindow) {
                     if (!componentWindow.classList.contains("minimized") && xterm && fitAddon) {
@@ -506,7 +504,7 @@
 </script>
 
 <style lang="scss" scoped>
-    .ssh_component {
+    .component_ssh {
         .menu_ssh {
             height: 28px;
             background-color: #2b2b2b;
@@ -531,7 +529,7 @@
             }
         }
 
-        .part_1_container {
+        .part_1_parent {
             position: absolute;
             top: 28px;
             bottom: 0;
@@ -541,7 +539,7 @@
             display: block;
         }
 
-        .part_2_container {
+        .part_2_parent {
             position: absolute;
             top: 29px;
             bottom: 0;

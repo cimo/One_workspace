@@ -1,12 +1,12 @@
 <template>
-    <div class="footer_component">
-        <div class="left_column">
+    <div class="component_footer">
+        <div class="column_left">
             <ComponentMenuRoot />
-            <div class="taskbar_element program empty">
+            <div class="element_taskbar program empty">
                 <img class="icon_window" src="" alt="icon_window" />
             </div>
         </div>
-        <div class="right_column">
+        <div class="column_right">
             <ComponentTimeDate />
         </div>
     </div>
@@ -14,9 +14,8 @@
 
 <script lang="ts">
     import { Component, Vue } from "vue-property-decorator";
-
+    // Source
     import * as Helper from "../assets/js/Helper";
-
     import ComponentMenuRoot from "./MenuRoot.vue";
     import ComponentPrompt from "./Prompt.vue";
     import ComponentTimeDate from "./TimeDate.vue";
@@ -40,7 +39,7 @@
 
         // Logic
         public logicInit(openerWindow: HTMLElement, index: number): void {
-            const elementTaskbarEmpty = document.querySelector(".footer_component .left_column .taskbar_element.empty") as HTMLElement;
+            const elementTaskbarEmpty = document.querySelector(".component_footer .column_left .element_taskbar.empty") as HTMLElement;
 
             const elementTaskbarNew = elementTaskbarEmpty.cloneNode(true) as HTMLElement;
             elementTaskbarNew.classList.remove("empty");
@@ -53,7 +52,7 @@
             const elementIcon = elementTaskbarNew.querySelector("img") as HTMLElement;
             elementIcon.setAttribute("src", openerWindowElementImgSrc);
 
-            const elementLeftColumn = document.querySelector(".footer_component .left_column") as HTMLElement;
+            const elementLeftColumn = document.querySelector(".component_footer .column_left") as HTMLElement;
             elementLeftColumn.appendChild(elementTaskbarNew);
         }
 
@@ -64,13 +63,13 @@
                 return false;
             }
 
-            const elementTaskbar = Helper.findElement(elementEventTarget, ["taskbar_element"]);
+            const elementTaskbar = Helper.findElement(elementEventTarget, ["element_taskbar"]);
 
             if (elementTaskbar) {
                 const elementTaskbarDataIndex = elementTaskbar.getAttribute("data-index") as string;
 
                 if (elementTaskbarDataIndex) {
-                    const componentWindow = document.querySelector(`.window_component[data-index="${elementTaskbarDataIndex}"]`) as HTMLElement;
+                    const componentWindow = document.querySelector(`.component_window[data-index="${elementTaskbarDataIndex}"]`) as HTMLElement;
 
                     if (elementTaskbar.classList.contains("focused")) {
                         this.logicMinimize(componentWindow);
@@ -87,7 +86,7 @@
             if (openerWindow) {
                 const openerWindowDataIndex = openerWindow.getAttribute("data-index") as string;
 
-                const elementTaskbar = document.querySelector(`.footer_component .left_column .taskbar_element[data-index="${openerWindowDataIndex}"]`) as HTMLElement;
+                const elementTaskbar = document.querySelector(`.component_footer .column_left .element_taskbar[data-index="${openerWindowDataIndex}"]`) as HTMLElement;
 
                 elementTaskbar.classList.add("minimized");
 
@@ -98,7 +97,7 @@
 
         public logicRemove(openerWindow: HTMLElement): void {
             const openerWindowDataIndex = openerWindow.getAttribute("data-index") as string;
-            const elementTaskbar = document.querySelector(`.footer_component .left_column .taskbar_element[data-index="${openerWindowDataIndex}"]`) as HTMLElement;
+            const elementTaskbar = document.querySelector(`.component_footer .column_left .element_taskbar[data-index="${openerWindowDataIndex}"]`) as HTMLElement;
 
             const elementTaskbarParentNode = elementTaskbar.parentNode as HTMLElement;
             elementTaskbarParentNode.removeChild(elementTaskbar);
@@ -107,7 +106,7 @@
 </script>
 
 <style lang="scss">
-    .footer_component {
+    .component_footer {
         display: flex;
         justify-content: space-between;
         height: 40px;
@@ -118,19 +117,19 @@
         bottom: 0;
         border-bottom: 1px solid #424242;
 
-        .left_column {
-            .taskbar_element {
+        .column_left {
+            .element_taskbar {
                 margin-left: 5px;
             }
         }
 
-        .right_column {
-            .taskbar_element {
+        .column_right {
+            .element_taskbar {
                 margin-right: 5px;
             }
         }
 
-        .taskbar_element {
+        .element_taskbar {
             text-align: center;
             display: inline-block;
             color: #ffffff;

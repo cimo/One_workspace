@@ -1,5 +1,5 @@
 <template>
-    <div class="data_component">
+    <div class="component_data">
         <div class="square square_1">
             <p class="title">CPU</p>
             <p class="value"></p>
@@ -21,7 +21,7 @@
 
 <script lang="ts">
     import { Component, Vue } from "vue-property-decorator";
-
+    // Source
     import * as Interface from "../assets/js/Interface";
     import * as Helper from "../assets/js/Helper";
     import * as Sio from "../assets/js/Sio";
@@ -60,10 +60,10 @@
                             const resultList = data.out.split("[-]");
 
                             if (resultList.length > 1) {
-                                const squareValue1 = this.componentWindowList[containerName].querySelector(".data_component .square_1 .value") as HTMLElement;
-                                const squareValue2 = this.componentWindowList[containerName].querySelector(".data_component .square_2 .value") as HTMLElement;
-                                const squareValue3 = this.componentWindowList[containerName].querySelector(".data_component .square_3 .value") as HTMLElement;
-                                const squareValue4 = this.componentWindowList[containerName].querySelector(".data_component .square_4 .value") as HTMLElement;
+                                const squareValue1 = this.componentWindowList[containerName].querySelector(".component_data .square_1 .value") as HTMLElement;
+                                const squareValue2 = this.componentWindowList[containerName].querySelector(".component_data .square_2 .value") as HTMLElement;
+                                const squareValue3 = this.componentWindowList[containerName].querySelector(".component_data .square_3 .value") as HTMLElement;
+                                const squareValue4 = this.componentWindowList[containerName].querySelector(".component_data .square_4 .value") as HTMLElement;
 
                                 squareValue1.innerHTML = resultList[0];
                                 squareValue2.innerHTML = resultList[1];
@@ -102,7 +102,7 @@
 </script>
 
 <style lang="scss" scoped>
-    .data_component {
+    .component_data {
         display: none;
         position: absolute;
         top: 28px;

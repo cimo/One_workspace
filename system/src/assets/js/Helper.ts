@@ -1,3 +1,4 @@
+// Source
 import * as Interface from "./Interface";
 
 let dragTagList: string[][] = [];
@@ -104,7 +105,7 @@ export const findNextElement = (listTag: string, targetTag: string): HTMLElement
 };
 
 export const currentWindow = (element: HTMLElement | null): Interface.Window | null => {
-    if (element && element.classList.contains("window_component")) {
+    if (element && element.classList.contains("component_window")) {
         const dataIndex = element.getAttribute("data-index") as string;
         const dataName = element.getAttribute("data-name") as string;
 
@@ -129,8 +130,8 @@ export const currentWindow = (element: HTMLElement | null): Interface.Window | n
 };
 
 export const focusCurrentWindow = (componentWindow?: HTMLElement): void => {
-    const elementFocused = document.querySelector(".window_component.focused") as HTMLElement;
-    const elementComponentWindowList = (document.querySelectorAll(".window_component:not(.empty)") as unknown) as HTMLElement[];
+    const elementFocused = document.querySelector(".component_window.focused") as HTMLElement;
+    const elementComponentWindowList = (document.querySelectorAll(".component_window:not(.empty)") as unknown) as HTMLElement[];
     const elementFocusedDataIndex = elementFocused ? (elementFocused.getAttribute("data-index") as string) : "";
 
     for (const value of elementComponentWindowList) {
@@ -151,13 +152,13 @@ export const focusCurrentWindow = (componentWindow?: HTMLElement): void => {
 };
 
 export const focusNextWindow = (): void => {
-    const elementComponentWindowList = (document.querySelectorAll(".window_component:not(.empty)") as unknown) as HTMLElement[];
+    const elementComponentWindowList = (document.querySelectorAll(".component_window:not(.empty)") as unknown) as HTMLElement[];
 
     for (const value of elementComponentWindowList) {
         value.classList.remove("focused");
     }
 
-    const elementComponentWindowMinimizedList = (document.querySelectorAll(".window_component:not(.empty):not(.minimized)") as unknown) as HTMLElement[];
+    const elementComponentWindowMinimizedList = (document.querySelectorAll(".component_window:not(.empty):not(.minimized)") as unknown) as HTMLElement[];
 
     if (elementComponentWindowMinimizedList.length > 0) {
         const index = elementComponentWindowMinimizedList.length - 1;
@@ -168,18 +169,18 @@ export const focusNextWindow = (): void => {
 };
 
 export const focusCurrentTaskbarElement = (): void => {
-    const elementTaskbarList = (document.querySelectorAll(".footer_component .left_column .taskbar_element:not(.empty)") as unknown) as HTMLElement[];
+    const elementTaskbarList = (document.querySelectorAll(".component_footer .column_left .element_taskbar:not(.empty)") as unknown) as HTMLElement[];
 
     for (const value of elementTaskbarList) {
         value.classList.remove("focused");
     }
 
-    const elementFocused = document.querySelector(".window_component:not(.empty):not(.minimized).focused") as HTMLElement;
+    const elementFocused = document.querySelector(".component_window:not(.empty):not(.minimized).focused") as HTMLElement;
 
     if (elementFocused) {
         const elementFocusedDataIndex = elementFocused.getAttribute("data-index") as string;
 
-        const elementTaskbar = document.querySelector(`.footer_component .left_column .taskbar_element[data-index="${elementFocusedDataIndex}"]`) as HTMLElement;
+        const elementTaskbar = document.querySelector(`.component_footer .column_left .element_taskbar[data-index="${elementFocusedDataIndex}"]`) as HTMLElement;
 
         if (elementTaskbar) {
             elementTaskbar.classList.add("focused");
@@ -188,13 +189,13 @@ export const focusCurrentTaskbarElement = (): void => {
 };
 
 export const unMinimizeElement = (index: string): void => {
-    const elementComponentWindowList = (document.querySelectorAll(".window_component:not(.empty)") as unknown) as HTMLElement[];
+    const elementComponentWindowList = (document.querySelectorAll(".component_window:not(.empty)") as unknown) as HTMLElement[];
 
     for (const value of elementComponentWindowList) {
         value.classList.remove("focused");
     }
 
-    const elementComponentWindow = document.querySelector(`.window_component[data-index="${index}"]`) as HTMLElement;
+    const elementComponentWindow = document.querySelector(`.component_window[data-index="${index}"]`) as HTMLElement;
 
     if (elementComponentWindow) {
         elementComponentWindow.classList.remove("minimized");
@@ -205,13 +206,13 @@ export const unMinimizeElement = (index: string): void => {
         elementComponentWindowParentNode.appendChild(elementComponentWindow);
     }
 
-    const elementTaskbarList = (document.querySelectorAll(".footer_component .left_column .taskbar_element:not(.empty)") as unknown) as HTMLElement[];
+    const elementTaskbarList = (document.querySelectorAll(".component_footer .column_left .element_taskbar:not(.empty)") as unknown) as HTMLElement[];
 
     for (const value of elementTaskbarList) {
         value.classList.remove("focused");
     }
 
-    const elementTaskbar = document.querySelector(`.footer_component .left_column .taskbar_element[data-index="${index}"]`) as HTMLElement;
+    const elementTaskbar = document.querySelector(`.component_footer .column_left .element_taskbar[data-index="${index}"]`) as HTMLElement;
 
     if (elementTaskbar) {
         elementTaskbar.classList.remove("minimized");
@@ -234,7 +235,7 @@ export const replaceName = (name: string, rule: RegExp, isLower: boolean): strin
 };
 
 export const lastWindowIndex = (): number => {
-    const elementComponentWindowList = (document.querySelectorAll(".window_component:not(.empty)") as unknown) as HTMLElement[];
+    const elementComponentWindowList = (document.querySelectorAll(".component_window:not(.empty)") as unknown) as HTMLElement[];
     const indexList: number[] = [];
 
     if (elementComponentWindowList.length === 0) {

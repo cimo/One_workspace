@@ -1,5 +1,5 @@
 <template>
-    <div class="prompt_component">
+    <div class="component_prompt">
         <div class="header drag">
             <p>Warning</p>
         </div>
@@ -15,7 +15,7 @@
 
 <script lang="ts">
     import { Component, Vue } from "vue-property-decorator";
-
+    // Source
     import * as Helper from "../assets/js/Helper";
 
     @Component({
@@ -36,7 +36,7 @@
 
         // Logic
         private logicFindWindowElement(): void {
-            this.element = document.querySelector(".prompt_component") as HTMLElement;
+            this.element = document.querySelector(".component_prompt") as HTMLElement;
 
             if (this.element) {
                 this.elementBodyMessage = this.element.querySelector(".body .message") as HTMLElement;
@@ -61,7 +61,7 @@
             this.logicFindWindowElement();
 
             if (this.element) {
-                Helper.dragInit(this.element, ["prompt_component"]);
+                Helper.dragInit(this.element, ["component_prompt"]);
             }
         }
 
@@ -111,7 +111,7 @@
 </script>
 
 <style lang="scss" scoped>
-    .prompt_component {
+    .component_prompt {
         display: none;
         position: fixed;
         top: 50%;

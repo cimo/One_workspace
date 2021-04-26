@@ -1,9 +1,9 @@
 <template>
-    <div class="menuRoot_component taskbar_element">
+    <div class="component_menuRoot element_taskbar">
         <img class="menuRoot_image" src="../assets/images/menu_root.svg" alt="menu_root.svg" />
-        <div class="menuRoot_container">
+        <div class="menuRoot_parent">
             <div class="menuRoot_side">
-                <div class="menuRoot_side_container">
+                <div class="itemList_parent">
                     <div v-for="(value, key) in interfaceConfig.menuRoot.sideItemList" v-bind:key="`${key}-${value.name}`" class="window_opener" v-bind:data-category="value.category" v-bind:data-name="value.name">
                         <div class="item">
                             <img class="icon" v-bind:src="value.imagePath" v-bind:alt="value.imageName" />
@@ -40,11 +40,10 @@
 
 <script lang="ts">
     import { Component, Vue } from "vue-property-decorator";
-
+    // Source
     import * as Config from "../assets/js/Config";
     import * as Interface from "../assets/js/Interface";
     import * as Helper from "../assets/js/Helper";
-
     import ComponentPrompt from "./Prompt.vue";
     import ComponentWindow from "./Window.vue";
 
@@ -56,7 +55,7 @@
         private componentPrompt!: ComponentPrompt;
         private componentWindow!: ComponentWindow;
         private interfaceConfig!: Interface.Config;
-        private elementMenuRootContainer!: HTMLElement;
+        private elementMenuRoot!: HTMLElement;
 
         // Hooks
         protected created(): void {
@@ -71,22 +70,22 @@
         public logicClick(event: Event): boolean {
             const elementEventTarget = event.target as HTMLElement;
 
-            const elementMenuRootComponent = Helper.findElement(elementEventTarget, ["menuRoot_component"]);
+            const elementMenuRootComponent = Helper.findElement(elementEventTarget, ["component_menuRoot"]);
 
             if (elementMenuRootComponent) {
-                this.elementMenuRootContainer = elementMenuRootComponent.querySelector(".menuRoot_container") as HTMLElement;
+                this.elementMenuRoot = elementMenuRootComponent.querySelector(".menuRoot_parent") as HTMLElement;
 
                 if (!elementMenuRootComponent || this.componentPrompt.logicCheck()) {
-                    this.elementMenuRootContainer.style.display = "none";
+                    this.elementMenuRoot.style.display = "none";
 
                     return false;
                 }
 
-                if (elementEventTarget.classList.contains("menuRoot_component") || elementEventTarget.classList.contains("menuRoot_image")) {
-                    if (this.elementMenuRootContainer.style.display === "" || this.elementMenuRootContainer.style.display === "none") {
-                        this.elementMenuRootContainer.style.display = "block";
+                if (elementEventTarget.classList.contains("component_menuRoot") || elementEventTarget.classList.contains("menuRoot_image")) {
+                    if (this.elementMenuRoot.style.display === "" || this.elementMenuRoot.style.display === "none") {
+                        this.elementMenuRoot.style.display = "block";
                     } else {
-                        this.elementMenuRootContainer.style.display = "none";
+                        this.elementMenuRoot.style.display = "none";
                     }
                 }
 
@@ -105,10 +104,10 @@
                         this.componentWindow.logicInit(elementWindowOpener);
                     }
 
-                    this.elementMenuRootContainer.style.display = "none";
+                    this.elementMenuRoot.style.display = "none";
                 }
-            } else if (this.elementMenuRootContainer) {
-                this.elementMenuRootContainer.style.display = "none";
+            } else if (this.elementMenuRoot) {
+                this.elementMenuRoot.style.display = "none";
             }
 
             return true;
@@ -117,8 +116,8 @@
 </script>
 
 <style lang="scss" scoped>
-    .menuRoot_component {
-        .menuRoot_container {
+    .component_menuRoot {
+        .menuRoot_parent {
             display: none;
             position: fixed;
             bottom: 40px;
@@ -138,10 +137,8 @@
                 top: 100px;
                 left: 0;
                 cursor: default;
-            }
 
-            .menuRoot_side {
-                .menuRoot_side_container {
+                .itemList_parent {
                     position: absolute;
                     bottom: 0;
 
