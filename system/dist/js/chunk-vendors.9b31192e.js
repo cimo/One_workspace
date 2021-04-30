@@ -12480,12 +12480,14 @@ module.exports = function (argument) {
   !*** ./node_modules/core-js/internals/has.js ***!
   \***********************************************/
 /*! no static exports found */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
+
+var toObject = __webpack_require__(/*! ../internals/to-object */ "7b0b");
 
 var hasOwnProperty = {}.hasOwnProperty;
 
-module.exports = function (it, key) {
-  return hasOwnProperty.call(it, key);
+module.exports = function hasOwn(it, key) {
+  return hasOwnProperty.call(toObject(it), key);
 };
 
 
@@ -12693,7 +12695,7 @@ var store = __webpack_require__(/*! ../internals/shared-store */ "c6cd");
 (module.exports = function (key, value) {
   return store[key] || (store[key] = value !== undefined ? value : {});
 })('versions', []).push({
-  version: '3.10.1',
+  version: '3.11.1',
   mode: IS_PURE ? 'pure' : 'global',
   copyright: '© 2021 Denis Pushkarev (zloirock.ru)'
 });
@@ -12979,6 +12981,7 @@ var shared = __webpack_require__(/*! ../internals/shared-store */ "c6cd");
 var sharedKey = __webpack_require__(/*! ../internals/shared-key */ "f772");
 var hiddenKeys = __webpack_require__(/*! ../internals/hidden-keys */ "d012");
 
+var OBJECT_ALREADY_INITIALIZED = 'Object already initialized';
 var WeakMap = global.WeakMap;
 var set, get, has;
 
@@ -13001,6 +13004,7 @@ if (NATIVE_WEAK_MAP) {
   var wmhas = store.has;
   var wmset = store.set;
   set = function (it, metadata) {
+    if (wmhas.call(store, it)) throw new TypeError(OBJECT_ALREADY_INITIALIZED);
     metadata.facade = it;
     wmset.call(store, it, metadata);
     return metadata;
@@ -13015,6 +13019,7 @@ if (NATIVE_WEAK_MAP) {
   var STATE = sharedKey('state');
   hiddenKeys[STATE] = true;
   set = function (it, metadata) {
+    if (objectHas(it, STATE)) throw new TypeError(OBJECT_ALREADY_INITIALIZED);
     metadata.facade = it;
     createNonEnumerableProperty(it, STATE, metadata);
     return metadata;
@@ -18187,7 +18192,7 @@ var UPDATES_LAST_INDEX_WRONG = (function () {
 var UNSUPPORTED_Y = stickyHelpers.UNSUPPORTED_Y || stickyHelpers.BROKEN_CARET;
 
 // nonparticipating capturing group, copied from es5-shim's String#split patch.
-// eslint-disable-next-line regexp/no-assertion-capturing-group, regexp/no-empty-group -- required for testing
+// eslint-disable-next-line regexp/no-assertion-capturing-group, regexp/no-empty-group, regexp/no-lazy-ends -- testing
 var NPCG_INCLUDED = /()??/.exec('')[1] !== undefined;
 
 var PATCH = UPDATES_LAST_INDEX_WRONG || NPCG_INCLUDED || UNSUPPORTED_Y;
@@ -18948,7 +18953,7 @@ var wrappedWellKnownSymbolModule = __webpack_require__(/*! ../internals/well-kno
 var defineWellKnownSymbol = __webpack_require__(/*! ../internals/define-well-known-symbol */ "746f");
 var setToStringTag = __webpack_require__(/*! ../internals/set-to-string-tag */ "d44e");
 var InternalStateModule = __webpack_require__(/*! ../internals/internal-state */ "69f3");
-var $forEach = __webpack_require__(/*! ../internals/array-iteration */ "b7271").forEach;
+var $forEach = __webpack_require__(/*! ../internals/array-iteration */ "b727").forEach;
 
 var HIDDEN = sharedKey('hidden');
 var SYMBOL = 'Symbol';
@@ -21552,7 +21557,7 @@ $({ target: 'Object', stat: true, forced: FAILS_ON_PRIMITIVES }, {
 
 /***/ }),
 
-/***/ "b7271":
+/***/ "b727":
 /*!***********************************************************!*\
   !*** ./node_modules/core-js/internals/array-iteration.js ***!
   \***********************************************************/
@@ -24669,6 +24674,7 @@ var getBuiltIn = __webpack_require__(/*! ../internals/get-built-in */ "d066");
 var NativePromise = __webpack_require__(/*! ../internals/native-promise-constructor */ "fea9");
 var redefine = __webpack_require__(/*! ../internals/redefine */ "6eeb");
 var redefineAll = __webpack_require__(/*! ../internals/redefine-all */ "e2cc");
+var setPrototypeOf = __webpack_require__(/*! ../internals/object-set-prototype-of */ "d2bb");
 var setToStringTag = __webpack_require__(/*! ../internals/set-to-string-tag */ "d44e");
 var setSpecies = __webpack_require__(/*! ../internals/set-species */ "2626");
 var isObject = __webpack_require__(/*! ../internals/is-object */ "861d");
@@ -24695,11 +24701,11 @@ var PROMISE = 'Promise';
 var getInternalState = InternalStateModule.get;
 var setInternalState = InternalStateModule.set;
 var getInternalPromiseState = InternalStateModule.getterFor(PROMISE);
+var NativePromisePrototype = NativePromise && NativePromise.prototype;
 var PromiseConstructor = NativePromise;
 var TypeError = global.TypeError;
 var document = global.document;
 var process = global.process;
-var $fetch = getBuiltIn('fetch');
 var newPromiseCapability = newPromiseCapabilityModule.f;
 var newGenericPromiseCapability = newPromiseCapability;
 var DISPATCH_EVENT = !!(document && document.createEvent && global.dispatchEvent);
@@ -24946,11 +24952,11 @@ if (FORCED) {
       : newGenericPromiseCapability(C);
   };
 
-  if (!IS_PURE && typeof NativePromise == 'function') {
-    nativeThen = NativePromise.prototype.then;
+  if (!IS_PURE && typeof NativePromise == 'function' && NativePromisePrototype !== Object.prototype) {
+    nativeThen = NativePromisePrototype.then;
 
-    // wrap native Promise#then for native async functions
-    redefine(NativePromise.prototype, 'then', function then(onFulfilled, onRejected) {
+    // make `Promise#then` return a polyfilled `Promise` for native promise-based APIs
+    redefine(NativePromisePrototype, 'then', function then(onFulfilled, onRejected) {
       var that = this;
       return new PromiseConstructor(function (resolve, reject) {
         nativeThen.call(that, resolve, reject);
@@ -24958,13 +24964,15 @@ if (FORCED) {
     // https://github.com/zloirock/core-js/issues/640
     }, { unsafe: true });
 
-    // wrap fetch result
-    if (typeof $fetch == 'function') $({ global: true, enumerable: true, forced: true }, {
-      // eslint-disable-next-line no-unused-vars -- required for `.length`
-      fetch: function fetch(input /* , init */) {
-        return promiseResolve(PromiseConstructor, $fetch.apply(global, arguments));
-      }
-    });
+    // make `.constructor === Promise` work for native promise-based APIs
+    try {
+      delete NativePromisePrototype.constructor;
+    } catch (error) { /* empty */ }
+
+    // make `instanceof Promise` work for native promise-based APIs
+    if (setPrototypeOf) {
+      setPrototypeOf(NativePromisePrototype, PromiseConstructor.prototype);
+    }
   }
 }
 
@@ -25439,4 +25447,4 @@ module.exports = global.Promise;
 /***/ })
 
 }]);
-//# sourceMappingURL=chunk-vendors.c9558205.js.map
+//# sourceMappingURL=chunk-vendors.9b31192e.js.map
