@@ -12,7 +12,7 @@ export const data: Interface.Config = {
     websocket: {
         url: `${websocketProtocol}//${domain}:${nodeJsPort}`
     },
-    vueJs: { uiPort: 10000 },
+    vueJs: { uiPort: 30000 },
     systemData: {
         pathKey: "/home/user_1/root/key",
         pathSetting: "/home/user_1/root/system/setting",

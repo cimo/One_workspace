@@ -6,7 +6,7 @@ module.exports = {
     },
     devServer: {
         host: "0.0.0.0",
-        port: 10000,
+        port: 30000,
         https: false,
         open: false,
         hot: true,

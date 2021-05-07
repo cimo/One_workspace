@@ -15,31 +15,12 @@
         "noImplicitAny": false,
         "baseUrl": ".",
         "outDir": "./dist",
-        "types": [
-            "webpack-env",
-            "jest"
-        ],
+        "types": ["webpack-env", "jest"],
         "paths": {
-            "@/*": [
-                "src/*"
-            ]
+            "@/*": ["src/*"]
         },
-        "lib": [
-            "esnext",
-            "dom",
-            "dom.iterable",
-            "scripthost"
-        ]
+        "lib": ["esnext", "dom", "dom.iterable", "scripthost"]
     },
-    "include": [
-        "src/**/*.ts",
-        "src/**/*.vue",
-        "tests/**/*.ts"
-    ],
-    "exclude": [
-        "node_modules",
-        "dist",
-        "public",
-        "setting"
-    ]
+    "include": ["src/**/*.ts", "src/**/*.vue", "tests/**/*.ts"],
+    "exclude": ["node_modules", "dist", "public", "setting"]
 }
