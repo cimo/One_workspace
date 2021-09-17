@@ -114,7 +114,9 @@
             xterm.loadAddon(fitAddon);
             xterm.open(elementTerminal);
             xterm.focus();
+            xterm._core.element.style.width = computedStyle.width;
             xterm._core.element.style.height = computedStyle.height;
+            xterm.reset();
             fitAddon.fit();
 
             const size = fitAddon.proposeDimensions();
@@ -474,7 +476,9 @@
                 if (componentWindow) {
                     if (!componentWindow.classList.contains("minimized") && xterm && fitAddon) {
                         const computedStyle = window.getComputedStyle(value);
+                        xterm._core.element.style.width = computedStyle.width;
                         xterm._core.element.style.height = computedStyle.height;
+                        xterm.reset();
                         fitAddon.fit();
 
                         const size = fitAddon.proposeDimensions();

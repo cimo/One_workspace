@@ -41,7 +41,9 @@
             xtermList[indexTag].loadAddon(fitAddonList[indexTag]);
             xtermList[indexTag].open(elementTerminal);
             xtermList[indexTag].focus();
+            xtermList[indexTag]._core.element.style.width = computedStyle.width;
             xtermList[indexTag]._core.element.style.height = computedStyle.height;
+            xtermList[indexTag].reset();
             fitAddonList[indexTag].fit();
 
             const size = fitAddonList[indexTag].proposeDimensions();
@@ -145,14 +147,16 @@
 
                     if (!componentWindow.classList.contains("minimized") && xtermList[indexTag] && fitAddonList[indexTag]) {
                         const computedStyle = window.getComputedStyle(value);
+                        xtermList[indexTag]._core.element.style.width = computedStyle.width;
                         xtermList[indexTag]._core.element.style.height = computedStyle.height;
+                        xtermList[indexTag].reset();
                         fitAddonList[indexTag].fit();
 
                         const size = fitAddonList[indexTag].proposeDimensions();
 
                         Sio.sendMessage("t_pty_resize", {
                             tag: indexTag,
-                            size: [size.cols, size.rows]
+                            sizeList: [size.cols, size.rows]
                         });
                     }
                 }
