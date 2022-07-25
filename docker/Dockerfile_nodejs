@@ -1,0 +1,88 @@
+ARG NODEJS_VERSION
+
+FROM node:${NODEJS_VERSION}
+
+ARG PROXY_HTTP
+ARG PROXY_HTTPS
+ARG PROXY_CERTIFICATE
+ARG DOCKER_PATH_ROOT
+ARG TIMEZONE
+ARG CERTIFICATE_FILE
+ARG CERTIFICATE_KEY
+ARG CERTIFICATE_CHAIN
+ARG WWW_USER_NAME
+ARG WWW_USER_PASSWORD
+ARG WEB_FOLDER
+ARG WEB_USER_GROUP
+
+ARG NODEJS_REGISTRY
+ARG NODEJS_STRICT_SSL
+ARG NODEJS_ENV
+ARG NODEJS_PORT_HTTP
+ARG NODEJS_PORT_HTTPS
+ARG NODEJS_PORT_VUE
+ARG NODEJS_PORT_RANGE
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV DEBCONF_NOWARNINGS=yes
+ENV http_proxy=${PROXY_HTTP}
+ENV https_proxy=${PROXY_HTTPS}
+ENV HTTP_PROXY=${PROXY_HTTP}
+ENV HTTPS_PROXY=${PROXY_HTTPS}
+ENV CURL_CA_BUNDLE=${PROXY_CERTIFICATE}
+
+ENV NODE_ENV=${NODEJS_ENV}
+ENV NODE_EXTRA_CA_CERTS=${PROXY_CERTIFICATE}
+
+COPY ${DOCKER_PATH_ROOT}certificate/zscaler/* /usr/local/share/ca-certificates/
+COPY ${DOCKER_PATH_ROOT}docker/.npmrc /root/.npmrc_TMP
+COPY ${DOCKER_PATH_ROOT}docker/.curlrc /root/.curlrc_TMP
+COPY ${DOCKER_PATH_ROOT}docker/entrypoint_nodejs.sh /usr/local/bin/entrypoint.sh
+
+# Env variable conversion
+RUN cd ~ \
+    && apt-get update && apt-get install -y \
+    gettext \
+    && envsubst < /root/.npmrc_TMP > /root/.npmrc && cat /root/.npmrc && rm /root/.npmrc_TMP \
+    && envsubst < /root/.curlrc_TMP > /root/.curlrc && cat /root/.curlrc && rm /root/.curlrc_TMP
+
+# System
+RUN cd ~ \
+    && chmod +x /usr/local/bin/entrypoint.sh \
+    && apt-get update && apt-get install -y \
+    ca-certificates \
+    software-properties-common \
+    apt-transport-https \
+    lsb-release \
+    gnupg \
+    nano \
+    tzdata \
+    curl \
+    make \
+    git \
+    zip \
+    unzip \
+    cron \
+    # Certificate
+    && update-ca-certificates \
+    # Time
+    && ln -sf /usr/share/zoneinfo/${TIMEZONE} /etc/localtime \
+    && dpkg-reconfigure -f noninteractive tzdata \
+    # Npm
+    && npm install -g @vue/cli \
+    # Docker
+    && curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg \
+    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/debian \
+    $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null \
+    && apt-get update && apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin \
+    # Clean
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean -y \
+    && apt-get autoclean -y \
+    && apt-get autoremove -y
+
+WORKDIR /home/${WWW_USER_NAME}/root/
+
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+
+EXPOSE ${NODEJS_PORT_HTTP} ${NODEJS_PORT_HTTPS} ${NODEJS_PORT_VUE} ${NODEJS_PORT_RANGE}

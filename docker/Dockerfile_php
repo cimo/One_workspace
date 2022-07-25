@@ -1,0 +1,114 @@
+ARG PHP_VERSION
+
+FROM php:${PHP_VERSION}
+
+ARG PROXY_HTTP
+ARG PROXY_HTTPS
+ARG PROXY_CERTIFICATE
+ARG DOCKER_PATH_ROOT
+ARG TIMEZONE
+ARG CERTIFICATE_FILE
+ARG CERTIFICATE_KEY
+ARG CERTIFICATE_CHAIN
+ARG WWW_USER_NAME
+ARG WWW_USER_PASSWORD
+ARG WEB_FOLDER
+ARG WEB_USER_GROUP
+
+ARG PHP_VH_NAME
+ARG PHP_PORT_FPM
+ARG PHP_XDEBUG_KEY
+ARG PHP_XDEBUG_HOST
+ARG PHP_XDEBUG_PORT
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV DEBCONF_NOWARNINGS=yes
+ENV http_proxy=${PROXY_HTTP}
+ENV https_proxy=${PROXY_HTTPS}
+ENV HTTP_PROXY=${PROXY_HTTP}
+ENV HTTPS_PROXY=${PROXY_HTTPS}
+ENV CURL_CA_BUNDLE=${PROXY_CERTIFICATE}
+
+COPY ${DOCKER_PATH_ROOT}certificate/zscaler/* /usr/local/share/ca-certificates/
+COPY ${DOCKER_PATH_ROOT}docker/.curlrc /root/.curlrc_TMP
+COPY ${DOCKER_PATH_ROOT}docker/php_zz-docker.conf /usr/local/etc/php-fpm.d/zz-docker.conf_TMP
+COPY ${DOCKER_PATH_ROOT}docker/php_override.ini /usr/local/etc/php/conf.d/override.ini_TMP
+COPY ${DOCKER_PATH_ROOT}docker/entrypoint_php.sh /usr/local/bin/entrypoint.sh
+
+# Env variable conversion
+RUN cd ~ \
+    && apt-get update && apt-get install -y \
+    gettext \
+    && envsubst < /root/.curlrc_TMP > /root/.curlrc && cat /root/.curlrc && rm /root/.curlrc_TMP \
+    && envsubst < /usr/local/etc/php-fpm.d/zz-docker.conf_TMP > /usr/local/etc/php-fpm.d/zz-docker.conf && cat /usr/local/etc/php-fpm.d/zz-docker.conf && rm /usr/local/etc/php-fpm.d/zz-docker.conf_TMP \
+    && envsubst < /usr/local/etc/php/conf.d/override.ini_TMP > /usr/local/etc/php/conf.d/override.ini && cat /usr/local/etc/php/conf.d/override.ini && rm /usr/local/etc/php/conf.d/override.ini_TMP
+
+# System
+RUN cd ~ \
+    && cp /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini \
+    && chmod +x /usr/local/bin/entrypoint.sh \
+    && apt-get update && apt-get install -y \
+    ca-certificates \
+    software-properties-common \
+    apt-transport-https \
+    lsb-release \
+    gnupg \
+    nano \
+    tzdata \
+    curl \
+    make \
+    zip \
+    unzip \
+    cron \
+    re2c \
+    file \
+    libfreetype6-dev \
+    libjpeg-dev \
+    libpng-dev \
+    libssl-dev \
+    libicu-dev \
+    libzip-dev \
+    zlib1g-dev \
+    libxml2-dev \
+    libpq-dev \
+    libmagickwand-dev \
+    libgmp-dev \
+    libmhash-dev \
+    libmcrypt-dev \
+    libmemcached-dev \
+    zlib1g-dev \
+    # Group
+    && addgroup sftp \
+    # Certificate
+    && update-ca-certificates \
+    # Time
+    && ln -sf /usr/share/zoneinfo/${TIMEZONE} /etc/localtime \
+    && dpkg-reconfigure -f noninteractive tzdata \
+    # User www
+    && useradd --home /home/${WWW_USER_NAME}/ -g ${WEB_USER_GROUP} -G sftp --shell /bin/false -m ${WWW_USER_NAME} \
+    && echo "${WWW_USER_NAME}:${WWW_USER_PASSWORD}" | chpasswd \
+    && chown root:root /home/${WWW_USER_NAME}/ \
+    && mkdir /home/${WWW_USER_NAME}/root/ \
+    && chown ${WWW_USER_NAME}:${WEB_USER_GROUP} /home/${WWW_USER_NAME}/root/ \
+    # Extension
+    && pear config-set http_proxy ${PROXY_HTTP} \
+    && docker-php-ext-configure gd --with-freetype=/usr/include/ --with-jpeg=/usr/include/ \
+    && docker-php-ext-configure gmp \
+    && pecl install apcu \
+    && pecl install xdebug \
+    && pecl install imagick \
+    && pecl install memcached \
+    && docker-php-ext-install gd intl opcache zip pdo pdo_mysql pdo_pgsql bcmath gmp \
+    && docker-php-ext-enable gd intl opcache zip pdo pdo_mysql pdo_pgsql bcmath gmp \
+    # Composer
+    && curl -fsSL https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin/ --filename=composer \
+    # Clean
+    && pecl clear-cache \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean -y \
+    && apt-get autoclean -y \
+    && apt-get autoremove -y
+
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+
+EXPOSE ${PHP_PORT_FPM} ${PHP_XDEBUG_PORT}
