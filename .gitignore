@@ -14,8 +14,7 @@ pnpm-debug.log*
 *.sw?
 
 # cimo +
-certificate/*
-!certificate/selfsign/
+certificate/zscaler/*
 !certificate/zscaler/.gitkeep
 key/*
 !key/.gitkeep
@@ -28,6 +27,7 @@ project/*
 system/setting/*
 !system/setting/.gitkeep
 .env
+!core/env/.env
 package-lock.json
 node_modules
 *.log
