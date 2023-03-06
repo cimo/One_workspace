@@ -1,7 +1,7 @@
 version: '3.8'
 services:
-    oneworkspace_nodejs_container:
-        container_name: OneWorkspace_NodeJs_${NODEJS_VERSION}
+    oneworkspace_nodejs:
+        container_name: oneworkspace_nodejs_${NODEJS_VERSION}
         build:
             context: ${DOCKER_PATH_ROOT}
             dockerfile: ${DOCKER_PATH_ROOT}docker/Dockerfile_nodejs
