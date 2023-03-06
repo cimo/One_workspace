@@ -1,0 +1,31 @@
+version: '3.8'
+services:
+    oneworkspace_nodejs_container:
+        container_name: OneWorkspace_NodeJs_${NODEJS_VERSION}
+        build:
+            context: ${DOCKER_PATH_ROOT}
+            dockerfile: ${DOCKER_PATH_ROOT}docker/Dockerfile_nodejs
+            args:
+                ENV_NAME: ${ENV_NAME}
+                DOMAIN: ${DOMAIN}
+                PUBLIC_PATH: ${PUBLIC_PATH}
+                DEBUG: ${DEBUG}
+                PROXY_HTTP: ${PROXY_HTTP}
+                PROXY_HTTPS: ${PROXY_HTTPS}
+                PROXY_CERTIFICATE: ${PROXY_CERTIFICATE}
+                DOCKER_PATH_ROOT: ${DOCKER_PATH_ROOT}
+                TIMEZONE: ${TIMEZONE}
+                NODEJS_VERSION: ${NODEJS_VERSION}
+                NODEJS_REGISTRY: ${NODEJS_REGISTRY}
+                NODEJS_STRICT_SSL: ${NODEJS_STRICT_SSL}
+                NODEJS_ENV: ${NODEJS_ENV}
+                NODEJS_PORT_HTTPS: ${NODEJS_PORT_HTTPS}
+                NODEJS_PORT_RANGE: ${NODEJS_PORT_RANGE}
+        env_file:
+            - ${DOCKER_PATH_ROOT}env/local.env
+        ports:
+            - 127.0.0.1:${NODEJS_PORT_HTTPS}:${NODEJS_PORT_HTTPS}
+            - 127.0.0.1:${NODEJS_PORT_RANGE}:${NODEJS_PORT_RANGE}
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+            - ${DOCKER_PATH_ROOT}:/home/root/

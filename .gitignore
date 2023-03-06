@@ -14,20 +14,10 @@ pnpm-debug.log*
 *.sw?
 
 # cimo +
-certificate/zscaler/*
-!certificate/zscaler/.gitkeep
-key/*
-!key/.gitkeep
+certificate/*
+!certificate/.gitkeep
 project/*
-!project/.digest_htpasswd
-!project/favicon.ico
-!project/index.html
-!project/opcache.php
-!project/robots.txt
-system/setting/*
-!system/setting/.gitkeep
-.env
-!core/env/.env
+!project/.gitkeep
 package-lock.json
 node_modules
 *.log
