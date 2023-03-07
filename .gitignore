@@ -18,6 +18,3 @@ certificate/*
 !certificate/.gitkeep
 project/*
 !project/.gitkeep
-package-lock.json
-node_modules
-*.log
