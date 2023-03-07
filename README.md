@@ -1,6 +1,6 @@
 # One workspace
 
-Is a docker service container for have, in one space, a complete develop tools that looks and work in same way on all machine.
+Docker service container for have, in one space, a complete develop tools that looks and work in same way on all machine.
 
 ## Info:
 
