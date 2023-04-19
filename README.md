@@ -12,9 +12,7 @@ Docker service container for have, in one space, a complete develop tools that l
 
 ## Setup:
 
-1. Copy file in your folder (for example: "/home/cimo/one_workspace/root/").
-
-2. Write on terminal:
+1. Write on terminal:
 
 ```
 docker-compose -f docker-compose_local.yml --env-file ./env/local.env up -d --build
