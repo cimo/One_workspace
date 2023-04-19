@@ -5,18 +5,17 @@ FROM node:${NODEJS_VERSION}
 ARG ENV_NAME
 ARG DOMAIN
 
-ARG PUBLIC_PATH
 ARG DEBUG
+ARG DOCKER_PATH_ROOT
+ARG TIMEZONE
 ARG PROXY_HTTP
 ARG PROXY_HTTPS
 ARG PROXY_CERTIFICATE
-ARG DOCKER_PATH_ROOT
-ARG TIMEZONE
 ARG NODEJS_REGISTRY
 ARG NODEJS_STRICT_SSL
 ARG NODEJS_ENV
 ARG NODEJS_PORT_HTTPS
-ARG NODEJS_PORT_RANGE
+ARG NODEJS_PORT_HTTPS_RANGE
 
 ENV ENV_NAME=${ENV_NAME}
 ENV DOMAIN=${DOMAIN}
@@ -29,19 +28,21 @@ ENV https_proxy=${PROXY_HTTPS}
 ENV HTTP_PROXY=${PROXY_HTTP}
 ENV HTTPS_PROXY=${PROXY_HTTPS}
 ENV CURL_CA_BUNDLE=${PROXY_CERTIFICATE}
+ENV NODE_REGISTRY=${NODEJS_REGISTRY}
+ENV NODE_STRICT_SSL=${NODEJS_STRICT_SSL}
 ENV NODE_ENV=${NODEJS_ENV}
 ENV NODE_EXTRA_CA_CERTS=${PROXY_CERTIFICATE}
 
 COPY ${DOCKER_PATH_ROOT}certificate/zscaler/* /usr/local/share/ca-certificates/
-COPY ${DOCKER_PATH_ROOT}docker/.npmrc /root/.npmrc_TMP
 COPY ${DOCKER_PATH_ROOT}docker/.curlrc /root/.curlrc_TMP
+COPY ${DOCKER_PATH_ROOT}docker/.npmrc /root/.npmrc_TMP
 
 # Env variable conversion
 RUN cd ~ \
     && apt-get update && apt-get install -y \
     gettext \
-    && envsubst < /root/.npmrc_TMP > /root/.npmrc && cat /root/.npmrc && rm /root/.npmrc_TMP \
-    && envsubst < /root/.curlrc_TMP > /root/.curlrc && cat /root/.curlrc && rm /root/.curlrc_TMP
+    && envsubst < /root/.curlrc_TMP > /root/.curlrc && cat /root/.curlrc && rm /root/.curlrc_TMP \
+    && envsubst < /root/.npmrc_TMP > /root/.npmrc && cat /root/.npmrc && rm /root/.npmrc_TMP
 
 # System
 RUN cd ~ \
@@ -51,7 +52,6 @@ RUN cd ~ \
     && chmod 775 /home/root/ /var/log/one_workspace/ /usr/local/lib/node_modules/ \
     # Apt
     && apt-get update && apt-get install -y \
-    apt-transport-https \
     ca-certificates \
     # Certificate
     && update-ca-certificates \
@@ -69,4 +69,4 @@ CMD chmod +x /home/root/docker/tls.sh \
     && bash /home/root/docker/tls.sh \
     && tail -f /dev/null
 
-EXPOSE ${NODEJS_PORT_HTTPS} ${NODEJS_PORT_RANGE}
+EXPOSE ${NODEJS_PORT_HTTPS} ${NODEJS_PORT_HTTPS_RANGE}

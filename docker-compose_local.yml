@@ -1,31 +1,30 @@
-version: '3.8'
+version: '3.7'
 services:
-    oneworkspace_nodejs:
-        container_name: oneworkspace_nodejs_${NODEJS_VERSION}
-        build:
-            context: ${DOCKER_PATH_ROOT}
-            dockerfile: ${DOCKER_PATH_ROOT}docker/Dockerfile_nodejs
-            args:
-                ENV_NAME: ${ENV_NAME}
-                DOMAIN: ${DOMAIN}
-                PUBLIC_PATH: ${PUBLIC_PATH}
-                DEBUG: ${DEBUG}
-                PROXY_HTTP: ${PROXY_HTTP}
-                PROXY_HTTPS: ${PROXY_HTTPS}
-                PROXY_CERTIFICATE: ${PROXY_CERTIFICATE}
-                DOCKER_PATH_ROOT: ${DOCKER_PATH_ROOT}
-                TIMEZONE: ${TIMEZONE}
-                NODEJS_VERSION: ${NODEJS_VERSION}
-                NODEJS_REGISTRY: ${NODEJS_REGISTRY}
-                NODEJS_STRICT_SSL: ${NODEJS_STRICT_SSL}
-                NODEJS_ENV: ${NODEJS_ENV}
-                NODEJS_PORT_HTTPS: ${NODEJS_PORT_HTTPS}
-                NODEJS_PORT_RANGE: ${NODEJS_PORT_RANGE}
-        env_file:
-            - ${DOCKER_PATH_ROOT}env/local.env
-        ports:
-            - 127.0.0.1:${NODEJS_PORT_HTTPS}:${NODEJS_PORT_HTTPS}
-            - 127.0.0.1:${NODEJS_PORT_RANGE}:${NODEJS_PORT_RANGE}
-        volumes:
-            - /var/run/docker.sock:/var/run/docker.sock
-            - ${DOCKER_PATH_ROOT}:/home/root/
+  one_workspace:
+    container_name: one_workspace
+    build:
+      context: ${OW_DOCKER_PATH_ROOT}
+      dockerfile: ${OW_DOCKER_PATH_ROOT}docker/Dockerfile_nodejs
+      args:
+        ENV_NAME: ${ENV_NAME}
+        DOMAIN: ${DOMAIN}
+        DEBUG: ${OW_DEBUG}
+        DOCKER_PATH_ROOT: ${OW_DOCKER_PATH_ROOT}
+        TIMEZONE: ${OW_TIMEZONE}
+        PROXY_HTTP: ${OW_PROXY_HTTP}
+        PROXY_HTTPS: ${OW_PROXY_HTTPS}
+        PROXY_CERTIFICATE: ${OW_PROXY_CERTIFICATE}
+        NODEJS_VERSION: ${OW_NODEJS_VERSION}
+        NODEJS_REGISTRY: ${OW_NODEJS_REGISTRY}
+        NODEJS_STRICT_SSL: ${OW_NODEJS_STRICT_SSL}
+        NODEJS_ENV: ${OW_NODEJS_ENV}
+        NODEJS_PORT_HTTPS: ${OW_NODEJS_PORT_HTTPS}
+        NODEJS_PORT_HTTPS_RANGE: ${OW_NODEJS_PORT_HTTPS_RANGE}
+    env_file:
+      - ${OW_DOCKER_PATH_ROOT}env/local.env
+    ports:
+      - 127.0.0.1:${OW_NODEJS_PORT_HTTPS}:${OW_NODEJS_PORT_HTTPS}
+      - 127.0.0.1:${OW_NODEJS_PORT_HTTPS_RANGE}:${OW_NODEJS_PORT_HTTPS_RANGE}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ${OW_DOCKER_PATH_ROOT}:/home/root/
