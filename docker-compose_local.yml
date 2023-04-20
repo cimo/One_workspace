@@ -18,13 +18,13 @@ services:
         NODEJS_REGISTRY: ${OW_NODEJS_REGISTRY}
         NODEJS_STRICT_SSL: ${OW_NODEJS_STRICT_SSL}
         NODEJS_ENV: ${OW_NODEJS_ENV}
-        NODEJS_PORT_HTTPS: ${OW_NODEJS_PORT_HTTPS}
-        NODEJS_PORT_HTTPS_RANGE: ${OW_NODEJS_PORT_HTTPS_RANGE}
+        NODEJS_PORT: ${OW_NODEJS_PORT}
+        NODEJS_PORT_RANGE: ${OW_NODEJS_PORT_RANGE}
     env_file:
       - ${OW_DOCKER_PATH_ROOT}env/local.env
     ports:
-      - 127.0.0.1:${OW_NODEJS_PORT_HTTPS}:${OW_NODEJS_PORT_HTTPS}
-      - 127.0.0.1:${OW_NODEJS_PORT_HTTPS_RANGE}:${OW_NODEJS_PORT_HTTPS_RANGE}
+      - 127.0.0.1:${OW_NODEJS_PORT}:${OW_NODEJS_PORT}
+      - 127.0.0.1:${OW_NODEJS_PORT_RANGE}:${OW_NODEJS_PORT_RANGE}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ${OW_DOCKER_PATH_ROOT}:/home/root/
