@@ -6,6 +6,7 @@ services:
       context: ./
       dockerfile: ./docker/${DOCKERFILE}
       args:
+        _NODEJS_VERSION: ${NODEJS_VERSION}
         _ENV_NAME: ${ENV_NAME}
         _DOMAIN: ${DOMAIN}
         _TIMEZONE: ${TIMEZONE}
