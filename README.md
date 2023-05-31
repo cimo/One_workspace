@@ -10,10 +10,16 @@ Docker service container for have, in one space, a complete develop tools that l
 
 -   NodeJs 18.13.0
 
-## Setup:
+## Setup
 
-1. Write on terminal:
+1. Wrinte on terminal:
 
 ```
-docker-compose -f docker-compose_local.yml --env-file ./env/local.env up -d --build
+docker compose -f docker-compose.yaml --env-file ./env/local.env up -d --build
+```
+
+2. If you have a proxy execute this command (if you use a certificate put it in "/certificate/proxy/" folder):
+
+```
+DOCKERFILE="Dockerfile_local_proxy" docker compose -f docker-compose.yaml --env-file ./env/local.env up -d --build
 ```

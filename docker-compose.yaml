@@ -1,0 +1,24 @@
+version: "3.8"
+services:
+  one_workspace:
+    container_name: one-workspace
+    build:
+      context: ./
+      dockerfile: ./docker/${DOCKERFILE}
+      args:
+        _ENV_NAME: ${ENV_NAME}
+        _DOMAIN: ${DOMAIN}
+        _TIMEZONE: ${TIMEZONE}
+        _SERVER_PORT: ${SERVER_PORT}
+        _SERVER_PORT_RANGE: ${SERVER_PORT_RANGE}
+        _PROXY_HTTP: ${PROXY_HTTP}
+        _PROXY_HTTPS: ${PROXY_HTTPS}
+        _PROXY_CERTIFICATE: ${PROXY_CERTIFICATE}
+    env_file:
+      - ./env/local.env
+    ports:
+      - 127.0.0.1:${SERVER_PORT}:${SERVER_PORT}
+      - 127.0.0.1:${SERVER_PORT_RANGE}:${SERVER_PORT_RANGE}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./:/home/root/
