@@ -33,6 +33,10 @@ RUN cd ~ \
     ca-certificates \
     # Certificate
     && update-ca-certificates \
+    # Tls
+    && mkdir -p /var/log/one_workspace/ \
+    && chown -R node:node /var/log/one_workspace/ \
+    && chmod 775 /var/log/one_workspace/ \
     # Clean
     && rm -rf /var/lib/apt/lists/* \
     && apt-get clean -y \
