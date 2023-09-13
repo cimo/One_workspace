@@ -20,3 +20,4 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./:/home/root/
+      - /tmp/.X11-unix:/tmp/.X11-unix
