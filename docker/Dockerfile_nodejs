@@ -50,6 +50,7 @@ RUN cd ~ \
     libgdk-pixbuf2.0-dev \
     libgtk-3-dev \
     libxss-dev \
+    libxtst-dev \
     # Tls
     && mkdir -p /var/log/one_workspace/ \
     && chown -R node:node /var/log/one_workspace/ \
