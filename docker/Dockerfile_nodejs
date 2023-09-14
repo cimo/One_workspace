@@ -69,6 +69,7 @@ WORKDIR /home/root/
 CMD chmod +x /home/root/docker/tls.sh \
     && bash /home/root/docker/tls.sh \
     # X11
+    && rm -f /run/dbus/pid \
     && dbus-daemon --config-file=/usr/share/dbus-1/system.conf --print-address \
     # Keep running
     && tail -f /dev/null
