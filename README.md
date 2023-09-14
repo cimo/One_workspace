@@ -7,6 +7,7 @@ Rename "/env/local.env.public" in "/env/local.env" and adjust the variable for y
 ## Info:
 
 -   Cross platform (Windows, Linux, Mac)
+-   X11 for WSL2 (Run linux GUI app directly in windows)
 
 ## Conatiner:
 
