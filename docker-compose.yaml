@@ -6,12 +6,12 @@ services:
       context: ./
       dockerfile: ./docker/${DOCKERFILE}
       args:
-        _NODEJS_VERSION: ${NODEJS_VERSION}
         _ENV_NAME: ${ENV_NAME}
         _DOMAIN: ${DOMAIN}
         _TIMEZONE: ${TIMEZONE}
         _SERVER_PORT: ${SERVER_PORT}
         _SERVER_PORT_RANGE: ${SERVER_PORT_RANGE}
+        _NODEJS_VERSION: ${NODEJS_VERSION}
     env_file:
       - ./env/local.env
     ports:
