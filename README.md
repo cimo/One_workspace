@@ -6,7 +6,7 @@ Docker service container for have, in one space, a complete develop tools that l
 
 -   Cross platform (Windows, Linux)
 -   X11 for WSL2 (Run linux GUI app directly in windows)
--   NodeJs 18.16.0
+-   NodeJs
 
 ## Installation
 
