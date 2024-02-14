@@ -20,9 +20,12 @@ pnpm-debug.log*
 .npm/*
 .pki/*
 certificate/*
-!certificate/.gitkeep
+!certificate/**/
+certificate/proxy/*
 !certificate/proxy/.gitkeep
 dist/*
+log/*
+!log/.gitkeep
 public/js/*
 public/style/*
 !public/style/.gitkeep
@@ -30,7 +33,5 @@ public/index.html
 node_modules
 package-lock.json
 # ---
-log/*
-!log/.gitkeep
 project/*
 !project/.gitkeep
