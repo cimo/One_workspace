@@ -2,7 +2,7 @@
 
 PATH_CRT="/home/root/certificate/tls.crt"
 PATH_KEY="/home/root/certificate/tls.key"
-PATH_LOG="/home/root/log/tsl.log"
+PATH_LOG="/home/root/log/tls.log"
 
 generate() {
     openssl req -x509 -newkey rsa:4096 -sha256 -days 365 -nodes \
