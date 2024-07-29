@@ -5,6 +5,8 @@ PATH_KEY="/home/root/certificate/tls.key"
 PATH_LOG="/home/root/log/tls.log"
 
 generate() {
+    echo "Generate new certificate." >> "$PATH_LOG"
+
     openssl req -x509 -newkey rsa:4096 -sha256 -days 365 -nodes \
         -keyout "$PATH_KEY" \
         -out "$PATH_CRT" \
@@ -12,8 +14,6 @@ generate() {
         -subj "/C=JP/ST=Tokyo/L=Tokyo/O=CIMO/OU=ONE-WORKSPACE/CN=$DOMAIN" >> "$PATH_LOG" 2>&1
 
     chmod 0644 "$PATH_KEY"
-
-    echo "New certificate generated." >> "$PATH_LOG"
 }
 
 if [ -f "$PATH_CRT" ];
@@ -25,12 +25,12 @@ then
 
     if [ "$expiryDifference" -lt 259200 ];
     then
-        echo "Current certificate expires within 3 days... Generating a new certificate." >> "$PATH_LOG"
+        echo "Current certificate expires within 3 days." >> "$PATH_LOG"
 
         generate
     fi
 else
-    echo "Certificate does not exist... Generating a new certificate." >> "$PATH_LOG"
+    echo "Certificate does not exist." >> "$PATH_LOG"
 
     generate
 fi

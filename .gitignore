@@ -26,10 +26,6 @@ certificate/proxy/*
 dist/*
 log/*
 !log/.gitkeep
-public/js/*
-public/style/*
-!public/style/.gitkeep
-public/index.html
 node_modules
 package-lock.json
 # ---

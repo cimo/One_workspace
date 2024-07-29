@@ -15,42 +15,29 @@ ENV TZ=${_TIMEZONE}
 ENV DEBIAN_FRONTEND=noninteractive
 ENV DEBCONF_NOWARNINGS=yes
 ENV NODE_OPTIONS=--use-openssl-ca
-ENV WINEDLLOVERRIDES="mscoree,mshtml="
-ENV WINEDEBUG="fixme-all"
-ENV WINEARCH=win64
 
 COPY ./certificate/proxy/ /usr/local/share/ca-certificates/
 
 RUN cd ~ \
+    && VERSION_CODENAME=$(grep VERSION_CODENAME= /etc/os-release | cut -d= -f2) \
     && chmod -R 0644 /usr/local/share/ca-certificates/ \
     && apt-get update && apt-get install -y ca-certificates gnupg curl \
     && update-ca-certificates \
     # No root
     && mkdir -p /home/root/ /usr/local/lib/node_modules/ /usr/local/bin/ \
     && chown -R node:node /home/root/ /usr/local/lib/node_modules/ /usr/local/bin/ \
-    && chmod 775 /home/root/ /usr/local/lib/node_modules/ /usr/local/bin/ \
-    # WineHq
-    && dpkg --add-architecture i386 \
-    && mkdir -p /etc/apt/keyrings/ \
-    && curl -fsSL https://dl.winehq.org/wine-builds/winehq.key --output /etc/apt/keyrings/winehq-archive.key \
-    && curl -fsSL https://dl.winehq.org/wine-builds/ubuntu/dists/jammy/winehq-jammy.sources --output /etc/apt/sources.list.d/winehq-jammy.sources \
-    # X11
-    && echo "export DISPLAY=:0.0" >> /home/node/.bashrc \
-    && echo "export LIBGL_ALWAYS_INDIRECT=true" >> /home/node/.bashrc \
-    && echo "export DBUS_SYSTEM_BUS_ADDRESS='unix:path=/var/run/dbus/system_bus_socket'" >> /home/node/.bashrc \
-    && echo "export DBUS_SESSION_BUS_ADDRESS='unix:path=/var/run/dbus/system_bus_socket'" >> /home/node/.bashrc \
-    && mkdir -p /run/user/1000/ /run/dbus/ \
-    && chown node:root /run/user/1000/ /run/dbus/ \
+    && chmod -R 775 /home/root/ /usr/local/lib/node_modules/ /usr/local/bin/ \
     # Apt
-    && apt-get update && apt-get install -y --install-recommends \
+    && apt-get update && apt-get install -y \
     fonts-noto \
     fonts-noto-cjk \
-    winehq-stable \
+    # Electron
     libnss3-dev \
-    libgdk-pixbuf2.0-dev \
     libgtk-3-dev \
+    libgdk-pixbuf2.0-dev \
     libxss-dev \
     libxtst-dev \
+    libasound2-dev \
     # Clean
     && rm -rf /var/lib/apt/lists/* \
     && apt-get clean -y \
@@ -64,9 +51,6 @@ WORKDIR /home/root/
 # Tls
 CMD chmod +x /home/root/docker/tls.sh \
     && bash /home/root/docker/tls.sh \
-    # X11
-    && rm -f /run/dbus/pid \
-    && dbus-daemon --config-file=/usr/share/dbus-1/system.conf --print-address \
     # Keep running
     && tail -f /dev/null
 
