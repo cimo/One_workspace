@@ -29,5 +29,7 @@ log/*
 node_modules
 package-lock.json
 # ---
+.ipython/*
+.jupyter
 project/*
 !project/.gitkeep
