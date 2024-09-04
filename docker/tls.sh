@@ -13,6 +13,7 @@ generate() {
         -addext "subjectAltName=DNS:localhost" \
         -subj "/C=JP/ST=Tokyo/L=Tokyo/O=CIMO/OU=ONE-WORKSPACE/CN=$DOMAIN" >> "$PATH_LOG" 2>&1
 
+    chmod 0644 "$PATH_CRT"
     chmod 0644 "$PATH_KEY"
 }
 

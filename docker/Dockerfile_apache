@@ -1,0 +1,53 @@
+ARG _APACHE_VERSION
+
+FROM httpd:${_APACHE_VERSION}
+
+ARG _ENV_NAME
+ARG _DOMAIN
+ARG _TIMEZONE
+ARG _APACHE_SERVER_PORT
+
+ENV ENV_NAME=${_ENV_NAME}
+ENV DOMAIN=${_DOMAIN}
+ENV TZ=${_TIMEZONE}
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV DEBCONF_NOWARNINGS=yes
+
+COPY ./certificate/proxy/ /usr/local/share/ca-certificates/
+COPY ./docker/apache_httpd.conf /usr/local/apache2/conf/httpd.conf.template
+
+RUN cd ~ \
+    && VERSION_CODENAME=$(grep VERSION_CODENAME= /etc/os-release | cut -d= -f2) \
+    && chmod -R 0644 /usr/local/share/ca-certificates/ \
+    && apt-get update && apt-get install -y ca-certificates gnupg curl gettext-base \
+    && update-ca-certificates \
+    # No root
+    && mkdir -p /home/root/ /usr/local/apache2/ /usr/local/apache2/conf/ /usr/local/apache2/htdocs/ \
+    && chown -R www-data:www-data /home/root/ /usr/local/apache2/ /usr/local/apache2/conf/ /usr/local/apache2/htdocs/ \
+    && chmod -R 775 /home/root/ /usr/local/apache2/ /usr/local/apache2/conf/ /usr/local/apache2/htdocs/ \
+    # Httpd env
+    && envsubst '${_APACHE_SERVER_PORT}' < /usr/local/apache2/conf/httpd.conf.template > /usr/local/apache2/conf/httpd.conf \
+    # Apt
+    && apt-get update && apt-get install -y \
+    fonts-noto \
+    fonts-noto-cjk \
+    lynx \
+    # Clean
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean -y \
+    && apt-get autoclean -y \
+    && apt-get autoremove -y
+
+USER www-data
+
+WORKDIR /home/root/
+
+# Httpd
+CMD apachectl start \
+    && apachectl configtest \
+    && apachectl status \
+    # Keep running
+    && tail -f /dev/null
+
+EXPOSE 443

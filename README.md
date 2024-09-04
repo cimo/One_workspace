@@ -8,6 +8,7 @@ Docker service container for have, in one space, a complete develop tools that l
 -   X11 for WSL2 (Run linux GUI app directly in windows)
 -   NodeJs
 -   Python (with jupyter lab)
+-   Apache
 
 ## Installation
 
