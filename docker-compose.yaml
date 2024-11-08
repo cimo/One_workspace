@@ -9,6 +9,7 @@ services:
         _ENV_NAME: ${ENV_NAME}
         _DOMAIN: ${DOMAIN}
         _TIMEZONE: ${TIMEZONE}
+        _PATH_ROOT: ${PATH_ROOT}
         _NODEJS_VERSION: ${NODEJS_VERSION}
         _NODEJS_SERVER_PORT: ${NODEJS_SERVER_PORT}
         _NODEJS_SERVER_PORT_RANGE: ${NODEJS_SERVER_PORT_RANGE}
@@ -30,6 +31,7 @@ services:
         _ENV_NAME: ${ENV_NAME}
         _DOMAIN: ${DOMAIN}
         _TIMEZONE: ${TIMEZONE}
+        _PATH_ROOT: ${PATH_ROOT}
         _PYTHON_VERSION: ${PYTHON_VERSION}
         _PYTHON_JUPYTER_PORT: ${PYTHON_JUPYTER_PORT}
     env_file:
@@ -51,6 +53,7 @@ services:
         _ENV_NAME: ${ENV_NAME}
         _DOMAIN: ${DOMAIN}
         _TIMEZONE: ${TIMEZONE}
+        _PATH_ROOT: ${PATH_ROOT}
         _APACHE_VERSION: ${APACHE_VERSION}
         _APACHE_SERVER_PORT: ${APACHE_SERVER_PORT}
     env_file:

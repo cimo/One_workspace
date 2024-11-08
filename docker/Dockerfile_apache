@@ -30,7 +30,7 @@ RUN cd ~ \
     && chown -R www-data:www-data ${PATH_ROOT} /usr/local/apache2/ /usr/local/apache2/conf/ /usr/local/apache2/htdocs/ \
     && chmod -R 775 ${PATH_ROOT} /usr/local/apache2/ /usr/local/apache2/conf/ /usr/local/apache2/htdocs/ \
     # Httpd env
-    && envsubst '${_APACHE_SERVER_PORT}' < /usr/local/apache2/conf/httpd.conf.template > /usr/local/apache2/conf/httpd.conf \
+    && envsubst '${_PATH_ROOT},${_APACHE_SERVER_PORT}' < /usr/local/apache2/conf/httpd.conf.template > /usr/local/apache2/conf/httpd.conf \
     # Apt
     && apt-get update && apt-get install -y \
     fonts-noto \
