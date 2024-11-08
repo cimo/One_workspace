@@ -1,37 +1,37 @@
 #!/bin/bash
 
-PATH_CRT="/home/root/certificate/tls.crt"
-PATH_KEY="/home/root/certificate/tls.key"
-PATH_LOG="/home/root/log/tls.log"
+pathCrt="${PATH_ROOT}certificate/tls.crt"
+pathKey="${PATH_ROOT}certificate/tls.key"
+pathLog="${PATH_ROOT}log/tls.log"
 
 generate() {
-    echo "Generate new certificate." >> "$PATH_LOG"
+    echo "Generate new certificate." >> "$pathLog"
 
     openssl req -x509 -newkey rsa:4096 -sha256 -days 365 -nodes \
-        -keyout "$PATH_KEY" \
-        -out "$PATH_CRT" \
+        -keyout "$pathKey" \
+        -out "$pathCrt" \
         -addext "subjectAltName=DNS:localhost" \
-        -subj "/C=JP/ST=Tokyo/L=Tokyo/O=CIMO/OU=ONE-WORKSPACE/CN=$DOMAIN" >> "$PATH_LOG" 2>&1
+        -subj "/C=JP/ST=Tokyo/L=Tokyo/O=CIMO/OU=ONE-WORKSPACE/CN=${DOMAIN}" >> "$pathLog" 2>&1
 
-    chmod 0644 "$PATH_CRT"
-    chmod 0644 "$PATH_KEY"
+    chmod 0644 "$pathCrt"
+    chmod 0644 "$pathKey"
 }
 
-if [ -f "$PATH_CRT" ];
+if [ -f "$pathCrt" ];
 then
-    expiry=$(openssl x509 -enddate -noout -in "$PATH_CRT" | cut -d= -f2)
+    expiry=$(openssl x509 -enddate -noout -in "$pathCrt" | cut -d= -f2)
     expiryTimestamp=$(date -d "$expiry" +%s)
     currentDateTimestamp=$(date +%s)
     expiryDifference=$((expiryTimestamp - currentDateTimestamp))
 
     if [ "$expiryDifference" -lt 259200 ];
     then
-        echo "Current certificate expires within 3 days." >> "$PATH_LOG"
+        echo "Current certificate expires within 3 days." >> "$pathLog"
 
         generate
     fi
 else
-    echo "Certificate does not exist." >> "$PATH_LOG"
+    echo "Certificate does not exist." >> "$pathLog"
 
     generate
 fi

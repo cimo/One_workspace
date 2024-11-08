@@ -5,16 +5,19 @@ FROM node:${_NODEJS_VERSION}
 ARG _ENV_NAME
 ARG _DOMAIN
 ARG _TIMEZONE
+ARG _PATH_ROOT
 ARG _NODEJS_SERVER_PORT
 ARG _NODEJS_SERVER_PORT_RANGE
 
 ENV ENV_NAME=${_ENV_NAME}
 ENV DOMAIN=${_DOMAIN}
 ENV TZ=${_TIMEZONE}
+ENV PATH_ROOT=${_PATH_ROOT}
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV DEBCONF_NOWARNINGS=yes
 ENV NODE_OPTIONS=--use-openssl-ca
+ENV SUDO_FORCE_REMOVE=yes
 
 COPY ./certificate/proxy/ /usr/local/share/ca-certificates/
 
@@ -24,9 +27,9 @@ RUN cd ~ \
     && apt-get update && apt-get install -y ca-certificates gnupg curl \
     && update-ca-certificates \
     # No root
-    && mkdir -p /home/root/ /usr/local/lib/node_modules/ /usr/local/bin/ \
-    && chown -R node:node /home/root/ /usr/local/lib/node_modules/ /usr/local/bin/ \
-    && chmod -R 775 /home/root/ /usr/local/lib/node_modules/ /usr/local/bin/ \
+    && mkdir -p ${PATH_ROOT} /usr/local/lib/node_modules/ /usr/local/bin/ \
+    && chown -R node:node ${PATH_ROOT} /usr/local/lib/node_modules/ /usr/local/bin/ \
+    && chmod -R 775 ${PATH_ROOT} /usr/local/lib/node_modules/ /usr/local/bin/ \
     # Apt
     && apt-get update && apt-get install -y \
     fonts-noto \
@@ -46,11 +49,11 @@ RUN cd ~ \
 
 USER node
 
-WORKDIR /home/root/
+WORKDIR ${PATH_ROOT}
 
 # Tls
-CMD chmod +x /home/root/docker/tls.sh \
-    && bash /home/root/docker/tls.sh \
+CMD chmod +x ${PATH_ROOT}docker/tls.sh \
+    && bash ${PATH_ROOT}docker/tls.sh \
     # Keep running
     && tail -f /dev/null
 

@@ -19,7 +19,7 @@ services:
       - 127.0.0.1:${NODEJS_SERVER_PORT_RANGE}:${NODEJS_SERVER_PORT_RANGE}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ./:/home/root/
+      - ./:${PATH_ROOT}
       - /tmp/.X11-unix:/tmp/.X11-unix
   ow_python:
     container_name: ow-python
@@ -38,7 +38,7 @@ services:
       - 127.0.0.1:${PYTHON_JUPYTER_PORT}:${PYTHON_JUPYTER_PORT}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ./:/home/root/
+      - ./:${PATH_ROOT}
       - /tmp/.X11-unix:/tmp/.X11-unix
     depends_on:
       - ow_nodejs
@@ -59,7 +59,7 @@ services:
       - 127.0.0.1:443:${APACHE_SERVER_PORT}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ./:/home/root/
+      - ./:${PATH_ROOT}
       - /tmp/.X11-unix:/tmp/.X11-unix
     depends_on:
       - ow_nodejs

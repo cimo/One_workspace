@@ -5,14 +5,17 @@ FROM httpd:${_APACHE_VERSION}
 ARG _ENV_NAME
 ARG _DOMAIN
 ARG _TIMEZONE
+ARG _PATH_ROOT
 ARG _APACHE_SERVER_PORT
 
 ENV ENV_NAME=${_ENV_NAME}
 ENV DOMAIN=${_DOMAIN}
 ENV TZ=${_TIMEZONE}
+ENV PATH_ROOT=${_PATH_ROOT}
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV DEBCONF_NOWARNINGS=yes
+ENV SUDO_FORCE_REMOVE=yes
 
 COPY ./certificate/proxy/ /usr/local/share/ca-certificates/
 COPY ./docker/apache_httpd.conf /usr/local/apache2/conf/httpd.conf.template
@@ -23,9 +26,9 @@ RUN cd ~ \
     && apt-get update && apt-get install -y ca-certificates gnupg curl gettext-base \
     && update-ca-certificates \
     # No root
-    && mkdir -p /home/root/ /usr/local/apache2/ /usr/local/apache2/conf/ /usr/local/apache2/htdocs/ \
-    && chown -R www-data:www-data /home/root/ /usr/local/apache2/ /usr/local/apache2/conf/ /usr/local/apache2/htdocs/ \
-    && chmod -R 775 /home/root/ /usr/local/apache2/ /usr/local/apache2/conf/ /usr/local/apache2/htdocs/ \
+    && mkdir -p ${PATH_ROOT} /usr/local/apache2/ /usr/local/apache2/conf/ /usr/local/apache2/htdocs/ \
+    && chown -R www-data:www-data ${PATH_ROOT} /usr/local/apache2/ /usr/local/apache2/conf/ /usr/local/apache2/htdocs/ \
+    && chmod -R 775 ${PATH_ROOT} /usr/local/apache2/ /usr/local/apache2/conf/ /usr/local/apache2/htdocs/ \
     # Httpd env
     && envsubst '${_APACHE_SERVER_PORT}' < /usr/local/apache2/conf/httpd.conf.template > /usr/local/apache2/conf/httpd.conf \
     # Apt
@@ -41,7 +44,7 @@ RUN cd ~ \
 
 USER www-data
 
-WORKDIR /home/root/
+WORKDIR ${PATH_ROOT}
 
 # Httpd
 CMD apachectl start \
