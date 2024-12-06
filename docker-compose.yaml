@@ -2,6 +2,8 @@ version: "3.8"
 services:
   ow_nodejs:
     container_name: ow-nodejs
+    env_file:
+      - ./env/local.env
     build:
       context: ./
       dockerfile: ./docker/Dockerfile_nodejs
@@ -14,8 +16,6 @@ services:
         _NODEJS_VERSION: ${NODEJS_VERSION}
         _NODEJS_SERVER_PORT: ${NODEJS_SERVER_PORT}
         _NODEJS_SERVER_PORT_RANGE: ${NODEJS_SERVER_PORT_RANGE}
-    env_file:
-      - ./env/local.env
     ports:
       - 127.0.0.1:${NODEJS_SERVER_PORT}:${NODEJS_SERVER_PORT}
       - 127.0.0.1:${NODEJS_SERVER_PORT_RANGE}:${NODEJS_SERVER_PORT_RANGE}
@@ -25,6 +25,8 @@ services:
       - /tmp/.X11-unix:/tmp/.X11-unix
   ow_python:
     container_name: ow-python
+    env_file:
+      - ./env/local.env
     build:
       context: ./
       dockerfile: ./docker/Dockerfile_python
@@ -36,8 +38,6 @@ services:
         _PATH_ROOT: ${PATH_ROOT}
         _PYTHON_VERSION: ${PYTHON_VERSION}
         _PYTHON_JUPYTER_PORT: ${PYTHON_JUPYTER_PORT}
-    env_file:
-      - ./env/local.env
     ports:
       - 127.0.0.1:${PYTHON_JUPYTER_PORT}:${PYTHON_JUPYTER_PORT}
     volumes:
@@ -48,6 +48,8 @@ services:
       - ow_nodejs
   ow_apache:
     container_name: ow-apache
+    env_file:
+      - ./env/local.env
     build:
       context: ./
       dockerfile: ./docker/Dockerfile_apache
@@ -59,8 +61,6 @@ services:
         _PATH_ROOT: ${PATH_ROOT}
         _APACHE_VERSION: ${APACHE_VERSION}
         _APACHE_SERVER_PORT: ${APACHE_SERVER_PORT}
-    env_file:
-      - ./env/local.env
     ports:
       - 127.0.0.1:443:${APACHE_SERVER_PORT}
     volumes:
