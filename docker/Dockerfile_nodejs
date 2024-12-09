@@ -15,6 +15,9 @@ ENV DOMAIN=${_DOMAIN}
 ENV TZ=${_TIMEZONE}
 ENV SERVER_LOCATION=${_SERVER_LOCATION}
 ENV PATH_ROOT=${_PATH_ROOT}
+ENV NODEJS_VERSION=${_NODEJS_VERSION}
+ENV NODEJS_SERVER_PORT=${_NODEJS_SERVER_PORT}
+ENV NODEJS_SERVER_PORT_RANGE=${_NODEJS_SERVER_PORT_RANGE}
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV DEBCONF_NOWARNINGS=yes
@@ -28,6 +31,7 @@ RUN cd ~ \
     && chmod -R 0644 /usr/local/share/ca-certificates/ \
     && apt-get update && apt-get install -y ca-certificates gnupg curl \
     && update-ca-certificates \
+    && npm install -g npm@latest \
     # No root
     && mkdir -p ${PATH_ROOT} /usr/local/lib/node_modules/ /usr/local/bin/ \
     && chown -R node:node ${PATH_ROOT} /usr/local/lib/node_modules/ /usr/local/bin/ \
@@ -59,4 +63,4 @@ CMD chmod +x ${PATH_ROOT}docker/tls.sh \
     # Keep running
     && tail -f /dev/null
 
-EXPOSE ${_NODEJS_SERVER_PORT} ${_NODEJS_SERVER_PORT_RANGE}
+EXPOSE ${NODEJS_SERVER_PORT} ${NODEJS_SERVER_PORT_RANGE}

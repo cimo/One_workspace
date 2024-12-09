@@ -14,6 +14,8 @@ ENV DOMAIN=${_DOMAIN}
 ENV TZ=${_TIMEZONE}
 ENV SERVER_LOCATION=${_SERVER_LOCATION}
 ENV PATH_ROOT=${_PATH_ROOT}
+ENV APACHE_VERSION=${_APACHE_VERSION}
+ENV APACHE_SERVER_PORT=${_APACHE_SERVER_PORT}
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV DEBCONF_NOWARNINGS=yes
@@ -32,7 +34,7 @@ RUN cd ~ \
     && chown -R www-data:www-data ${PATH_ROOT} /usr/local/apache2/ /usr/local/apache2/conf/ /usr/local/apache2/htdocs/ \
     && chmod -R 775 ${PATH_ROOT} /usr/local/apache2/ /usr/local/apache2/conf/ /usr/local/apache2/htdocs/ \
     # Httpd env
-    && envsubst '${_PATH_ROOT},${_APACHE_SERVER_PORT}' < /usr/local/apache2/conf/httpd.conf.template > /usr/local/apache2/conf/httpd.conf \
+    && envsubst '${PATH_ROOT},${APACHE_SERVER_PORT}' < /usr/local/apache2/conf/httpd.conf.template > /usr/local/apache2/conf/httpd.conf \
     # Apt
     && apt-get update && apt-get install -y \
     fonts-noto \

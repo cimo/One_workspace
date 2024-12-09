@@ -14,6 +14,8 @@ ENV DOMAIN=${_DOMAIN}
 ENV TZ=${_TIMEZONE}
 ENV SERVER_LOCATION=${_SERVER_LOCATION}
 ENV PATH_ROOT=${_PATH_ROOT}
+ENV PYTHON_VERSION=${_PYTHON_VERSION}
+ENV PYTHON_JUPYTER_PORT=${_PYTHON_JUPYTER_PORT}
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV DEBCONF_NOWARNINGS=yes
@@ -57,4 +59,4 @@ CMD python3 -m pip install pip --upgrade \
     # Jupyter lab
     && jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --NotebookApp.token='' --NotebookApp.password=''
 
-EXPOSE ${_PYTHON_JUPYTER_PORT}
+EXPOSE ${PYTHON_JUPYTER_PORT}

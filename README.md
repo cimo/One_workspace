@@ -6,9 +6,9 @@ Docker service container for have, in one space, a complete development tools th
 
 -   Cross platform (Windows, Linux)
 -   X11 for WSL2 (Run linux GUI app directly in windows)
--   NodeJs
+-   NodeJs (with electron library)
 -   Python (with jupyter lab)
--   Apache
+-   Apache (https)
 
 ## Installation
 
