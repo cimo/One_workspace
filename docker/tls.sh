@@ -1,7 +1,7 @@
 #!/bin/bash
 
-pathCrt="${PATH_ROOT}application/tls/certificate/tls.crt"
-pathKey="${PATH_ROOT}application/tls/certificate/tls.key"
+pathCrt="${PATH_ROOT}certificate/tls.crt"
+pathKey="${PATH_ROOT}certificate/tls.key"
 pathLog="${PATH_ROOT}log/tls.log"
 
 generate() {
