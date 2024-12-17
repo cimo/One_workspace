@@ -21,21 +21,22 @@ ENV NODEJS_SERVER_PORT_RANGE=${_NODEJS_SERVER_PORT_RANGE}
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV DEBCONF_NOWARNINGS=yes
-ENV NODE_OPTIONS=--use-openssl-ca
 ENV SUDO_FORCE_REMOVE=yes
+ENV NODE_OPTIONS=--use-openssl-ca
 
 COPY ./certificate/proxy/ /usr/local/share/ca-certificates/
 
 RUN cd ~ \
+    # No root
+    && mkdir -p ${PATH_ROOT} \
+    && chown -R node:node ${PATH_ROOT} \
+    && chmod -R 775 ${PATH_ROOT} \
+    # Update
     && VERSION_CODENAME=$(grep VERSION_CODENAME= /etc/os-release | cut -d= -f2) \
     && chmod -R 0644 /usr/local/share/ca-certificates/ \
-    && apt-get update && apt-get install -y ca-certificates gnupg curl \
+    && apt-get update && apt-get install -y ca-certificates curl \
     && update-ca-certificates \
     && npm install -g npm@latest \
-    # No root
-    && mkdir -p ${PATH_ROOT} /usr/local/lib/node_modules/ /usr/local/bin/ \
-    && chown -R node:node ${PATH_ROOT} /usr/local/lib/node_modules/ /usr/local/bin/ \
-    && chmod -R 775 ${PATH_ROOT} /usr/local/lib/node_modules/ /usr/local/bin/ \
     # Apt
     && apt-get update && apt-get install -y \
     fonts-noto \
@@ -48,6 +49,7 @@ RUN cd ~ \
     libxtst-dev \
     libasound2-dev \
     # Clean
+    && apt-get remove --purge -y sudo \
     && rm -rf /var/lib/apt/lists/* \
     && apt-get clean -y \
     && apt-get autoclean -y \

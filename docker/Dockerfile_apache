@@ -25,14 +25,15 @@ COPY ./certificate/proxy/ /usr/local/share/ca-certificates/
 COPY ./docker/apache_httpd.conf /usr/local/apache2/conf/httpd.conf.template
 
 RUN cd ~ \
-    && VERSION_CODENAME=$(grep VERSION_CODENAME= /etc/os-release | cut -d= -f2) \
-    && chmod -R 0644 /usr/local/share/ca-certificates/ \
-    && apt-get update && apt-get install -y ca-certificates gnupg curl gettext-base \
-    && update-ca-certificates \
     # No root
     && mkdir -p ${PATH_ROOT} /usr/local/apache2/ /usr/local/apache2/conf/ /usr/local/apache2/htdocs/ \
     && chown -R www-data:www-data ${PATH_ROOT} /usr/local/apache2/ /usr/local/apache2/conf/ /usr/local/apache2/htdocs/ \
     && chmod -R 775 ${PATH_ROOT} /usr/local/apache2/ /usr/local/apache2/conf/ /usr/local/apache2/htdocs/ \
+    # Update
+    && VERSION_CODENAME=$(grep VERSION_CODENAME= /etc/os-release | cut -d= -f2) \
+    && chmod -R 0644 /usr/local/share/ca-certificates/ \
+    && apt-get update && apt-get install -y ca-certificates curl \
+    && update-ca-certificates \
     # Httpd env
     && envsubst '${PATH_ROOT},${APACHE_SERVER_PORT}' < /usr/local/apache2/conf/httpd.conf.template > /usr/local/apache2/conf/httpd.conf \
     # Apt
@@ -41,6 +42,7 @@ RUN cd ~ \
     fonts-noto-cjk \
     lynx \
     # Clean
+    && apt-get remove --purge -y sudo \
     && rm -rf /var/lib/apt/lists/* \
     && apt-get clean -y \
     && apt-get autoclean -y \
