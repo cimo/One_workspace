@@ -32,7 +32,7 @@ RUN cd ~ \
     # Update
     && VERSION_CODENAME=$(grep VERSION_CODENAME= /etc/os-release | cut -d= -f2) \
     && chmod -R 0644 /usr/local/share/ca-certificates/ \
-    && apt-get update && apt-get install -y ca-certificates curl \
+    && apt-get update && apt-get install -y ca-certificates curl gettext-base \
     && update-ca-certificates \
     # Httpd env
     && envsubst '${PATH_ROOT},${APACHE_SERVER_PORT}' < /usr/local/apache2/conf/httpd.conf.template > /usr/local/apache2/conf/httpd.conf \
