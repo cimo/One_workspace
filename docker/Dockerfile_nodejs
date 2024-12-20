@@ -5,6 +5,7 @@ FROM node:${_NODEJS_VERSION}
 ARG _ENV_NAME
 ARG _DOMAIN
 ARG _TIMEZONE
+ARG _LANG
 ARG _SERVER_LOCATION
 ARG _PATH_ROOT
 ARG _NODEJS_SERVER_PORT
@@ -13,6 +14,7 @@ ARG _NODEJS_SERVER_PORT_RANGE
 ENV ENV_NAME=${_ENV_NAME}
 ENV DOMAIN=${_DOMAIN}
 ENV TZ=${_TIMEZONE}
+ENV LANG=${_LANG}
 ENV SERVER_LOCATION=${_SERVER_LOCATION}
 ENV PATH_ROOT=${_PATH_ROOT}
 ENV NODEJS_VERSION=${_NODEJS_VERSION}
@@ -36,7 +38,6 @@ RUN cd ~ \
     && chmod -R 0644 /usr/local/share/ca-certificates/ \
     && apt-get update && apt-get install -y ca-certificates curl \
     && update-ca-certificates \
-    && npm install -g npm@latest \
     # Apt
     && apt-get update && apt-get install -y \
     fonts-noto \
