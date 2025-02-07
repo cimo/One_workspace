@@ -10,9 +10,8 @@ services:
       args:
         _ENV_NAME: ${ENV_NAME}
         _DOMAIN: ${DOMAIN}
-        _TIMEZONE: ${TIMEZONE}
+        _TIME_ZONE: ${TIME_ZONE}
         _LANG: ${LANG}
-        _SERVER_LOCATION: ${SERVER_LOCATION}
         _PATH_ROOT: ${PATH_ROOT}
         _NODEJS_VERSION: ${NODEJS_VERSION}
         _NODEJS_SERVER_PORT: ${NODEJS_SERVER_PORT}
@@ -34,9 +33,8 @@ services:
       args:
         _ENV_NAME: ${ENV_NAME}
         _DOMAIN: ${DOMAIN}
-        _TIMEZONE: ${TIMEZONE}
+        _TIME_ZONE: ${_TIME_ZONE}
         _LANG: ${LANG}
-        _SERVER_LOCATION: ${SERVER_LOCATION}
         _PATH_ROOT: ${PATH_ROOT}
         _PYTHON_VERSION: ${PYTHON_VERSION}
         _PYTHON_JUPYTER_PORT: ${PYTHON_JUPYTER_PORT}
@@ -58,9 +56,8 @@ services:
       args:
         _ENV_NAME: ${ENV_NAME}
         _DOMAIN: ${DOMAIN}
-        _TIMEZONE: ${TIMEZONE}
+        _TIME_ZONE: ${_TIME_ZONE}
         _LANG: ${LANG}
-        _SERVER_LOCATION: ${SERVER_LOCATION}
         _PATH_ROOT: ${PATH_ROOT}
         _APACHE_VERSION: ${APACHE_VERSION}
         _APACHE_SERVER_PORT: ${APACHE_SERVER_PORT}
