@@ -2,7 +2,7 @@
 
 pathCrt="${PATH_ROOT}certificate/tls.crt"
 pathKey="${PATH_ROOT}certificate/tls.key"
-pathPem="${PATH_ROOT}application/tls/certificate/tls.pem"
+pathPem="${PATH_ROOT}certificate/tls.pem"
 pathLog="${PATH_ROOT}log/tls.log"
 
 concatenate() {
