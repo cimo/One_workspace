@@ -33,7 +33,7 @@ services:
       args:
         _ENV_NAME: ${ENV_NAME}
         _DOMAIN: ${DOMAIN}
-        _TIME_ZONE: ${_TIME_ZONE}
+        _TIME_ZONE: ${TIME_ZONE}
         _LANG: ${LANG}
         _PATH_ROOT: ${PATH_ROOT}
         _PYTHON_VERSION: ${PYTHON_VERSION}
@@ -56,7 +56,7 @@ services:
       args:
         _ENV_NAME: ${ENV_NAME}
         _DOMAIN: ${DOMAIN}
-        _TIME_ZONE: ${_TIME_ZONE}
+        _TIME_ZONE: ${TIME_ZONE}
         _LANG: ${LANG}
         _PATH_ROOT: ${PATH_ROOT}
         _APACHE_VERSION: ${APACHE_VERSION}
