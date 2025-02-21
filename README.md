@@ -12,11 +12,17 @@ Docker service container for have, in one space, a complete development tools th
 
 ## Installation
 
-1. Wrinte on terminal:
+1. For full build write on terminal:
 
 ```
 docker compose -f docker-compose.yaml --env-file ./env/local.env build --no-cache \
 && docker compose -f docker-compose.yaml --env-file ./env/local.env up --detach --pull "always"
+```
+
+2. For light build (just env variable change) remove the container and write on terminal:
+
+```
+docker compose -f docker-compose.yaml --env-file ./env/local.env up --detach --pull "always"
 ```
 
 ## Python - Jupyter lab
