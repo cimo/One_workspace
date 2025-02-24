@@ -33,3 +33,4 @@ package-lock.json
 .jupyter
 project/*
 !project/.gitkeep
+!project/git.sh
