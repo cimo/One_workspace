@@ -32,3 +32,4 @@ package-lock.json
 .ipython/*
 .jupyter
 project/*
+!project/.gitkeep
