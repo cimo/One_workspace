@@ -1,6 +1,6 @@
 services:
-  ow_nodejs:
-    container_name: ow-nodejs
+  cimo_ow_nodejs:
+    container_name: cimo-ow-nodejs
     env_file:
       - ./env/local.env
     build:
@@ -22,8 +22,8 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./:${PATH_ROOT}
       - /tmp/.X11-unix:/tmp/.X11-unix
-  ow_python:
-    container_name: ow-python
+  cimo_ow_python:
+    container_name: cimo-ow-python
     env_file:
       - ./env/local.env
     build:
@@ -44,9 +44,9 @@ services:
       - ./:${PATH_ROOT}
       - /tmp/.X11-unix:/tmp/.X11-unix
     depends_on:
-      - ow_nodejs
-  ow_apache:
-    container_name: ow-apache
+      - cimo_ow_nodejs
+  cimo_ow_apache:
+    container_name: cimo-ow-apache
     env_file:
       - ./env/local.env
     build:
@@ -67,4 +67,4 @@ services:
       - ./:${PATH_ROOT}
       - /tmp/.X11-unix:/tmp/.X11-unix
     depends_on:
-      - ow_nodejs
+      - cimo_ow_nodejs
