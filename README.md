@@ -25,6 +25,20 @@ docker compose -f docker-compose.yaml --env-file ./env/local.env build --no-cach
 docker compose -f docker-compose.yaml --env-file ./env/local.env up --detach --pull "always"
 ```
 
+## Reset
+
+1. Remove this from the root:
+
+    - .cache
+    - .ipython
+    - .jupyter
+    - .local
+    - certificate/tls.crt
+    - certificate/tls.key
+    - certificate/tls.pem
+
+2. Follow the "Installation" instructions.
+
 ## Python - Jupyter lab
 
 1. Write on the browser url:
