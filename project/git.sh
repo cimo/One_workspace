@@ -8,7 +8,7 @@ sudo -u ${USERNAME} git config --global credential.helper cache
 sudo -u ${USERNAME} git config --global --unset-all safe.directory
 
 for directory in ${PROJECT_ROOT}/*/; do
-  if [ -d "${directory}/.git" ]; then
+  if [ -d "${directory}.git" ]; then
     name=$(basename "${directory}")
 
     sudo -u ${USERNAME} git config --global --add safe.directory ${directory}
