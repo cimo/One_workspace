@@ -32,11 +32,9 @@ docker compose -f docker-compose.yaml --env-file ./env/local.env up --detach --p
 1. Remove this from the root:
 
     - .cache
-    - .config
     - .ipython
     - .jupyter
     - .local
-    - .pki
     - certificate/tls.crt
     - certificate/tls.key
     - certificate/tls.pem

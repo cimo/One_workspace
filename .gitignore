@@ -22,11 +22,9 @@ pnpm-debug.log*
 
 # cimo +
 .cache
-.config
 .ipython
 .jupyter
 .local
-.pki
 certificate/*
 !certificate/.gitkeep
 certificate/proxy/*
