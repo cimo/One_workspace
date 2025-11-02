@@ -5,7 +5,7 @@ Docker service container for have, in one space, a complete development tools th
 ## Info:
 
 -   Cross platform (Windows, Linux)
--   X11 for WSL2 (Run linux GUI app directly in windows)
+-   X11 for WSL2 (Run linux GUI app directly in windows) with full GPU host support.
 -   NodeJs (with electron library)
 -   Python (with jupyter lab)
 -   Apache (https)
@@ -14,14 +14,21 @@ Docker service container for have, in one space, a complete development tools th
 
 1. For the proxy, copy the xxx.crt file in "/certificate/proxy/" folder before start the docker build.
 
-2. For full build write on terminal:
+2. For full build with GPU write on terminal:
 
 ```
-docker compose -f docker-compose.yaml --env-file ./env/local.env build --no-cache \
-&& docker compose -f docker-compose.yaml --env-file ./env/local.env up --detach --pull "always"
+docker compose -f docker-compose-gpu.yaml --env-file ./env/local.env build --no-cache \
+&& docker compose -f docker-compose-gpu.yaml --env-file ./env/local.env up --detach --pull "always"
 ```
 
-3. For light build (just env variable change) remove the container and write on terminal:
+3. For full build with CPU write on terminal:
+
+```
+docker compose -f docker-compose-cpu.yaml --env-file ./env/local.env build --no-cache \
+&& docker compose -f docker-compose-cpu.yaml --env-file ./env/local.env up --detach --pull "always"
+```
+
+4. For light build (just env variable change) remove the container and write on terminal:
 
 ```
 docker compose -f docker-compose.yaml --env-file ./env/local.env up --detach --pull "always"
