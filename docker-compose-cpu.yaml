@@ -21,10 +21,6 @@ services:
       - ./:${PATH_ROOT}
       - /tmp/.X11-unix:/tmp/.X11-unix
       - /run/dbus/system_bus_socket:/run/dbus/system_bus_socket
-    cap_add:
-      - SYS_ADMIN
-    devices:
-      - /dev/fuse:/dev/fuse
   cimo_ow_python_cpu:
     container_name: cimo-ow-python-cpu
     env_file:
@@ -46,10 +42,6 @@ services:
       - ./:${PATH_ROOT}
       - /tmp/.X11-unix:/tmp/.X11-unix
       - /run/dbus/system_bus_socket:/run/dbus/system_bus_socket
-    cap_add:
-      - SYS_ADMIN
-    devices:
-      - /dev/fuse:/dev/fuse
     depends_on:
       - cimo_ow_nodejs_cpu
   cimo_ow_apache:

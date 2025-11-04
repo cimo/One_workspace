@@ -23,6 +23,7 @@ ENV SUDO_FORCE_REMOVE=yes
 
 COPY ./certificate/proxy/ /usr/local/share/ca-certificates/
 COPY ./docker/apache_httpd.conf /usr/local/apache2/conf/httpd.conf.template
+COPY ./docker/NotoSansJP-Regular.ttf /usr/share/fonts/truetype/noto/
 
 RUN cd ~ \
     # No root
@@ -38,8 +39,6 @@ RUN cd ~ \
     && envsubst '${PATH_ROOT},${APACHE_SERVER_PORT}' < /usr/local/apache2/conf/httpd.conf.template > /usr/local/apache2/conf/httpd.conf \
     # Apt
     && apt-get update && apt-get install -y \
-    fonts-noto \
-    fonts-noto-cjk \
     lynx \
     # Clean
     && apt-get remove --purge -y sudo \
