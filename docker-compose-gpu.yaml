@@ -73,6 +73,5 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./:${PATH_ROOT}
-      - /tmp/.X11-unix:/tmp/.X11-unix
     depends_on:
       - cimo_ow_nodejs_gpu
