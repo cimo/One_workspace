@@ -41,12 +41,16 @@ RUN cd ~ \
     # Update
     && VERSION_CODENAME=$(grep VERSION_CODENAME= /etc/os-release | cut -d= -f2) \
     && chmod -R 0644 /usr/local/share/ca-certificates/ \
-    && apt-get update && apt-get install -y ca-certificates curl \
+    && apt-get update && apt-get install -y ca-certificates tzdata curl media-types \
     && update-ca-certificates \
-    # Apt
+    && ln -sf /usr/share/zoneinfo/${TZ} /etc/localtime && echo ${TZ} > /etc/timezone \
+    && echo "application/typescript ts" >> /etc/mime.types \
+    # Dbus
     && apt-get update && apt-get install -y \
-    media-types \
+    dbus \
+    dbus-x11 \
     # GPU
+    && apt-get update && apt-get install -y \
     libglib2.0-0 \
     libgtk-3-0 \
     libnss3 \
@@ -65,8 +69,6 @@ RUN cd ~ \
     mesa-vulkan-drivers \
     mesa-utils \
     xdg-utils \
-    dbus \
-    dbus-x11 \
     # Clean
     && apt-get remove --purge -y sudo \
     && rm -rf /var/lib/apt/lists/* \
