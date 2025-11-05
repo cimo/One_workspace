@@ -3,9 +3,11 @@
     "l13Diff.exclude": [
         ".git",
         ".cache",
+        ".dbus",
         ".ipython",
         ".jupyter",
         ".local",
+        ".nv",
         "log",
         "project"
     ],

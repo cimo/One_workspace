@@ -81,6 +81,8 @@ WORKDIR ${PATH_ROOT}
 # Pip
 CMD python3 -m pip install pip --upgrade \
     && python3 -m pip install --user --trusted-host pypi.python.org --trusted-host files.pythonhosted.org --trusted-host pypi.org -r ${PATH_ROOT}docker/python_requirements.txt \
+    # Engine package
+    && bash ${PATH_ROOT}script/engine_package.sh \
     # Nvidia
     && command -v nvidia-smi > /dev/null && nvidia-smi --query-gpu=name --format=csv,noheader || echo "Host without nvidia GPU." \
     # Vulkan

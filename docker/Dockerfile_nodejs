@@ -83,8 +83,7 @@ USER node
 WORKDIR ${PATH_ROOT}
 
 # Tls
-CMD chmod +x ${PATH_ROOT}docker/tls.sh \
-    && bash ${PATH_ROOT}docker/tls.sh \
+CMD bash ${PATH_ROOT}docker/tls.sh \
     # Nvidia
     && command -v nvidia-smi > /dev/null && nvidia-smi --query-gpu=name --format=csv,noheader || echo "Host without nvidia GPU." \
     # Vulkan
