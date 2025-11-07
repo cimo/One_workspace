@@ -1,5 +1,5 @@
 {
-    "typescript.tsdk": "node_modules/typescript/lib",
+    "typescript.tsdk": "project/npm_jsmvcfw/node_modules/typescript/lib",
     "l13Diff.exclude": [
         ".git",
         ".cache",
