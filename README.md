@@ -7,7 +7,7 @@ Docker service container for have, in one space, a complete development tools th
 -   Cross platform (Windows, Linux)
 -   X11 for WSL2 (Run linux GUI app directly in windows) with full GPU host support.
 -   NodeJs (with electron library)
--   Python (with jupyter lab)
+-   Python (with jupyter lab, torch, torchvision, torchaudio)
 -   Apache (https)
 
 ## Installation
@@ -44,9 +44,6 @@ docker compose -f docker-compose.yaml --env-file ./env/local.env up --detach --p
     - .jupyter
     - .local
     - .nv
-    - certificate/tls.crt
-    - certificate/tls.key
-    - certificate/tls.pem
 
 2. Follow the "Installation" instructions.
 
