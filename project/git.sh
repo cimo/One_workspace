@@ -8,7 +8,8 @@ sudo -u ${username} git config --global credential.helper cache
 sudo -u ${username} git config --global --unset-all safe.directory
 
 for directory in "${projectRoot}"/*/; do
-  if [ -d "${directory}.git" ]; then
+  if [ -d "${directory}.git" ]
+  then
     folderName="$(basename "${directory}")"
 
     sudo -u ${username} git config --global --add safe.directory "${directory}"
@@ -17,7 +18,8 @@ for directory in "${projectRoot}"/*/; do
 
     cd "${directory}" || continue
 
-    if sudo -u ${username} git rev-parse --verify main >/dev/null 2>&1; then
+    if sudo -u ${username} git rev-parse --verify main >/dev/null 2>&1
+    then
       sudo -u ${username} git checkout main
       sudo -u ${username} git fetch --all
       sudo -u ${username} git pull

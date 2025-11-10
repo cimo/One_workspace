@@ -22,8 +22,8 @@ ENV DEBCONF_NOWARNINGS=yes
 ENV SUDO_FORCE_REMOVE=yes
 
 COPY ./certificate/proxy/ /usr/local/share/ca-certificates/
-COPY ./docker/apache_httpd.conf /usr/local/apache2/conf/httpd.conf.template
 COPY ./docker/NotoSansJP-Regular.ttf /usr/share/fonts/truetype/noto/
+COPY ./docker/apache_httpd.conf /usr/local/apache2/conf/httpd.conf.template
 
 RUN cd ~ \
     # No root
@@ -33,15 +33,12 @@ RUN cd ~ \
     # Update
     && VERSION_CODENAME=$(grep VERSION_CODENAME= /etc/os-release | cut -d= -f2) \
     && chmod -R 0644 /usr/local/share/ca-certificates/ \
-    && apt-get update && apt-get install -y ca-certificates tzdata curl media-types gettext-base \
+    && apt-get update && apt-get install -y ca-certificates tzdata curl media-types gettext-base lynx \
     && update-ca-certificates \
     && ln -sf /usr/share/zoneinfo/${TZ} /etc/localtime && echo ${TZ} > /etc/timezone \
     && echo "application/typescript ts" >> /etc/mime.types \
-    # Httpd env
+    # Httpd
     && envsubst '${PATH_ROOT},${APACHE_SERVER_PORT}' < /usr/local/apache2/conf/httpd.conf.template > /usr/local/apache2/conf/httpd.conf \
-    # Apt
-    && apt-get update && apt-get install -y \
-    lynx \
     # Clean
     && apt-get remove --purge -y sudo \
     && rm -rf /var/lib/apt/lists/* \

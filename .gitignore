@@ -27,10 +27,9 @@ pnpm-debug.log*
 .jupyter
 .local
 .nv
-certificate/*
-!certificate/.gitkeep
-certificate/proxy/*
-!certificate/proxy/.gitkeep
+certificate/**/*
+!certificate/**/
+!certificate/**/.gitkeep
 log/*
 !log/.gitkeep
 project/*

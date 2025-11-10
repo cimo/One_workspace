@@ -12,26 +12,24 @@ Docker service container for have, in one space, a complete development tools th
 
 ## Installation
 
-1. For the proxy, copy the xxx.crt file in "/certificate/proxy/" folder before start the docker build.
+1. In case of proxy, put the certificate in "/certificate/proxy/" folder before start the build.
 
-2. For full build with GPU write on terminal:
-
-```
-docker compose -f docker-compose-gpu.yaml --env-file ./env/local.env build --no-cache \
-&& docker compose -f docker-compose-gpu.yaml --env-file ./env/local.env up --detach --pull "always"
-```
-
-3. For full build with CPU write on terminal:
+2. For build and up with GPU write on terminal:
 
 ```
-docker compose -f docker-compose-cpu.yaml --env-file ./env/local.env build --no-cache \
-&& docker compose -f docker-compose-cpu.yaml --env-file ./env/local.env up --detach --pull "always"
+bash docker/container_execute.sh "local" "build-up" "gpu"
 ```
 
-4. For light build (just env variable change) remove the container and write on terminal:
+3. For build and up with CPU write on terminal:
 
 ```
-docker compose -f docker-compose.yaml --env-file ./env/local.env up --detach --pull "always"
+bash docker/container_execute.sh "local" "build-up" "cpu"
+```
+
+4. Just for up write on terminal:
+
+```
+bash docker/container_execute.sh "local" "up" "xxx"
 ```
 
 ## Reset
