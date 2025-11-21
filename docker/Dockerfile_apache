@@ -54,4 +54,4 @@ CMD apachectl start \
     # Keep running
     && tail -f /dev/null
 
-EXPOSE 443
+EXPOSE ${APACHE_SERVER_PORT}
