@@ -8,11 +8,11 @@ then
     then
         if [ "${3}" = "cpu" ]
         then
-            docker compose -f docker-compose-cpu.yaml --env-file ./env/${1}.env build --no-cache
+            docker compose -f docker-compose-cpu.yaml --env-file ./env/${1}.env build --no-cache &&
             docker compose -f docker-compose-cpu.yaml --env-file ./env/${1}.env up --detach --pull always
         elif [ "${3}" = "gpu" ]
         then
-            docker compose -f docker-compose-gpu.yaml --env-file ./env/${1}.env build --no-cache
+            docker compose -f docker-compose-gpu.yaml --env-file ./env/${1}.env build --no-cache &&
             docker compose -f docker-compose-gpu.yaml --env-file ./env/${1}.env up --detach --pull always
         fi
     elif [ "${2}" = "up" ]

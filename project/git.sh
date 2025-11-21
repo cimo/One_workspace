@@ -7,7 +7,8 @@ username=$(stat -c "%U" "${projectRoot}")
 sudo -u ${username} git config --global credential.helper cache
 sudo -u ${username} git config --global --unset-all safe.directory
 
-for directory in "${projectRoot}"/*/; do
+for directory in "${projectRoot}"/*/
+do
   if [ -d "${directory}.git" ]
   then
     folderName="$(basename "${directory}")"

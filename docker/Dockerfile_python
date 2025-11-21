@@ -1,6 +1,4 @@
-ARG _PYTHON_VERSION
-
-FROM python:${_PYTHON_VERSION}
+FROM python:3.12.8
 
 ARG _ENV_NAME
 ARG _DOMAIN
@@ -14,7 +12,6 @@ ENV DOMAIN=${_DOMAIN}
 ENV TZ=${_TIME_ZONE}
 ENV LANG=${_LANG}
 ENV PATH_ROOT=${_PATH_ROOT}
-ENV PYTHON_VERSION=${_PYTHON_VERSION}
 ENV PYTHON_JUPYTER_PORT=${_PYTHON_JUPYTER_PORT}
 
 ENV DEBIAN_FRONTEND=noninteractive
@@ -69,6 +66,9 @@ RUN cd ~ \
     mesa-vulkan-drivers \
     mesa-utils \
     xdg-utils \
+    libxcb1 \
+    libx11-xcb1 \
+    libcairo2 \
     # Clean
     && apt-get remove --purge -y sudo \
     && rm -rf /var/lib/apt/lists/* \
