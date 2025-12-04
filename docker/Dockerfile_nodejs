@@ -24,7 +24,7 @@ ENV NVIDIA_VISIBLE_DEVICES=all
 ENV NVIDIA_DRIVER_CAPABILITIES=all
 ENV VK_ICD_FILENAMES=/usr/share/vulkan/icd.d/lvp_icd.x86_64.json
 
-COPY ./certificate/proxy/ /usr/local/share/ca-certificates/
+COPY ./certificate/* /usr/local/share/ca-certificates/
 COPY ./docker/NotoSansJP-Regular.ttf /usr/share/fonts/truetype/noto/
 
 RUN cd ~ \

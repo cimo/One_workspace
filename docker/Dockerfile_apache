@@ -18,7 +18,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 ENV DEBCONF_NOWARNINGS=yes
 ENV SUDO_FORCE_REMOVE=yes
 
-COPY ./certificate/proxy/ /usr/local/share/ca-certificates/
+COPY ./certificate/* /usr/local/share/ca-certificates/
 COPY ./docker/NotoSansJP-Regular.ttf /usr/share/fonts/truetype/noto/
 COPY ./docker/apache_httpd.conf /usr/local/apache2/conf/httpd.conf.template
 
