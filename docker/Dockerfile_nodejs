@@ -25,6 +25,7 @@ ENV NVIDIA_DRIVER_CAPABILITIES=all
 ENV VK_ICD_FILENAMES=/usr/share/vulkan/icd.d/lvp_icd.x86_64.json
 ENV PATH="/home/node/.cargo/bin:${PATH}"
 ENV RUST_BACKTRACE=1
+ENV XWIN_CACHE_DIR="/home/node/xwin_cache/"
 
 COPY ./certificate/* /usr/local/share/ca-certificates/
 COPY ./docker/NotoSansJP-Regular.ttf /usr/share/fonts/truetype/noto/
@@ -74,6 +75,10 @@ RUN cd ~ \
     libssl-dev \
     libayatana-appindicator3-dev \
     librsvg2-dev \
+    nsis \
+    lld \
+    llvm \
+    clang \
     # Clean
     && apt-get remove --purge -y sudo \
     && rm -rf /var/lib/apt/lists/* \
@@ -85,8 +90,10 @@ USER node
 
 # Rust
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y \
+    && rustup target add x86_64-pc-windows-msvc \
     && rustup target add i686-pc-windows-msvc \
-    && rustup target add aarch64-pc-windows-msvc
+    && rustup target add aarch64-pc-windows-msvc \
+    && cargo install --locked cargo-xwin
 
 WORKDIR ${PATH_ROOT}
 
@@ -101,6 +108,7 @@ CMD bash ${PATH_ROOT}script/tls.sh \
     # Rust
     && rustc --version \
     && cargo --version \
+    && cargo xwin --version \
     # Keep running
     && tail -f /dev/null
 
