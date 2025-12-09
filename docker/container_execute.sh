@@ -9,9 +9,9 @@ then
         if [ "${3}" = "cpu" ]
         then
             docker compose -f docker-compose-cpu.yaml --env-file ./env/${1}.env build cimo_ow_nodejs_cpu --no-cache &&
-            docker compose -f docker-compose-gpu.yaml --env-file ./env/${1}.env up cimo_ow_nodejs_cpu --detach --pull always &&
+            docker compose -f docker-compose-cpu.yaml --env-file ./env/${1}.env up cimo_ow_nodejs_cpu --detach --pull always &&
             docker compose -f docker-compose-cpu.yaml --env-file ./env/${1}.env build cimo_ow_python_cpu --no-cache &&
-            docker compose -f docker-compose-gpu.yaml --env-file ./env/${1}.env up cimo_ow_python_cpu --detach --pull always
+            docker compose -f docker-compose-cpu.yaml --env-file ./env/${1}.env up cimo_ow_python_cpu --detach --pull always
         elif [ "${3}" = "gpu" ]
         then
             docker compose -f docker-compose-gpu.yaml --env-file ./env/${1}.env build cimo_ow_nodejs_gpu --no-cache &&
