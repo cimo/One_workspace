@@ -12,16 +12,17 @@ then
             docker compose -f docker-compose-cpu.yaml --env-file ./env/${1}.env up cimo_ow_nodejs_cpu --detach --pull always &&
             docker compose -f docker-compose-cpu.yaml --env-file ./env/${1}.env build cimo_ow_python_cpu --no-cache &&
             docker compose -f docker-compose-cpu.yaml --env-file ./env/${1}.env up cimo_ow_python_cpu --detach --pull always
+            docker compose -f docker-compose-cpu.yaml --env-file ./env/${1}.env build cimo_ow_apache --no-cache &&
+            docker compose -f docker-compose-cpu.yaml --env-file ./env/${1}.env up cimo_ow_apache --detach --pull always
         elif [ "${3}" = "gpu" ]
         then
             docker compose -f docker-compose-gpu.yaml --env-file ./env/${1}.env build cimo_ow_nodejs_gpu --no-cache &&
             docker compose -f docker-compose-gpu.yaml --env-file ./env/${1}.env up cimo_ow_nodejs_gpu --detach --pull always &&
             docker compose -f docker-compose-gpu.yaml --env-file ./env/${1}.env build cimo_ow_python_gpu --no-cache &&
             docker compose -f docker-compose-gpu.yaml --env-file ./env/${1}.env up cimo_ow_python_gpu --detach --pull always
+            docker compose -f docker-compose-gpu.yaml --env-file ./env/${1}.env build cimo_ow_apache --no-cache &&
+            docker compose -f docker-compose-gpu.yaml --env-file ./env/${1}.env up cimo_ow_apache --detach --pull always
         fi
-
-        docker compose -f docker-compose-gpu.yaml --env-file ./env/${1}.env build cimo_ow_apache --no-cache &&
-        docker compose -f docker-compose-gpu.yaml --env-file ./env/${1}.env up cimo_ow_apache --detach --pull always
     elif [ "${2}" = "up" ]
     then
         if [ "${3}" = "cpu" ]
