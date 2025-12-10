@@ -79,6 +79,10 @@ RUN cd ~ \
     lld \
     llvm \
     clang \
+    osslsigncode \
+    libengine-pkcs11-openssl libp11-3 \
+    opensc \
+    softhsm2 \
     # Clean
     && apt-get remove --purge -y sudo \
     && rm -rf /var/lib/apt/lists/* \
