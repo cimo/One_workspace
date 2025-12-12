@@ -91,9 +91,7 @@ USER node
 # Rust
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y \
     && rustup target add x86_64-unknown-linux-gnu \
-    && rustup target add aarch64-unknown-linux-gnu \
     && rustup target add x86_64-pc-windows-msvc \
-    && rustup target add aarch64-pc-windows-msvc \
     && cargo install --locked cargo-xwin
 
 WORKDIR ${PATH_ROOT}
