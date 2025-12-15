@@ -17,7 +17,12 @@ generate() {
     openssl req -x509 -newkey rsa:4096 -sha256 -days 365 -nodes \
         -keyout "${pathKey}" \
         -out "${pathCrt}" \
-        -addext "subjectAltName=DNS:localhost" \
+        -addext "subjectAltName=DNS:localhost,\
+            DNS:cimo-ow-apache,\
+            DNS:cimo-ow-nodejs-cpu,\
+            DNS:cimo-ow-nodejs-gpu,\
+            DNS:cimo-ow-python-cpu,\
+            DNS:cimo-ow-python-gpu" \
         -subj "/C=JP/ST=Tokyo/L=Tokyo/O=CIMO/OU=ONE-WORKSPACE/CN=${DOMAIN}" >> "${pathLog}" 2>&1
 
     chmod 0644 "${pathKey}"
