@@ -5,7 +5,7 @@ Docker service container for have, in one space, a complete development tools th
 ## Info:
 
 -   Cross platform (Windows, Linux)
--   X11 for WSL2 (Run linux GUI app directly in windows with full GPU host support).
+-   X11 for WSL2 (Run linux GUI app directly in windows with full nvidia GPU host support).
 -   NodeJs (with rust and tauri library)
 -   Python (with jupyter lab, torch, torchvision, torchaudio)
 -   Apache
