@@ -22,6 +22,8 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - /tmp/.X11-unix:/tmp/.X11-unix
       - /run/dbus/system_bus_socket:/run/dbus/system_bus_socket
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
   cimo_ow_python_cpu:
     container_name: cimo-ow-python-cpu
     env_file:
@@ -43,6 +45,8 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - /tmp/.X11-unix:/tmp/.X11-unix
       - /run/dbus/system_bus_socket:/run/dbus/system_bus_socket
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
       - cimo_ow_nodejs_cpu
   cimo_ow_apache:
@@ -64,5 +68,7 @@ services:
     volumes:
       - ./:${PATH_ROOT}
       - /var/run/docker.sock:/var/run/docker.sock
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
       - cimo_ow_nodejs_cpu
