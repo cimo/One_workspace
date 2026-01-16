@@ -23,7 +23,7 @@ ENV NODE_OPTIONS=--use-openssl-ca
 ENV NVIDIA_VISIBLE_DEVICES=all
 ENV NVIDIA_DRIVER_CAPABILITIES=all
 ENV VK_ICD_FILENAMES=/usr/share/vulkan/icd.d/lvp_icd.x86_64.json
-ENV PATH="/home/node/.cargo/bin:${PATH}"
+ENV PATH="${PATH}:/home/node/.cargo/bin/"
 ENV RUST_BACKTRACE=1
 ENV XWIN_CACHE_DIR="/home/node/xwin_cache/"
 
@@ -98,11 +98,9 @@ WORKDIR ${PATH_ROOT}
 
 # Tls
 CMD bash ${PATH_ROOT}script/tls.sh \
-    # Nvidia
+    # Command
     && command -v nvidia-smi > /dev/null && nvidia-smi --query-gpu=name --format=csv,noheader || echo "Host without nvidia GPU." \
-    # Vulkan
     && command -v vulkaninfo > /dev/null && vulkaninfo | grep "deviceName" || echo "Host without vulkan support." \
-    # OpenGL
     && command -v glxinfo > /dev/null && glxinfo | grep "OpenGL renderer string" || echo "Host without opengl support." \
     # Rust
     && rustc --version \
