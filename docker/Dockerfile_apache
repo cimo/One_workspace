@@ -20,6 +20,9 @@ ENV SUDO_FORCE_REMOVE=yes
 
 COPY ./certificate/* /usr/local/share/ca-certificates/
 COPY ./docker/NotoSansJP-Regular.ttf /usr/share/fonts/truetype/noto/
+COPY ./docker/NotoSansSymbols2-Regular.ttf /usr/share/fonts/truetype/noto/
+COPY ./docker/NotoColorEmoji-Regular.ttf /usr/share/fonts/truetype/noto/
+COPY ./docker/font.local.conf /etc/fonts/local.conf
 COPY ./docker/apache_httpd.conf /usr/local/apache2/conf/httpd.conf.template
 
 RUN cd ~ \
