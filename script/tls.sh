@@ -3,7 +3,7 @@
 pathCrt="${PATH_ROOT}certificate/tls.crt"
 pathKey="${PATH_ROOT}certificate/tls.key"
 pathPem="${PATH_ROOT}certificate/tls.pem"
-pathLog="${PATH_ROOT}log/tls.log"
+pathLog="${PATH_ROOT}${PATH_LOG}tls.log"
 
 concatenate() {
     echo "Concatenate in pem." >> "${pathLog}"

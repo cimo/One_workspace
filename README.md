@@ -5,7 +5,7 @@ Docker service container for have, in one space, a complete development tools th
 ## Info:
 
 -   Cross platform (Windows, Linux)
--   WSLg for WSL2 (Run linux GUI app directly in windows with full nvidia GPU host support).
+-   WSLg for WSL2 (Run linux GUI app directly in windows) with full nvidia GPU host support.
 -   NodeJs (with rust and tauri library)
 -   Python (with jupyter lab, torch, torchvision, torchaudio)
 -   Apache
@@ -32,12 +32,18 @@ bash docker/container_execute.sh "local" "build-up" "cpu"
 bash docker/container_execute.sh "local" "up" "xxx"
 ```
 
+## GPU
+
+1. When the container start, a message appears that indicates the GPU status:
+
+NVIDIA GeForce RTX 3060 - (Host GPU available)
+
 ## Reset
 
 1. Remove this from the root:
 
     - .cache
-    - .dbus
+    - .config
     - .ipython
     - .jupyter
     - .local
