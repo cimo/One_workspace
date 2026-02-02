@@ -42,7 +42,6 @@ COPY ./docker/font.local.conf /etc/fonts/local.conf
 
 RUN cd ~ \
     # No root
-    && useradd -U node -d ${PATH_ROOT} -s /bin/bash \
     && uid="$(id -u node)" \
     && mkdir -p ${PATH_ROOT} "/run/user/${uid}" \
     && chown -R node:node ${PATH_ROOT} "/run/user/${uid}" \
@@ -110,7 +109,7 @@ CMD \
     # Tls
     bash ${PATH_ROOT}script/tls.sh \
     # Command
-    command -v nvidia-smi > /dev/null && nvidia-smi --query-gpu=name --format=csv,noheader || echo "Host without nvidia GPU support." \
+    && command -v nvidia-smi > /dev/null && nvidia-smi --query-gpu=name --format=csv,noheader || echo "Host without nvidia GPU support." \
     # Dbus
     && bash ${PATH_ROOT}script/dbus.sh \
     # Rust
