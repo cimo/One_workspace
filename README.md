@@ -1,6 +1,6 @@
 # One workspace
 
-Docker service container for have, in one space, a complete development tools that looks and work in same way on all machine.
+Docker service container to have, in one place, a complete set of development tools that look and work the same way on all machines.
 
 ## Info:
 
@@ -12,7 +12,7 @@ Docker service container for have, in one space, a complete development tools th
 
 ## Installation
 
-1. In case of proxy, put the certificate in "/certificate/proxy/" folder before start the build.
+1. In case of a proxy, place the certificate in the "/certificate/proxy/" folder before starting the build.
 
 2. For build and up with GPU write on terminal:
 
@@ -44,10 +44,13 @@ NVIDIA GeForce RTX 3060 - (Host GPU available)
 
     - .cache
     - .config
+    - .cuda
     - .ipython
     - .jupyter
     - .local
+    - .npm
     - .nv
+    - .pki
 
 2. Follow the "Installation" instructions.
 

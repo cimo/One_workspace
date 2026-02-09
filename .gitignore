@@ -22,11 +22,14 @@ pnpm-debug.log*
 
 # cimo +
 .cache
-.dbus
+.config
+.cuda
 .ipython
 .jupyter
 .local
+.npm
 .nv
+.pki
 certificate/**/*
 !certificate/**/
 !certificate/**/.gitkeep
