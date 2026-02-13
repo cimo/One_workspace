@@ -20,8 +20,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 ENV DEBCONF_NOWARNINGS=yes
 ENV SUDO_FORCE_REMOVE=yes
 
-COPY ./.ms_cronjob-volume/certificate/* /usr/local/share/ca-certificates/
-COPY ./certificate/* /usr/local/share/ca-certificates/
+COPY ./certificate/ /usr/local/share/ca-certificates/
 COPY ./docker/NotoSansJP-Regular.ttf /usr/share/fonts/truetype/noto/
 COPY ./docker/NotoSansSymbols2-Regular.ttf /usr/share/fonts/truetype/noto/
 COPY ./docker/NotoColorEmoji-Regular.ttf /usr/share/fonts/truetype/noto/

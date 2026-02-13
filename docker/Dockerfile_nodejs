@@ -38,8 +38,7 @@ ENV PATH="${PATH}:/home/node/.cargo/bin/"
 ENV RUST_BACKTRACE=1
 ENV XWIN_CACHE_DIR="/home/node/xwin_cache/"
 
-COPY ./.ms_cronjob-volume/certificate/* /usr/local/share/ca-certificates/
-COPY ./certificate/* /usr/local/share/ca-certificates/
+COPY ./certificate/ /usr/local/share/ca-certificates/
 COPY ./docker/NotoSansJP-Regular.ttf /usr/share/fonts/truetype/noto/
 COPY ./docker/NotoSansSymbols2-Regular.ttf /usr/share/fonts/truetype/noto/
 COPY ./docker/NotoColorEmoji-Regular.ttf /usr/share/fonts/truetype/noto/

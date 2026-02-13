@@ -27,9 +27,6 @@ pnpm-debug.log*
 .ipython
 .jupyter
 .local
-.ms_cronjob-volume/**/*
-!.ms_cronjob-volume/**/
-!.ms_cronjob-volume/**/.gitkeep
 .npm
 .nv
 .pki
