@@ -1,6 +1,12 @@
 # One workspace
 
-Docker service container to have, in one place, a complete set of development tools that look and work the same way on all machines.
+Docker container to have, in one place, a complete set of development tools that look and work the same way on all machines.
+
+Depend on "Ms_cronjob" (use "ms_cronjob-volume" to share the certificate).
+
+It's possible to use an internal certificate instead of "Ms_cronjob", in this case, change the variable in "local.env" file as follows: CERTIFICATE_LABEL='ow_tls'.
+
+It's possible to use a custom certificate instead of "Ms_cronjob" and internal, just add it to the "certificate" folder before build the container.
 
 ## Info:
 
@@ -12,9 +18,7 @@ Docker service container to have, in one place, a complete set of development to
 
 ## Installation
 
-1. In case of a proxy, place the certificate in the "/certificate/proxy/" folder before starting the build.
-
-2. For build and up with GPU write on terminal:
+1. For build and up with GPU write on terminal:
 
 ```
 bash docker/container_execute.sh "local" "build-up" "gpu"
@@ -48,6 +52,7 @@ NVIDIA GeForce RTX 3060 - (Host GPU available)
     - .ipython
     - .jupyter
     - .local
+    - .ms_cronjob-volume/certificate
     - .npm
     - .nv
     - .pki
@@ -56,7 +61,7 @@ NVIDIA GeForce RTX 3060 - (Host GPU available)
 
 ## Command
 
-1. To force certificate regeneration write on terminal:
+1. To force the internal certificate regeneration write on terminal:
 
     ```
     bash script/tls.sh "force"

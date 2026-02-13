@@ -5,6 +5,7 @@ ARG _DOMAIN
 ARG _TIME_ZONE
 ARG _LANG
 ARG _PATH_ROOT
+ARG _CERTIFICATE_LABEL
 ARG _NODEJS_SERVER_PORT
 ARG _NODEJS_SERVER_PORT_RANGE
 
@@ -13,6 +14,7 @@ ENV DOMAIN=${_DOMAIN}
 ENV TZ=${_TIME_ZONE}
 ENV LANG=${_LANG}
 ENV PATH_ROOT=${_PATH_ROOT}
+ENV CERTIFICATE_LABEL=${_CERTIFICATE_LABEL}
 ENV NODEJS_SERVER_PORT=${_NODEJS_SERVER_PORT}
 ENV NODEJS_SERVER_PORT_RANGE=${_NODEJS_SERVER_PORT_RANGE}
 
@@ -36,6 +38,7 @@ ENV PATH="${PATH}:/home/node/.cargo/bin/"
 ENV RUST_BACKTRACE=1
 ENV XWIN_CACHE_DIR="/home/node/xwin_cache/"
 
+COPY ./.ms_cronjob-volume/certificate/* /usr/local/share/ca-certificates/
 COPY ./certificate/* /usr/local/share/ca-certificates/
 COPY ./docker/NotoSansJP-Regular.ttf /usr/share/fonts/truetype/noto/
 COPY ./docker/NotoSansSymbols2-Regular.ttf /usr/share/fonts/truetype/noto/
@@ -108,10 +111,8 @@ RUN \
 WORKDIR ${PATH_ROOT}
 
 CMD \
-    # Tls
-    bash ${PATH_ROOT}script/tls.sh \
     # Command
-    && command -v nvidia-smi > /dev/null && nvidia-smi --query-gpu=name --format=csv,noheader || echo "Host without nvidia GPU support." \
+    command -v nvidia-smi > /dev/null && nvidia-smi --query-gpu=name --format=csv,noheader || echo "Host without nvidia GPU support." \
     # Dbus
     && bash ${PATH_ROOT}script/dbus.sh \
     # Rust

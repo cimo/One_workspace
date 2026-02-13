@@ -8,10 +8,10 @@
         ".ipython",
         ".jupyter",
         ".local",
+        ".ms_cronjob-volume",
         ".npm",
         ".nv",
         ".pki",
-        "certificate",
         "log",
         "project"
     ],

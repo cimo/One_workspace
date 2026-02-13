@@ -12,6 +12,7 @@ services:
         _TIME_ZONE: ${TIME_ZONE}
         _LANG: ${LANG}
         _PATH_ROOT: ${PATH_ROOT}
+        _CERTIFICATE_LABEL: ${CERTIFICATE_LABEL}
         _NODEJS_SERVER_PORT: ${NODEJS_SERVER_PORT}
         _NODEJS_SERVER_PORT_RANGE: ${NODEJS_SERVER_PORT_RANGE}
     ports:
@@ -21,6 +22,7 @@ services:
       - "host.docker.internal:host-gateway"
     volumes:
       - ./:${PATH_ROOT}
+      - ms_cronjob-volume:${PATH_ROOT}.ms_cronjob-volume/:ro
       - /var/run/docker.sock:/var/run/docker.sock
       - /run/dbus/system_bus_socket:/run/dbus/system_bus_socket
       - /mnt/wslg:/mnt/wslg
@@ -44,6 +46,7 @@ services:
         _TIME_ZONE: ${TIME_ZONE}
         _LANG: ${LANG}
         _PATH_ROOT: ${PATH_ROOT}
+        _CERTIFICATE_LABEL: ${CERTIFICATE_LABEL}
         _PYTHON_JUPYTER_PORT: ${PYTHON_JUPYTER_PORT}
     ports:
       - 127.0.0.1:${PYTHON_JUPYTER_PORT}:${PYTHON_JUPYTER_PORT}
@@ -51,6 +54,7 @@ services:
       - "host.docker.internal:host-gateway"
     volumes:
       - ./:${PATH_ROOT}
+      - ms_cronjob-volume:${PATH_ROOT}.ms_cronjob-volume/:ro
       - /var/run/docker.sock:/var/run/docker.sock
       - /run/dbus/system_bus_socket:/run/dbus/system_bus_socket
       - /mnt/wslg:/mnt/wslg
@@ -76,6 +80,7 @@ services:
         _TIME_ZONE: ${TIME_ZONE}
         _LANG: ${LANG}
         _PATH_ROOT: ${PATH_ROOT}
+        _CERTIFICATE_LABEL: ${CERTIFICATE_LABEL}
         _APACHE_SERVER_PORT: ${APACHE_SERVER_PORT}
     ports:
       - 127.0.0.1:443:${APACHE_SERVER_PORT}
@@ -83,6 +88,9 @@ services:
       - "host.docker.internal:host-gateway"
     volumes:
       - ./:${PATH_ROOT}
+      - ms_cronjob-volume:${PATH_ROOT}.ms_cronjob-volume/:ro
       - /var/run/docker.sock:/var/run/docker.sock
     depends_on:
       - cimo_ow_nodejs_gpu
+volumes:
+  ms_cronjob-volume:

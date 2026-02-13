@@ -5,6 +5,7 @@ ARG _DOMAIN
 ARG _TIME_ZONE
 ARG _LANG
 ARG _PATH_ROOT
+ARG _CERTIFICATE_LABEL
 ARG _PYTHON_JUPYTER_PORT
 
 ENV ENV_NAME=${_ENV_NAME}
@@ -12,6 +13,7 @@ ENV DOMAIN=${_DOMAIN}
 ENV TZ=${_TIME_ZONE}
 ENV LANG=${_LANG}
 ENV PATH_ROOT=${_PATH_ROOT}
+ENV CERTIFICATE_LABEL=${_CERTIFICATE_LABEL}
 ENV PYTHON_JUPYTER_PORT=${_PYTHON_JUPYTER_PORT}
 
 ENV DEBIAN_FRONTEND=noninteractive
@@ -35,6 +37,7 @@ ENV PULSE_SERVER="unix:/mnt/wslg/PulseServer"
 ENV NVIDIA_VISIBLE_DEVICES=all
 ENV NVIDIA_DRIVER_CAPABILITIES=all
 
+COPY ./.ms_cronjob-volume/certificate/* /usr/local/share/ca-certificates/
 COPY ./certificate/* /usr/local/share/ca-certificates/
 COPY ./docker/NotoSansJP-Regular.ttf /usr/share/fonts/truetype/noto/
 COPY ./docker/NotoSansSymbols2-Regular.ttf /usr/share/fonts/truetype/noto/
