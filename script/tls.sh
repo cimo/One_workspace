@@ -18,6 +18,7 @@ generate() {
         -keyout "${pathKey}" \
         -out "${pathCrt}" \
         -addext "subjectAltName=DNS:localhost,\
+            DNS:host.docker.internal,\
             DNS:cimo-ow-apache,\
             DNS:cimo-ow-nodejs-cpu,\
             DNS:cimo-ow-nodejs-gpu,\
@@ -37,13 +38,18 @@ then
     currentDateTimestamp=$(date +%s)
     expiryDifference=$((${expiryTimestamp} - ${currentDateTimestamp}))
 
-    if [ ${expiryDifference} -lt 259200 ];
+    if [ "${1}" = "force" ]
     then
-        echo "Current certificate expires within 3 days." >> "${pathLog}"
-
         generate
     else
-        echo "Certificate exists and is valid." >> "${pathLog}"
+        if [ ${expiryDifference} -lt 259200 ];
+        then
+            echo "Current certificate expires within 3 days." >> "${pathLog}"
+
+            generate
+        else
+            echo "Certificate exists and is valid." >> "${pathLog}"
+        fi
     fi
 else
     echo "Certificate does not exist." >> "${pathLog}"

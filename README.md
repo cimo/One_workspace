@@ -54,6 +54,14 @@ NVIDIA GeForce RTX 3060 - (Host GPU available)
 
 2. Follow the "Installation" instructions.
 
+## Command
+
+1. To force certificate regeneration write on terminal:
+
+    ```
+    bash script/tls.sh "force"
+    ```
+
 ## Python - Jupyter lab
 
 1. Write on the browser url:
