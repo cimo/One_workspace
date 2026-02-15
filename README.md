@@ -4,9 +4,7 @@ Docker container to have, in one place, a complete set of development tools that
 
 Depend on "Ms_cronjob" (use "ms_cronjob-volume" to share the certificate).
 
-It's possible to use an internal certificate instead of "Ms_cronjob", in this case, change the variable in "local.env" file as follows: CERTIFICATE_LABEL='ow_'.
-
-It's possible to use a custom certificate instead of "Ms_cronjob" and internal, just add it to the "certificate" folder before build the container.
+It's possible to use a custom certificate instead of "Ms_cronjob", just add it to the "certificate" folder before build the container.
 
 ## Info:
 
@@ -57,14 +55,6 @@ NVIDIA GeForce RTX 3060 - (Host GPU available)
     - .pki
 
 2. Follow the "Installation" instructions.
-
-## Command
-
-1. To force the internal certificate regeneration write on terminal:
-
-    ```
-    bash script/tls.sh "local" "force"
-    ```
 
 ## Python - Jupyter lab
 

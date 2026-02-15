@@ -22,8 +22,6 @@ docker run --rm \
 -v $(pwd)/certificate/:/home/target/ \
 alpine sh -c "cp -r /home/source/* /home/target/"
 
-bash "./script/tls.sh" "${parameter1}" "-"
-
 echo "Execute container."
 
 if [ "${parameter2}" = "build-up" ]

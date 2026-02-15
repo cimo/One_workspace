@@ -5,7 +5,6 @@ ARG _DOMAIN
 ARG _TIME_ZONE
 ARG _LANG
 ARG _PATH_ROOT
-ARG _CERTIFICATE_LABEL
 ARG _APACHE_SERVER_PORT
 
 ENV ENV_NAME=${_ENV_NAME}
@@ -13,7 +12,6 @@ ENV DOMAIN=${_DOMAIN}
 ENV TZ=${_TIME_ZONE}
 ENV LANG=${_LANG}
 ENV PATH_ROOT=${_PATH_ROOT}
-ENV CERTIFICATE_LABEL=${_CERTIFICATE_LABEL}
 ENV APACHE_SERVER_PORT=${_APACHE_SERVER_PORT}
 
 ENV DEBIAN_FRONTEND=noninteractive
@@ -40,7 +38,7 @@ RUN cd ~ \
     && ln -sf /usr/share/zoneinfo/${TZ} /etc/localtime && echo ${TZ} > /etc/timezone \
     && echo "application/typescript ts" >> /etc/mime.types \
     # Httpd
-    && envsubst '${PATH_ROOT},${CERTIFICATE_LABEL},${APACHE_SERVER_PORT}' < /usr/local/apache2/conf/httpd.conf.template > /usr/local/apache2/conf/httpd.conf \
+    && envsubst '${PATH_ROOT},${APACHE_SERVER_PORT}' < /usr/local/apache2/conf/httpd.conf.template > /usr/local/apache2/conf/httpd.conf \
     # Clean
     && apt-get remove --purge -y sudo \
     && rm -rf /var/lib/apt/lists/* \

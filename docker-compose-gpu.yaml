@@ -12,7 +12,6 @@ services:
         _TIME_ZONE: ${TIME_ZONE}
         _LANG: ${LANG}
         _PATH_ROOT: ${PATH_ROOT}
-        _CERTIFICATE_LABEL: ${CERTIFICATE_LABEL}
         _NODEJS_SERVER_PORT: ${NODEJS_SERVER_PORT}
         _NODEJS_SERVER_PORT_RANGE: ${NODEJS_SERVER_PORT_RANGE}
     ports:
@@ -46,7 +45,6 @@ services:
         _TIME_ZONE: ${TIME_ZONE}
         _LANG: ${LANG}
         _PATH_ROOT: ${PATH_ROOT}
-        _CERTIFICATE_LABEL: ${CERTIFICATE_LABEL}
         _PYTHON_JUPYTER_PORT: ${PYTHON_JUPYTER_PORT}
     ports:
       - 127.0.0.1:${PYTHON_JUPYTER_PORT}:${PYTHON_JUPYTER_PORT}
@@ -80,7 +78,6 @@ services:
         _TIME_ZONE: ${TIME_ZONE}
         _LANG: ${LANG}
         _PATH_ROOT: ${PATH_ROOT}
-        _CERTIFICATE_LABEL: ${CERTIFICATE_LABEL}
         _APACHE_SERVER_PORT: ${APACHE_SERVER_PORT}
     ports:
       - 127.0.0.1:443:${APACHE_SERVER_PORT}
