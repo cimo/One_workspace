@@ -1,4 +1,4 @@
-FROM python:3.12.8
+FROM ubuntu:26.04
 
 ARG _ENV_NAME
 ARG _DOMAIN
@@ -17,7 +17,7 @@ ENV PYTHON_JUPYTER_PORT=${_PYTHON_JUPYTER_PORT}
 ENV DEBIAN_FRONTEND=noninteractive
 ENV DEBCONF_NOWARNINGS=yes
 ENV SUDO_FORCE_REMOVE=yes
-ENV PATH="${PATH}:${PATH_ROOT}.local/bin/:/root/.local/bin/"
+ENV PATH="${PATH_ROOT}.local/bin/:${PATH}"
 ENV PYTHONPATH="${PATH_ROOT}"
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -36,19 +36,19 @@ ENV NVIDIA_VISIBLE_DEVICES=all
 ENV NVIDIA_DRIVER_CAPABILITIES=all
 
 COPY ./certificate/ /usr/local/share/ca-certificates/
-COPY ./docker/NotoSansJP-Regular.ttf /usr/share/fonts/truetype/noto/
-COPY ./docker/NotoSansSymbols2-Regular.ttf /usr/share/fonts/truetype/noto/
-COPY ./docker/NotoColorEmoji-Regular.ttf /usr/share/fonts/truetype/noto/
-COPY ./docker/font.local.conf /etc/fonts/local.conf
+COPY ./docker/font/ /usr/share/fonts/truetype/noto/
+COPY ./docker/font.conf /etc/fonts/local.conf
 
 RUN cd ~ \
     # No root
-    && useradd -U pyuser -d ${PATH_ROOT} -s /bin/bash \
+    && userdel -r ubuntu \
+    && groupadd -g 1000 pyuser \
+    && useradd -m -u 1000 -g 1000 -d ${PATH_ROOT} -s /bin/bash pyuser \
     && uid="$(id -u pyuser)" \
-    && mkdir -p ${PATH_ROOT} "/run/user/${uid}" \
-    && chown -R pyuser:pyuser ${PATH_ROOT} "/run/user/${uid}" \
+    && mkdir -p ${PATH_ROOT} /run/user/${uid} \
+    && chown -R pyuser:pyuser ${PATH_ROOT} /run/user/${uid} \
     && chmod -R 775 ${PATH_ROOT} \
-    && chmod -R 700 "/run/user/${uid}" \
+    && chmod -R 700 /run/user/${uid} \
     # Update
     && VERSION_CODENAME=$(grep VERSION_CODENAME= /etc/os-release | cut -d= -f2) \
     && chmod -R 0644 /usr/local/share/ca-certificates/ \
@@ -56,21 +56,39 @@ RUN cd ~ \
     && update-ca-certificates \
     && ln -sf /usr/share/zoneinfo/${TZ} /etc/localtime && echo ${TZ} > /etc/timezone \
     && echo "application/typescript ts" >> /etc/mime.types \
+    # Python
+    && apt-get update && apt-get install -y \
+    python3-pip \
     # Wslg
+    && groupadd -g 110 render || true \
+    && groupadd -g 44 video || true \
+    && usermod -aG 110 pyuser \
+    && usermod -aG 44 pyuser \
     && apt-get update && apt-get install -y \
     libglib2.0-0 \
     libgtk-3-0 \
     libcairo2 \
+    libatk-bridge2.0-0 \
+    libatspi2.0-0 \
+    libxkbcommon0 \
     libfontconfig1 \
     libfreetype6 \
     libnss3 \
     libnspr4 \
     libasound2 \
-    libgbm1 \
+    libgl1 \
+    libglx-mesa0 \
+    libgl1-mesa-dri \
     libegl1 \
     libegl1-mesa \
-    libgl1-mesa-dri \
+    libgbm1 \
+    mesa-va-drivers \
+    mesa-utils-extra \
     libdrm2 \
+    libxdamage1 \
+    libxfixes3 \
+    libxcomposite1 \
+    libxrandr2 \
     libwayland-client0 \
     libwayland-egl1 \
     libwayland-cursor0 \
@@ -88,16 +106,16 @@ USER pyuser
 WORKDIR ${PATH_ROOT}
 
 CMD \
-    # Pip
-    python3 -m pip install pip --upgrade \
-    && python3 -m pip install --user --trusted-host pypi.python.org --trusted-host files.pythonhosted.org --trusted-host pypi.org -r ${PATH_ROOT}docker/python_requirements.txt \
     # Command
-    && command -v nvidia-smi > /dev/null && nvidia-smi --query-gpu=name --format=csv,noheader || echo "Host without nvidia GPU support." \
+    command -v nvidia-smi > /dev/null && nvidia-smi --query-gpu=name --format=csv,noheader || echo "Host without nvidia GPU support." \
     # Dbus
     && bash ${PATH_ROOT}script/dbus.sh \
     # Engine package
     && bash ${PATH_ROOT}script/engine_package.sh \
+    # Pip
+    && python3 -m pip install pip --upgrade \
+    && python3 -m pip install --user --trusted-host pypi.python.org --trusted-host files.pythonhosted.org --trusted-host pypi.org -r ${PATH_ROOT}docker/python_requirements.txt \
     # Jupyter lab
-    && jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --NotebookApp.token='' --NotebookApp.password=''
+    && jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --NotebookApp.token="" --NotebookApp.password=""
 
 EXPOSE ${PYTHON_JUPYTER_PORT}

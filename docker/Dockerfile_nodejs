@@ -1,4 +1,4 @@
-FROM node:22.12.0
+FROM ubuntu:26.04
 
 ARG _ENV_NAME
 ARG _DOMAIN
@@ -22,6 +22,9 @@ ENV DEBCONF_NOWARNINGS=yes
 ENV SUDO_FORCE_REMOVE=yes
 ENV NODE_OPTIONS=--use-openssl-ca
 ENV NODE_EXTRA_CA_CERTS="${_PATH_CERTIFICATE_PEM}"
+ENV PATH="${PATH_ROOT}.cargo/bin/:${PATH}"
+ENV RUST_BACKTRACE=1
+ENV XWIN_CACHE_DIR="/home/xwin_cache/"
 ENV WAYLAND_DISPLAY=wayland-0
 ENV XDG_SESSION_TYPE=wayland
 ENV XDG_RUNTIME_DIR="/mnt/wslg/runtime-dir/"
@@ -34,23 +37,21 @@ ENV DBUS_SESSION_BUS_ADDRESS="unix:path=${XDG_RUNTIME_DIR}bus"
 ENV PULSE_SERVER="unix:/mnt/wslg/PulseServer"
 ENV NVIDIA_VISIBLE_DEVICES=all
 ENV NVIDIA_DRIVER_CAPABILITIES=all
-ENV PATH="${PATH}:/home/node/.cargo/bin/"
-ENV RUST_BACKTRACE=1
-ENV XWIN_CACHE_DIR="/home/node/xwin_cache/"
 
 COPY ./certificate/ /usr/local/share/ca-certificates/
-COPY ./docker/NotoSansJP-Regular.ttf /usr/share/fonts/truetype/noto/
-COPY ./docker/NotoSansSymbols2-Regular.ttf /usr/share/fonts/truetype/noto/
-COPY ./docker/NotoColorEmoji-Regular.ttf /usr/share/fonts/truetype/noto/
-COPY ./docker/font.local.conf /etc/fonts/local.conf
+COPY ./docker/font/ /usr/share/fonts/truetype/noto/
+COPY ./docker/font.conf /etc/fonts/local.conf
 
 RUN cd ~ \
     # No root
+    && userdel -r ubuntu \
+    && groupadd -g 1000 node \
+    && useradd -m -u 1000 -g 1000 -d ${PATH_ROOT} -s /bin/bash node \
     && uid="$(id -u node)" \
-    && mkdir -p ${PATH_ROOT} "/run/user/${uid}" \
-    && chown -R node:node ${PATH_ROOT} "/run/user/${uid}" \
+    && mkdir -p ${PATH_ROOT} /run/user/${uid} \
+    && chown -R node:node ${PATH_ROOT} /run/user/${uid} \
     && chmod -R 775 ${PATH_ROOT} \
-    && chmod -R 700 "/run/user/${uid}" \
+    && chmod -R 700 /run/user/${uid} \
     # Update
     && VERSION_CODENAME=$(grep VERSION_CODENAME= /etc/os-release | cut -d= -f2) \
     && chmod -R 0644 /usr/local/share/ca-certificates/ \
@@ -58,39 +59,62 @@ RUN cd ~ \
     && update-ca-certificates \
     && ln -sf /usr/share/zoneinfo/${TZ} /etc/localtime && echo ${TZ} > /etc/timezone \
     && echo "application/typescript ts" >> /etc/mime.types \
+    # NodeJs
+    && curl -fsSL https://deb.nodesource.com/setup_23.x | bash - \
+    && apt-get update && apt-get install -y \
+    nodejs \
     # Wslg
+    && groupadd -g 110 render || true \
+    && groupadd -g 44 video || true \
+    && usermod -aG 110 node \
+    && usermod -aG 44 node \
     && apt-get update && apt-get install -y \
     libglib2.0-0 \
     libgtk-3-0 \
     libcairo2 \
+    libatk-bridge2.0-0 \
+    libatspi2.0-0 \
+    libxkbcommon0 \
     libfontconfig1 \
     libfreetype6 \
     libnss3 \
     libnspr4 \
-    libasound2 \
-    libgbm1 \
-    libegl1 \
-    libegl1-mesa \
+    libasound2t64 \
+    libgl1 \
+    libglx-mesa0 \
     libgl1-mesa-dri \
+    libegl1 \
+    libegl1-mesa-dev \
+    libegl-dev \
+    libglvnd-dev \
+    libgbm1 \
+    mesa-va-drivers \
+    mesa-utils-extra \
     libdrm2 \
+    libxdamage1 \
+    libxfixes3 \
+    libxcomposite1 \
+    libxrandr2 \
     libwayland-client0 \
     libwayland-egl1 \
     libwayland-cursor0 \
     libgomp1 \
     xdg-utils \
+    # Rust
+    && apt-get update && apt-get install -y \
+    lld \
+    llvm \
+    clang \
+    libssl-dev \
     # Tauri
     && apt-get update && apt-get install -y \
     libwebkit2gtk-4.1-dev \
     libxdo-dev \
-    libssl-dev \
     libayatana-appindicator3-dev \
     librsvg2-dev \
-    nsis \
-    lld \
-    llvm \
-    clang \
     libpipewire-0.3-dev \
     libgbm-dev \
+    nsis \
     # Clean
     && apt-get remove --purge -y sudo \
     && rm -rf /var/lib/apt/lists/* \
@@ -100,13 +124,6 @@ RUN cd ~ \
 
 USER node
 
-RUN \
-    # Rust
-    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y \
-    && rustup target add x86_64-unknown-linux-gnu \
-    && rustup target add x86_64-pc-windows-msvc \
-    && cargo install --locked cargo-xwin
-
 WORKDIR ${PATH_ROOT}
 
 CMD \
@@ -115,9 +132,7 @@ CMD \
     # Dbus
     && bash ${PATH_ROOT}script/dbus.sh \
     # Rust
-    && rustc --version \
-    && cargo --version \
-    && cargo xwin --version \
+    && bash ${PATH_ROOT}script/rust.sh \
     # Keep running
     && tail -f /dev/null
 

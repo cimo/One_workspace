@@ -45,14 +45,17 @@ NVIDIA GeForce RTX 3060 - (Host GPU available)
 1. Remove this from the root:
 
     - .cache
+    - .cargo
     - .config
     - .cuda
     - .ipython
     - .jupyter
     - .local
+    - .rustup
     - .npm
     - .nv
     - .pki
+    - .profile
 
 2. Follow the "Installation" instructions.
 

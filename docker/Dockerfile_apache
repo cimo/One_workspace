@@ -19,17 +19,20 @@ ENV DEBCONF_NOWARNINGS=yes
 ENV SUDO_FORCE_REMOVE=yes
 
 COPY ./certificate/ /usr/local/share/ca-certificates/
-COPY ./docker/NotoSansJP-Regular.ttf /usr/share/fonts/truetype/noto/
-COPY ./docker/NotoSansSymbols2-Regular.ttf /usr/share/fonts/truetype/noto/
-COPY ./docker/NotoColorEmoji-Regular.ttf /usr/share/fonts/truetype/noto/
-COPY ./docker/font.local.conf /etc/fonts/local.conf
+COPY ./docker/font/ /usr/share/fonts/truetype/noto/
+COPY ./docker/font.conf /etc/fonts/local.conf
 COPY ./docker/apache_httpd.conf /usr/local/apache2/conf/httpd.conf.template
 
 RUN cd ~ \
     # No root
-    && mkdir -p ${PATH_ROOT} /usr/local/apache2/ /usr/local/apache2/conf/ /usr/local/apache2/htdocs/ \
-    && chown -R www-data:www-data ${PATH_ROOT} /usr/local/apache2/ /usr/local/apache2/conf/ /usr/local/apache2/htdocs/ \
+    && userdel -r ubuntu \
+    && groupadd -g 1000 www-data \
+    && useradd -m -u 1000 -g 1000 -d ${PATH_ROOT} -s /bin/bash www-data \
+    && uid="$(id -u www-data)" \
+    && mkdir -p ${PATH_ROOT} /run/user/${uid} /usr/local/apache2/ /usr/local/apache2/conf/ /usr/local/apache2/htdocs/ \
+    && chown -R www-data:www-data ${PATH_ROOT} /run/user/${uid} /usr/local/apache2/ /usr/local/apache2/conf/ /usr/local/apache2/htdocs/ \
     && chmod -R 775 ${PATH_ROOT} /usr/local/apache2/ /usr/local/apache2/conf/ /usr/local/apache2/htdocs/ \
+    && chmod -R 700 /run/user/${uid} \
     # Update
     && VERSION_CODENAME=$(grep VERSION_CODENAME= /etc/os-release | cut -d= -f2) \
     && chmod -R 0644 /usr/local/share/ca-certificates/ \

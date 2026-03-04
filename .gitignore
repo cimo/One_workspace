@@ -22,11 +22,13 @@ pnpm-debug.log*
 
 # cimo +
 .cache
+.cargo
 .config
 .cuda
 .ipython
 .jupyter
 .local
+.rustup
 .npm
 .nv
 .pki
@@ -38,3 +40,4 @@ log/*
 project/*
 !project/git.sh
 !project/.gitkeep
+.profile

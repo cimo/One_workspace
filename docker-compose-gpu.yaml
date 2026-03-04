@@ -28,6 +28,7 @@ services:
       - /mnt/wslg:/mnt/wslg
     devices:
       - /dev/dri:/dev/dri
+      - /dev/dxg:/dev/dxg
     deploy:
       resources:
         reservations:
@@ -59,6 +60,7 @@ services:
       - /mnt/wslg:/mnt/wslg
     devices:
       - /dev/dri:/dev/dri
+      - /dev/dxg:/dev/dxg
     deploy:
       resources:
         reservations:
