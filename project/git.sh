@@ -19,6 +19,10 @@ do
 
     cd "${directory}" || continue
 
+    mkdir -p .vscode
+    touch .vscode/git_source_control
+    rm -f .vscode/git_source_control
+
     if sudo -u ${username} git rev-parse --verify main >/dev/null 2>&1
     then
       sudo -u ${username} git checkout main

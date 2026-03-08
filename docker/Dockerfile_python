@@ -1,4 +1,4 @@
-FROM ubuntu:26.04
+FROM ubuntu:24.04
 
 ARG _ENV_NAME
 ARG _DOMAIN
@@ -17,7 +17,7 @@ ENV PYTHON_JUPYTER_PORT=${_PYTHON_JUPYTER_PORT}
 ENV DEBIAN_FRONTEND=noninteractive
 ENV DEBCONF_NOWARNINGS=yes
 ENV SUDO_FORCE_REMOVE=yes
-ENV PATH="${PATH_ROOT}.local/bin/:${PATH}"
+ENV PATH="${PATH_ROOT}venv/bin:${PATH_ROOT}.local/bin/:${PATH}"
 ENV PYTHONPATH="${PATH_ROOT}"
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -60,40 +60,42 @@ RUN cd ~ \
     && apt-get update && apt-get install -y \
     python3-pip \
     # Wslg
-    && groupadd -g 110 render || true \
-    && groupadd -g 44 video || true \
-    && usermod -aG 110 pyuser \
-    && usermod -aG 44 pyuser \
-    && apt-get update && apt-get install -y \
-    libglib2.0-0 \
-    libgtk-3-0 \
-    libcairo2 \
-    libatk-bridge2.0-0 \
-    libatspi2.0-0 \
-    libxkbcommon0 \
-    libfontconfig1 \
-    libfreetype6 \
-    libnss3 \
-    libnspr4 \
-    libasound2 \
-    libgl1 \
-    libglx-mesa0 \
-    libgl1-mesa-dri \
-    libegl1 \
-    libegl1-mesa \
-    libgbm1 \
-    mesa-va-drivers \
-    mesa-utils-extra \
-    libdrm2 \
-    libxdamage1 \
-    libxfixes3 \
-    libxcomposite1 \
-    libxrandr2 \
-    libwayland-client0 \
-    libwayland-egl1 \
-    libwayland-cursor0 \
-    libgomp1 \
-    xdg-utils \
+    #&& groupadd -g 110 render || true \
+    #&& groupadd -g 44 video || true \
+    #&& usermod -aG 110 pyuser \
+    #&& usermod -aG 44 pyuser \
+    #&& apt-get update && apt-get install -y \
+    #libglib2.0-0 \
+    #libgtk-3-0 \
+    #libcairo2 \
+    #libatk-bridge2.0-0 \
+    #libatspi2.0-0 \
+    #libxkbcommon0 \
+    #libfontconfig1 \
+    #libfreetype6 \
+    #libnss3 \
+    #libnspr4 \
+    #libasound2t64 \
+    #libgl1 \
+    #libglx-mesa0 \
+    #libgl1-mesa-dri \
+    #libegl1 \
+    #libegl1-mesa-dev \
+    #libegl-dev \
+    #libglvnd-dev \
+    #libgbm1 \
+    #mesa-va-drivers \
+    #mesa-utils-extra \
+    #libdrm2 \
+    #libxdamage1 \
+    #libxfixes3 \
+    #libxcomposite1 \
+    #libxrandr2 \
+    #libwayland-client0 \
+    #libwayland-egl1 \
+    #libwayland-cursor0 \
+    #libgomp1 \
+    #xdg-utils \
     # Clean
     && apt-get remove --purge -y sudo \
     && rm -rf /var/lib/apt/lists/* \
@@ -106,16 +108,15 @@ USER pyuser
 WORKDIR ${PATH_ROOT}
 
 CMD \
-    # Command
-    command -v nvidia-smi > /dev/null && nvidia-smi --query-gpu=name --format=csv,noheader || echo "Host without nvidia GPU support." \
+    # Gpu
+    bash ${PATH_ROOT}script/gpu.sh \
     # Dbus
     && bash ${PATH_ROOT}script/dbus.sh \
     # Engine package
     && bash ${PATH_ROOT}script/engine_package.sh \
     # Pip
-    && python3 -m pip install pip --upgrade \
-    && python3 -m pip install --user --trusted-host pypi.python.org --trusted-host files.pythonhosted.org --trusted-host pypi.org -r ${PATH_ROOT}docker/python_requirements.txt \
+    && bash ${PATH_ROOT}script/pip.sh \
     # Jupyter lab
-    && jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --NotebookApp.token="" --NotebookApp.password=""
+    && bash ${PATH_ROOT}script/jupyter_lab.sh
 
 EXPOSE ${PYTHON_JUPYTER_PORT}

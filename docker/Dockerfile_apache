@@ -25,9 +25,6 @@ COPY ./docker/apache_httpd.conf /usr/local/apache2/conf/httpd.conf.template
 
 RUN cd ~ \
     # No root
-    && userdel -r ubuntu \
-    && groupadd -g 1000 www-data \
-    && useradd -m -u 1000 -g 1000 -d ${PATH_ROOT} -s /bin/bash www-data \
     && uid="$(id -u www-data)" \
     && mkdir -p ${PATH_ROOT} /run/user/${uid} /usr/local/apache2/ /usr/local/apache2/conf/ /usr/local/apache2/htdocs/ \
     && chown -R www-data:www-data ${PATH_ROOT} /run/user/${uid} /usr/local/apache2/ /usr/local/apache2/conf/ /usr/local/apache2/htdocs/ \
@@ -55,9 +52,7 @@ WORKDIR ${PATH_ROOT}
 
 CMD \
     # Httpd
-    apachectl start \
-    && apachectl configtest \
-    && apachectl status \
+    bash ${PATH_ROOT}script/httpd.sh \
     # Keep running
     && tail -f /dev/null
 

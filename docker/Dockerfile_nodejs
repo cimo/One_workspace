@@ -1,4 +1,4 @@
-FROM ubuntu:26.04
+FROM ubuntu:24.04
 
 ARG _ENV_NAME
 ARG _DOMAIN
@@ -127,8 +127,8 @@ USER node
 WORKDIR ${PATH_ROOT}
 
 CMD \
-    # Command
-    command -v nvidia-smi > /dev/null && nvidia-smi --query-gpu=name --format=csv,noheader || echo "Host without nvidia GPU support." \
+    # Gpu
+    bash ${PATH_ROOT}script/gpu.sh \
     # Dbus
     && bash ${PATH_ROOT}script/dbus.sh \
     # Rust
