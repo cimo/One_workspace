@@ -29,6 +29,7 @@ services:
     devices:
       - /dev/dri:/dev/dri
       - /dev/dxg:/dev/dxg
+      - /usr/lib/wsl/lib:/usr/lib/wsl/lib
     deploy:
       resources:
         reservations:
