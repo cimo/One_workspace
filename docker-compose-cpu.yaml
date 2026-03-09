@@ -3,6 +3,7 @@ services:
     container_name: cimo-ow-nodejs-cpu
     env_file:
       - ./env/local.env
+    shm_size: "2gb"
     build:
       context: ./
       dockerfile: ./docker/Dockerfile_nodejs
@@ -30,6 +31,7 @@ services:
     container_name: cimo-ow-python-cpu
     env_file:
       - ./env/local.env
+    shm_size: "2gb"
     build:
       context: ./
       dockerfile: ./docker/Dockerfile_python
@@ -56,6 +58,7 @@ services:
     container_name: cimo-ow-apache
     env_file:
       - ./env/local.env
+    shm_size: "2gb"
     build:
       context: ./
       dockerfile: ./docker/Dockerfile_apache
