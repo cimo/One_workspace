@@ -30,6 +30,7 @@ pnpm-debug.log*
 .local
 .rustup
 .npm
+.npmrc
 .nv
 .pki
 certificate/**/*
