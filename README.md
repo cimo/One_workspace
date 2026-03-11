@@ -51,11 +51,11 @@ NVIDIA GeForce RTX 3060 - (Host GPU available)
     - .ipython
     - .jupyter
     - .local
-    - .rustup
     - .npm
     - .nv
     - .pki
     - .profile
+    - .rustup
 
 2. Follow the "Installation" instructions.
 
