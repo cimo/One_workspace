@@ -3,6 +3,7 @@
     "l13Diff.exclude": [
         ".git",
         ".cache",
+        ".cargo",
         ".config",
         ".cuda",
         ".ipython",
@@ -11,6 +12,8 @@
         ".npm",
         ".nv",
         ".pki",
+        ".profile",
+        ".rustup",
         "log",
         "project"
     ],
