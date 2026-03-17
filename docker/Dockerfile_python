@@ -17,6 +17,7 @@ ENV PYTHON_JUPYTER_PORT=${_PYTHON_JUPYTER_PORT}
 ENV DEBIAN_FRONTEND=noninteractive
 ENV DEBCONF_NOWARNINGS=yes
 ENV SUDO_FORCE_REMOVE=yes
+ENV HISTFILE="/home/pyuser/.bash_history"
 ENV PATH="${PATH_ROOT}.local/bin/:${PATH}"
 ENV PYTHONPATH="${PATH_ROOT}"
 ENV PYTHONUNBUFFERED=1
@@ -45,9 +46,9 @@ RUN cd ~ \
     && groupadd -g 1000 pyuser \
     && useradd -m -u 1000 -g 1000 -d ${PATH_ROOT} -s /bin/bash pyuser \
     && uid="$(id -u pyuser)" \
-    && mkdir -p ${PATH_ROOT} /run/user/${uid} \
-    && chown -R pyuser:pyuser ${PATH_ROOT} /run/user/${uid} \
-    && chmod -R 775 ${PATH_ROOT} \
+    && mkdir -p ${PATH_ROOT} /home/pyuser/ /run/user/${uid} \
+    && chown -R pyuser:pyuser ${PATH_ROOT} /home/pyuser/ /run/user/${uid} \
+    && chmod -R 775 ${PATH_ROOT} /home/pyuser/ \
     && chmod -R 700 /run/user/${uid} \
     # Update
     && VERSION_CODENAME=$(grep VERSION_CODENAME= /etc/os-release | cut -d= -f2) \

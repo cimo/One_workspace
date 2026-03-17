@@ -17,6 +17,7 @@ ENV APACHE_SERVER_PORT=${_APACHE_SERVER_PORT}
 ENV DEBIAN_FRONTEND=noninteractive
 ENV DEBCONF_NOWARNINGS=yes
 ENV SUDO_FORCE_REMOVE=yes
+ENV HISTFILE="/home/www-data/.bash_history"
 
 COPY ./certificate/ /usr/local/share/ca-certificates/
 COPY ./docker/font/ /usr/share/fonts/truetype/noto/
@@ -26,9 +27,9 @@ COPY ./docker/apache_httpd.conf /usr/local/apache2/conf/httpd.conf.template
 RUN cd ~ \
     # No root
     && uid="$(id -u www-data)" \
-    && mkdir -p ${PATH_ROOT} /run/user/${uid} /usr/local/apache2/ /usr/local/apache2/conf/ /usr/local/apache2/htdocs/ \
-    && chown -R www-data:www-data ${PATH_ROOT} /run/user/${uid} /usr/local/apache2/ /usr/local/apache2/conf/ /usr/local/apache2/htdocs/ \
-    && chmod -R 775 ${PATH_ROOT} /usr/local/apache2/ /usr/local/apache2/conf/ /usr/local/apache2/htdocs/ \
+    && mkdir -p ${PATH_ROOT} /home/www-data/ /run/user/${uid} /usr/local/apache2/ /usr/local/apache2/conf/ /usr/local/apache2/htdocs/ \
+    && chown -R www-data:www-data ${PATH_ROOT} /home/www-data/ /run/user/${uid} /usr/local/apache2/ /usr/local/apache2/conf/ /usr/local/apache2/htdocs/ \
+    && chmod -R 775 ${PATH_ROOT} /home/www-data/ /usr/local/apache2/ /usr/local/apache2/conf/ /usr/local/apache2/htdocs/ \
     && chmod -R 700 /run/user/${uid} \
     # Update
     && VERSION_CODENAME=$(grep VERSION_CODENAME= /etc/os-release | cut -d= -f2) \
