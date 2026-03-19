@@ -37,6 +37,7 @@ pnpm-debug.log*
 certificate/**/*
 !certificate/**/
 !certificate/**/.gitkeep
+env/*.secret.*
 log/*
 !log/.gitkeep
 project/*

@@ -1,5 +1,4 @@
 #!/bin/bash
 
-apachectl start
 apachectl configtest
-apachectl status
+exec apachectl -DFOREGROUND

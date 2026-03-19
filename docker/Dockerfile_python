@@ -48,8 +48,7 @@ RUN cd ~ \
     && uid="$(id -u pyuser)" \
     && mkdir -p ${PATH_ROOT} /home/pyuser/ /run/user/${uid} \
     && chown -R pyuser:pyuser ${PATH_ROOT} /home/pyuser/ /run/user/${uid} \
-    && chmod -R 775 ${PATH_ROOT} /home/pyuser/ \
-    && chmod -R 700 /run/user/${uid} \
+    && chmod -R 775 ${PATH_ROOT} /home/pyuser/ /run/user/${uid} \
     # Update
     && VERSION_CODENAME=$(grep VERSION_CODENAME= /etc/os-release | cut -d= -f2) \
     && chmod -R 0644 /usr/local/share/ca-certificates/ \

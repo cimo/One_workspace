@@ -1,4 +1,4 @@
-FROM httpd:2.4.62
+FROM ubuntu:24.04
 
 ARG _ENV_NAME
 ARG _DOMAIN
@@ -22,24 +22,33 @@ ENV HISTFILE="/home/www-data/.bash_history"
 COPY ./certificate/ /usr/local/share/ca-certificates/
 COPY ./docker/font/ /usr/share/fonts/truetype/noto/
 COPY ./docker/font.conf /etc/fonts/local.conf
-COPY ./docker/apache_httpd.conf /usr/local/apache2/conf/httpd.conf.template
+COPY ./docker/apache_vh.conf /etc/apache2/conf-available/vh.conf.template
 
 RUN cd ~ \
     # No root
+    && userdel -r ubuntu && userdel -r www-data \
+    && groupadd -g 1000 www-data \
+    && useradd -m -u 1000 -g 1000 -d ${PATH_ROOT} -s /bin/bash www-data \
     && uid="$(id -u www-data)" \
-    && mkdir -p ${PATH_ROOT} /home/www-data/ /run/user/${uid} /usr/local/apache2/ /usr/local/apache2/conf/ /usr/local/apache2/htdocs/ \
-    && chown -R www-data:www-data ${PATH_ROOT} /home/www-data/ /run/user/${uid} /usr/local/apache2/ /usr/local/apache2/conf/ /usr/local/apache2/htdocs/ \
-    && chmod -R 775 ${PATH_ROOT} /home/www-data/ /usr/local/apache2/ /usr/local/apache2/conf/ /usr/local/apache2/htdocs/ \
-    && chmod -R 700 /run/user/${uid} \
+    && mkdir -p ${PATH_ROOT} /home/www-data/ /run/user/${uid} \
+    && chown -R www-data:www-data ${PATH_ROOT} /home/www-data/ /run/user/${uid} \
+    && chmod -R 775 ${PATH_ROOT} /home/www-data/ /run/user/${uid} \
     # Update
     && VERSION_CODENAME=$(grep VERSION_CODENAME= /etc/os-release | cut -d= -f2) \
     && chmod -R 0644 /usr/local/share/ca-certificates/ \
-    && apt-get update && apt-get install -y ca-certificates tzdata curl media-types jq gettext-base lynx \
+    && apt-get update && apt-get install -y ca-certificates tzdata curl media-types jq \
     && update-ca-certificates \
     && ln -sf /usr/share/zoneinfo/${TZ} /etc/localtime && echo ${TZ} > /etc/timezone \
     && echo "application/typescript ts" >> /etc/mime.types \
-    # Httpd
-    && envsubst '${PATH_ROOT},${APACHE_SERVER_PORT}' < /usr/local/apache2/conf/httpd.conf.template > /usr/local/apache2/conf/httpd.conf \
+    # Apache
+    && apt-get update && apt-get install -y \
+    apache2 apache2-utils gettext-base lynx \
+    && envsubst '${PATH_ROOT},${APACHE_SERVER_PORT}' < /etc/apache2/conf-available/vh.conf.template > /etc/apache2/conf-available/vh.conf \
+    && a2enmod mpm_event rewrite ssl status socache_shmcb dir authz_core \
+    && a2enconf vh \
+    && mkdir -p /etc/apache2/ /run/apache2/ /var/run/apache2/ /var/lib/apache2/ /var/log/apache2/ \
+    && chown -R www-data:www-data /etc/apache2/ /run/apache2/ /var/run/apache2/ /var/lib/apache2/ /var/log/apache2/ \
+    && chmod -R 775 /etc/apache2/ /run/apache2/ /var/run/apache2/ /var/lib/apache2/ /var/log/apache2/ \
     # Clean
     && apt-get remove --purge -y sudo \
     && rm -rf /var/lib/apt/lists/* \
@@ -52,8 +61,8 @@ USER www-data
 WORKDIR ${PATH_ROOT}
 
 CMD \
-    # Httpd
-    bash ${PATH_ROOT}script/httpd.sh \
+    # Apache
+    bash ${PATH_ROOT}script/apache.sh \
     # Keep running
     && tail -f /dev/null
 

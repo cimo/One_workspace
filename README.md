@@ -14,6 +14,10 @@ It's possible to use a custom certificate instead of "Ms_cronjob", just add it t
 -   Python (with jupyter lab, torch, torchvision, torchaudio)
 -   Apache
 
+## Secret env
+
+1. Create "local.secret.env" file in "env" folder and add there only the secret variable.
+
 ## Installation
 
 1. For build and up with GPU write on terminal:
