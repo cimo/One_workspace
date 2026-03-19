@@ -3,6 +3,7 @@ services:
     container_name: cimo-ow-nodejs-cpu
     env_file:
       - ./env/local.env
+      - ./env/local.secret.env
     environment:
       LIBGL_ALWAYS_SOFTWARE: "1"
       GALLIUM_DRIVER: "llvmpipe"
@@ -36,6 +37,7 @@ services:
     container_name: cimo-ow-python-cpu
     env_file:
       - ./env/local.env
+      - ./env/local.secret.env
     environment:
       LIBGL_ALWAYS_SOFTWARE: "1"
       GALLIUM_DRIVER: "llvmpipe"
@@ -68,6 +70,7 @@ services:
     container_name: cimo-ow-apache
     env_file:
       - ./env/local.env
+      - ./env/local.secret.env
     environment:
       LIBGL_ALWAYS_SOFTWARE: "1"
       GALLIUM_DRIVER: "llvmpipe"

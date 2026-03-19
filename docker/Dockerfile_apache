@@ -32,7 +32,8 @@ RUN cd ~ \
     && uid="$(id -u www-data)" \
     && mkdir -p ${PATH_ROOT} /home/www-data/ /run/user/${uid} \
     && chown -R www-data:www-data ${PATH_ROOT} /home/www-data/ /run/user/${uid} \
-    && chmod -R 775 ${PATH_ROOT} /home/www-data/ /run/user/${uid} \
+    && chmod -R 775 ${PATH_ROOT} /home/www-data/ \
+    && chmod -R 700 /run/user/${uid} \
     # Update
     && VERSION_CODENAME=$(grep VERSION_CODENAME= /etc/os-release | cut -d= -f2) \
     && chmod -R 0644 /usr/local/share/ca-certificates/ \

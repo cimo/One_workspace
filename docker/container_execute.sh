@@ -28,28 +28,28 @@ if [ "${parameter2}" = "build-up" ]
 then
     if [ "${parameter3}" = "cpu" ]
     then
-        docker compose -f docker-compose-cpu.yaml --env-file ./env/${parameter1}.env build cimo_ow_nodejs_cpu --no-cache &&
-        docker compose -f docker-compose-cpu.yaml --env-file ./env/${parameter1}.env up cimo_ow_nodejs_cpu --detach --pull always &&
-        docker compose -f docker-compose-cpu.yaml --env-file ./env/${parameter1}.env build cimo_ow_python_cpu --no-cache &&
-        docker compose -f docker-compose-cpu.yaml --env-file ./env/${parameter1}.env up cimo_ow_python_cpu --detach --pull always
-        docker compose -f docker-compose-cpu.yaml --env-file ./env/${parameter1}.env build cimo_ow_apache --no-cache &&
-        docker compose -f docker-compose-cpu.yaml --env-file ./env/${parameter1}.env up cimo_ow_apache --detach --pull always
+        docker compose -f docker-compose-cpu.yaml --env-file ./env/${parameter1}.env --env-file ./env/${parameter1}.secret.env build cimo_ow_nodejs_cpu --no-cache &&
+        docker compose -f docker-compose-cpu.yaml --env-file ./env/${parameter1}.env --env-file ./env/${parameter1}.secret.env up cimo_ow_nodejs_cpu --detach --pull always &&
+        docker compose -f docker-compose-cpu.yaml --env-file ./env/${parameter1}.env --env-file ./env/${parameter1}.secret.env build cimo_ow_python_cpu --no-cache &&
+        docker compose -f docker-compose-cpu.yaml --env-file ./env/${parameter1}.env --env-file ./env/${parameter1}.secret.env up cimo_ow_python_cpu --detach --pull always
+        docker compose -f docker-compose-cpu.yaml --env-file ./env/${parameter1}.env --env-file ./env/${parameter1}.secret.env build cimo_ow_apache --no-cache &&
+        docker compose -f docker-compose-cpu.yaml --env-file ./env/${parameter1}.env --env-file ./env/${parameter1}.secret.env up cimo_ow_apache --detach --pull always
     elif [ "${parameter3}" = "gpu" ]
     then
-        docker compose -f docker-compose-gpu.yaml --env-file ./env/${parameter1}.env build cimo_ow_nodejs_gpu --no-cache &&
-        docker compose -f docker-compose-gpu.yaml --env-file ./env/${parameter1}.env up cimo_ow_nodejs_gpu --detach --pull always &&
-        docker compose -f docker-compose-gpu.yaml --env-file ./env/${parameter1}.env build cimo_ow_python_gpu --no-cache &&
-        docker compose -f docker-compose-gpu.yaml --env-file ./env/${parameter1}.env up cimo_ow_python_gpu --detach --pull always
-        docker compose -f docker-compose-gpu.yaml --env-file ./env/${parameter1}.env build cimo_ow_apache --no-cache &&
-        docker compose -f docker-compose-gpu.yaml --env-file ./env/${parameter1}.env up cimo_ow_apache --detach --pull always
+        docker compose -f docker-compose-gpu.yaml --env-file ./env/${parameter1}.env --env-file ./env/${parameter1}.secret.env build cimo_ow_nodejs_gpu --no-cache &&
+        docker compose -f docker-compose-gpu.yaml --env-file ./env/${parameter1}.env --env-file ./env/${parameter1}.secret.env up cimo_ow_nodejs_gpu --detach --pull always &&
+        docker compose -f docker-compose-gpu.yaml --env-file ./env/${parameter1}.env --env-file ./env/${parameter1}.secret.env build cimo_ow_python_gpu --no-cache &&
+        docker compose -f docker-compose-gpu.yaml --env-file ./env/${parameter1}.env --env-file ./env/${parameter1}.secret.env up cimo_ow_python_gpu --detach --pull always
+        docker compose -f docker-compose-gpu.yaml --env-file ./env/${parameter1}.env --env-file ./env/${parameter1}.secret.env build cimo_ow_apache --no-cache &&
+        docker compose -f docker-compose-gpu.yaml --env-file ./env/${parameter1}.env --env-file ./env/${parameter1}.secret.env up cimo_ow_apache --detach --pull always
     fi
 elif [ "${parameter2}" = "up" ]
 then
     if [ "${parameter3}" = "cpu" ]
     then
-        docker compose -f docker-compose-cpu.yaml --env-file ./env/${parameter1}.env up --detach --pull always
+        docker compose -f docker-compose-cpu.yaml --env-file ./env/${parameter1}.env --env-file ./env/${parameter1}.secret.env up --detach --pull always
     elif [ "${parameter3}" = "gpu" ]
     then
-        docker compose -f docker-compose-gpu.yaml --env-file ./env/${parameter1}.env up --detach --pull always
+        docker compose -f docker-compose-gpu.yaml --env-file ./env/${parameter1}.env --env-file ./env/${parameter1}.secret.env up --detach --pull always
     fi
 fi
