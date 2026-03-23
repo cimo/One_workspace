@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -euo pipefail
+
 projectRoot="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 username=$(stat -c "%U" "${projectRoot}")
