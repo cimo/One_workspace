@@ -63,8 +63,8 @@ RUN cd ~ \
     # Wslg
     && groupadd -g 110 render || true \
     && groupadd -g 44 video || true \
-    && usermod -aG 110 pyuser \
-    && usermod -aG 44 pyuser \
+    && usermod -aG 110 node \
+    && usermod -aG 44 node \
     && apt-get update && apt-get install -y \
     libglib2.0-0 \
     libgtk-3-0 \
@@ -96,6 +96,7 @@ RUN cd ~ \
     libwayland-egl1 \
     libwayland-cursor0 \
     libgomp1 \
+    libatomic1 \
     xdg-utils \
     # Clean
     && apt-get remove --purge -y sudo \
