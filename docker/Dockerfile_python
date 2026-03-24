@@ -51,6 +51,9 @@ RUN cd ~ \
     && chmod -R 775 ${PATH_ROOT} /home/pyuser/ \
     && chmod -R 700 /run/user/${uid} \
     # Update
+    && echo 'Acquire::Retries "3";' > /etc/apt/apt.conf.d/80-retries \
+    && echo 'Acquire::http::No-Cache "true";' > /etc/apt/apt.conf.d/99no-cache \
+    && echo 'Acquire::https::No-Cache "true";' >> /etc/apt/apt.conf.d/99no-cache \
     && VERSION_CODENAME=$(grep VERSION_CODENAME= /etc/os-release | cut -d= -f2) \
     && chmod -R 0644 /usr/local/share/ca-certificates/ \
     && apt-get update && apt-get install -y ca-certificates tzdata curl media-types jq \
@@ -63,8 +66,8 @@ RUN cd ~ \
     # Wslg
     && groupadd -g 110 render || true \
     && groupadd -g 44 video || true \
-    && usermod -aG 110 node \
-    && usermod -aG 44 node \
+    && usermod -aG 110 pyuser \
+    && usermod -aG 44 pyuser \
     && apt-get update && apt-get install -y \
     libglib2.0-0 \
     libgtk-3-0 \
