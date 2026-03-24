@@ -27,11 +27,11 @@ then
 
     rm -rf "node_modules/" "package-lock.json"
 
-    npm install
+    npm install --no-audit
 else
     echo -e "\nFile 'package.lock.json' not found, install the package.\n"
 
-    npm install
+    npm install --no-audit
 fi
 
 auditJson="$(mktemp)"
@@ -51,7 +51,7 @@ const data = JSON.parse(fs.readFileSync(file, "utf8"));
 
 const metadata = data.metadata || {};
 const vulnarability = metadata.vulnerabilities || {};
-const totalDependency = metadata.totalDependencies ?? "n/d";
+const totalDependency = metadata.dependencies.total ?? "n/d";
 
 console.log("\nSummary:");
 console.log(`Total dependency: ${totalDependency}`);
