@@ -23,9 +23,27 @@ do
 
     if sudo -u ${username} git rev-parse --verify main >/dev/null 2>&1
     then
+      statusIcon="✅"
+
+      statusRepo="$(sudo -u "${username}" git status --porcelain)"
+
+      if [ -n "${statusRepo}" ]
+      then
+        statusIcon="⚠️ "
+      fi
+
       sudo -u ${username} git checkout main
       sudo -u ${username} git fetch --all
-      sudo -u ${username} git pull
+      
+      if pullOutput="$(sudo -u "${username}" git pull 2>&1)"
+      then
+        echo "${pullOutput}" | sed "s/^Already up to date\.$/${statusIcon} Already up to date./"
+      else
+        echo "${pullOutput}"
+
+        exit 1
+      fi
+
     else
       echo "Repository 'main' not found."
     fi
