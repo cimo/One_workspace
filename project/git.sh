@@ -45,7 +45,7 @@ do
       fi
 
     else
-      echo "Repository 'main' not found."
+      echo -e "\n🚨Repository 'main' not found."
     fi
 
     cd "${projectRoot}"
