@@ -40,13 +40,13 @@ RUN cd ~ \
     && echo 'Acquire::https::No-Cache "true";' >> /etc/apt/apt.conf.d/99no-cache \
     && VERSION_CODENAME=$(grep VERSION_CODENAME= /etc/os-release | cut -d= -f2) \
     && chmod -R 0644 /usr/local/share/ca-certificates/ \
-    && apt-get update && apt-get install -y ca-certificates tzdata curl media-types jq \
+    && apt-get update && apt-get install -y ca-certificates tzdata curl media-types jq gettext-base lynx \
     && update-ca-certificates \
     && ln -sf /usr/share/zoneinfo/${TZ} /etc/localtime && echo ${TZ} > /etc/timezone \
     && echo "application/typescript ts" >> /etc/mime.types \
     # Apache
     && apt-get update && apt-get install -y \
-    apache2 apache2-utils gettext-base lynx \
+    apache2 apache2-utils \
     && envsubst '${PATH_ROOT},${APACHE_SERVER_PORT}' < /etc/apache2/conf-available/vh.conf.template > /etc/apache2/conf-available/vh.conf \
     && a2enmod mpm_event rewrite ssl status socache_shmcb dir authz_core \
     && a2enconf vh \
@@ -64,10 +64,6 @@ USER www-data
 
 WORKDIR ${PATH_ROOT}
 
-CMD \
-    # Apache
-    bash ${PATH_ROOT}script/apache.sh \
-    # Keep running
-    && tail -f /dev/null
+CMD ["sh", "-c", "bash ${PATH_ROOT}script/apache.sh && tail -f /dev/null"]
 
 EXPOSE ${APACHE_SERVER_PORT}

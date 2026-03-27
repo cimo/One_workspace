@@ -62,7 +62,7 @@ RUN cd ~ \
     && echo 'Acquire::https::No-Cache "true";' >> /etc/apt/apt.conf.d/99no-cache \
     && VERSION_CODENAME=$(grep VERSION_CODENAME= /etc/os-release | cut -d= -f2) \
     && chmod -R 0644 /usr/local/share/ca-certificates/ \
-    && apt-get update && apt-get install -y ca-certificates tzdata curl media-types jq \
+    && apt-get update && apt-get install -y ca-certificates tzdata curl media-types jq gettext-base lynx \
     && update-ca-certificates \
     && ln -sf /usr/share/zoneinfo/${TZ} /etc/localtime && echo ${TZ} > /etc/timezone \
     && echo "application/typescript ts" >> /etc/mime.types \
@@ -134,14 +134,6 @@ USER node
 
 WORKDIR ${PATH_ROOT}
 
-CMD \
-    # Gpu
-    bash ${PATH_ROOT}script/gpu.sh \
-    # Dbus
-    && bash ${PATH_ROOT}script/dbus.sh \
-    # Rust
-    && bash ${PATH_ROOT}script/rust.sh \
-    # Keep running
-    && tail -f /dev/null
+CMD ["sh", "-c", "bash ${PATH_ROOT}script/gpu.sh && bash ${PATH_ROOT}script/dbus.sh && bash ${PATH_ROOT}script/rust.sh && tail -f /dev/null"]
 
 EXPOSE ${NODEJS_SERVER_PORT} ${NODEJS_SERVER_PORT_RANGE}
