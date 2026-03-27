@@ -19,12 +19,12 @@ do
 
     echo -e "\n- Execute git on ${folderName^^}"
 
+    statusIcon="✅"
+
     cd "${directory}" || continue
 
     if sudo -u ${username} git rev-parse --verify main >/dev/null 2>&1
     then
-      statusIcon="✅"
-
       statusRepo="$(sudo -u "${username}" git status --porcelain)"
 
       if [ -n "${statusRepo}" ]
@@ -43,9 +43,10 @@ do
 
         exit 1
       fi
-
     else
-      echo -e "\n🚨Repository 'main' not found."
+      statusIcon="🚨"
+
+      echo -e "\n${statusIcon} Repository 'main' not found."
     fi
 
     cd "${projectRoot}"
