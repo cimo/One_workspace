@@ -18,7 +18,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 ENV DEBCONF_NOWARNINGS=yes
 ENV SUDO_FORCE_REMOVE=yes
 ENV HISTFILE="/home/pyuser/.bash_history"
-ENV PATH="${PATH_ROOT}.local/bin/:${PATH}"
+ENV PATH="${PATH_ROOT}.venv/bin/:${PATH_ROOT}.local/bin/:${PATH}"
 ENV PYTHONPATH="${PATH_ROOT}"
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -62,6 +62,7 @@ RUN cd ~ \
     && echo "application/typescript ts" >> /etc/mime.types \
     # Python
     && apt-get update && apt-get install -y \
+    python3-venv \
     python3-pip \
     # Wslg
     && groupadd -g 110 render || true \
@@ -113,6 +114,6 @@ USER pyuser
 
 WORKDIR ${PATH_ROOT}
 
-CMD ["sh", "-c", "bash ${PATH_ROOT}script/gpu.sh && bash ${PATH_ROOT}script/dbus.sh && bash ${PATH_ROOT}script/engine_package.sh && bash ${PATH_ROOT}script/pip.sh && bash ${PATH_ROOT}script/jupyter_lab.sh"]
+CMD ["sh", "-c", "bash ${PATH_ROOT}script/gpu.sh && bash ${PATH_ROOT}script/dbus.sh && bash ${PATH_ROOT}script/pip.sh && bash ${PATH_ROOT}script/engine_package.sh && bash ${PATH_ROOT}script/jupyter_lab.sh"]
 
 EXPOSE ${PYTHON_JUPYTER_PORT}

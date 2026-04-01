@@ -57,6 +57,7 @@ NVIDIA GeForce RTX 3060 - (Host GPU available)
     - .pki
     - .profile
     - .rustup
+    - .venv
 
 2. Follow the "Installation" instructions.
 
