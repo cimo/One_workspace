@@ -5,15 +5,18 @@ projectRoot="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 username=$(stat -c "%U" "${projectRoot}")
 
 sudo -u ${username} git config --global credential.helper cache
-sudo -u ${username} git config --global --unset-all safe.directory
 
 for directory in "${projectRoot}"/*/
 do
   if [ -d "${directory}.git" ]
   then
     folderName="$(basename "${directory}")"
+    safeDirectory="$(sudo -u ${username} git config --global --get-all safe.directory 2>/dev/null)"
 
-    sudo -u ${username} git config --global --add safe.directory "${directory}"
+    if ! echo "${safeDirectory}" | grep -Fxq "${directory}"
+    then
+      sudo -u ${username} git config --global --add safe.directory "${directory}"
+    fi
 
     echo -e "\n- Execute git on ${folderName^^}"
 
