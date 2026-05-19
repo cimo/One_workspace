@@ -38,7 +38,6 @@ bash docker/container_execute.sh "local" "up" "xxx"
 1. Delete this from the root:
     - .cache
     - .cargo
-    - .config
     - .cuda
     - .ipython
     - .jupyter

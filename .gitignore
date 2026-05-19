@@ -23,8 +23,9 @@ pnpm-debug.log*
 # cimo +
 .Identifier
 .cache
+.config/**
+!.config/.gitkeep
 .cargo
-.config
 .cuda
 .ipython
 .jupyter
