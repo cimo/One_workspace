@@ -40,8 +40,6 @@ certificate/**
 !certificate/.gitkeep
 !certificate/custom/.gitkeep
 !certificate/proxy/.gitkeep
-file/tmp/*
-!file/tmp/.gitkeep
 log/*
 !log/.gitkeep
 project/*
