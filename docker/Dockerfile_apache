@@ -22,7 +22,7 @@ ENV HISTFILE="/home/www-data/.bash_history"
 COPY ./certificate/ /usr/local/share/ca-certificates/
 COPY ./docker/font/ /usr/share/fonts/truetype/noto/
 COPY ./docker/font.conf /etc/fonts/local.conf
-COPY ./docker/apache_vh.conf /etc/apache2/conf-available/vh.conf.template
+COPY ./docker/apache_virtual_host.conf /etc/apache2/conf-available/virtual_host.conf.template
 
 RUN cd ~ \
     # No root
@@ -47,7 +47,7 @@ RUN cd ~ \
     # Apache
     && apt-get update && apt-get install -y \
     apache2 apache2-utils \
-    && envsubst '${PATH_ROOT},${APACHE_SERVER_PORT}' < /etc/apache2/conf-available/vh.conf.template > /etc/apache2/conf-available/vh.conf \
+    && envsubst '${PATH_ROOT},${APACHE_SERVER_PORT}' < /etc/apache2/conf-available/virtual_host.conf.template > /etc/apache2/conf-available/virtual_host.conf \
     && a2enmod mpm_event rewrite ssl status socache_shmcb dir authz_core \
     && a2enconf vh \
     && mkdir -p /etc/apache2/ /run/apache2/ /var/run/apache2/ /var/lib/apache2/ /var/log/apache2/ \
