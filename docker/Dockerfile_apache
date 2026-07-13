@@ -49,7 +49,7 @@ RUN cd ~ \
     apache2 apache2-utils \
     && envsubst '${PATH_ROOT},${APACHE_SERVER_PORT}' < /etc/apache2/conf-available/virtual_host.conf.template > /etc/apache2/conf-available/virtual_host.conf \
     && a2enmod mpm_event rewrite ssl status socache_shmcb dir authz_core \
-    && a2enconf vh \
+    && a2enconf virtual_host \
     && mkdir -p /etc/apache2/ /run/apache2/ /var/run/apache2/ /var/lib/apache2/ /var/log/apache2/ \
     && chown -R www-data:www-data /etc/apache2/ /run/apache2/ /var/run/apache2/ /var/lib/apache2/ /var/log/apache2/ \
     && chmod -R 775 /etc/apache2/ /run/apache2/ /var/run/apache2/ /var/lib/apache2/ /var/log/apache2/ \
