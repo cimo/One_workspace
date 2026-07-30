@@ -116,6 +116,7 @@ RUN cd ~ \
     && dpkg -i cuda-keyring_1.1-1_all.deb \
     && apt-get update && apt-get install -y \
     cuda-runtime-13-2 \
+    libcudnn9-cuda-13 \
     # Rust
     && apt-get update && apt-get install -y \
     lld \
