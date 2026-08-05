@@ -1,4 +1,4 @@
-FROM ubuntu:24.04
+FROM ubuntu:25.10
 
 ARG _ENV_NAME
 ARG _DOMAIN
@@ -53,6 +53,9 @@ RUN cd ~ \
     && mkdir -p /etc/apache2/ /run/apache2/ /var/run/apache2/ /var/lib/apache2/ /var/log/apache2/ \
     && chown -R www-data:www-data /etc/apache2/ /run/apache2/ /var/run/apache2/ /var/lib/apache2/ /var/log/apache2/ \
     && chmod -R 775 /etc/apache2/ /run/apache2/ /var/run/apache2/ /var/lib/apache2/ /var/log/apache2/ \
+    # Upgrade
+    && apt-get update \
+    && apt-get upgrade -y \
     # Clean
     && apt-get remove --purge -y sudo \
     && rm -rf /var/lib/apt/lists/* \

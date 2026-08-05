@@ -1,4 +1,4 @@
-FROM ubuntu:24.04
+FROM ubuntu:25.10
 
 ARG _ENV_NAME
 ARG _DOMAIN
@@ -112,6 +112,9 @@ RUN cd ~ \
     && apt-get update && apt-get install -y \
     cuda-libraries-13-2 \
     libcudnn9-cuda-13 \
+    # Upgrade
+    && apt-get update \
+    && apt-get upgrade -y \
     # Clean
     && apt-get remove --purge -y sudo \
     && rm -f cuda-keyring_1.1-1_all.deb \
