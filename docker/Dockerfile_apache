@@ -26,9 +26,10 @@ COPY ./docker/apache_virtual_host.conf /etc/apache2/conf-available/virtual_host.
 
 RUN cd ~ \
     # No root
-    && userdel -r ubuntu && userdel -r www-data \
+    && userdel ubuntu && userdel www-data \
+    && rm -rf /home/ubuntu/ && rm -rf /home/www-data/ \
     && groupadd -g 1000 www-data \
-    && useradd -m -u 1000 -g 1000 -d ${PATH_ROOT} -s /bin/bash www-data \
+    && useradd -M -u 1000 -g 1000 -d ${PATH_ROOT} -s /bin/bash www-data \
     && uid="$(id -u www-data)" \
     && mkdir -p ${PATH_ROOT} /home/www-data/ /run/user/${uid} \
     && chown -R www-data:www-data ${PATH_ROOT} /home/www-data/ /run/user/${uid} \
@@ -39,7 +40,8 @@ RUN cd ~ \
     && echo 'Acquire::http::No-Cache "true";' > /etc/apt/apt.conf.d/99no-cache \
     && echo 'Acquire::https::No-Cache "true";' >> /etc/apt/apt.conf.d/99no-cache \
     && VERSION_CODENAME=$(grep VERSION_CODENAME= /etc/os-release | cut -d= -f2) \
-    && chmod -R 0644 /usr/local/share/ca-certificates/ \
+    && find /usr/local/share/ca-certificates/ -type d -exec chmod 755 {} + \
+    && find /usr/local/share/ca-certificates/ -type f -exec chmod 644 {} + \
     && apt-get update && apt-get install -y ca-certificates tzdata curl media-types jq gettext-base \
     && update-ca-certificates \
     && ln -sf /usr/share/zoneinfo/${TZ} /etc/localtime && echo ${TZ} > /etc/timezone \
