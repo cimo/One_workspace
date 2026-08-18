@@ -17,10 +17,12 @@ parameter3="${p3}"
 
 echo -e "\nCopying from volume..."
 
+projectName="cimo"
+
 docker run --rm \
 -e HOST_UID="$(id -u)" \
 -e HOST_GID="$(id -g)" \
--v "cimo_${parameter1}_ms_cronjob-volume:/home/source/:ro" \
+-v "${projectName}_${parameter1}_ms_cronjob-volume:/home/source/:ro" \
 -v "$(pwd)/certificate/:/home/target/" \
 alpine sh -c 'cp -r "/home/source/"* "/home/target/" && chown -R "$HOST_UID:$HOST_GID" "/home/target/" && chmod -R u+rwX,go+rX "/home/target/"'
 
@@ -49,9 +51,21 @@ elif [ "${parameter2}" = "up" ]
 then
     if [ "${parameter3}" = "cpu" ]
     then
-        docker compose -f "docker-compose-cpu.yaml" --env-file "./env/${parameter1}.env" --env-file "./env/${parameter1}.secret.env" up --detach --pull always
+        docker compose -f "docker-compose-cpu.yaml" --env-file "./env/${parameter1}.env" --env-file "./env/${parameter1}.secret.env" up --detach --pull always --wait &&
+        docker compose -f "docker-compose-cpu.yaml" --env-file "./env/${parameter1}.env" --env-file "./env/${parameter1}.secret.env" exec -u root -T "${projectName}_ow_nodejs_cpu" sh -c 'cp -a "${PATH_ROOT}certificate/." "/usr/local/share/ca-certificates/"' &&
+        docker compose -f "docker-compose-cpu.yaml" --env-file "./env/${parameter1}.env" --env-file "./env/${parameter1}.secret.env" exec -u root -T "${projectName}_ow_nodejs_cpu" update-ca-certificates &&
+        docker compose -f "docker-compose-cpu.yaml" --env-file "./env/${parameter1}.env" --env-file "./env/${parameter1}.secret.env" exec -u root -T "${projectName}_ow_python_cpu" sh -c 'cp -a "${PATH_ROOT}certificate/." "/usr/local/share/ca-certificates/"' &&
+        docker compose -f "docker-compose-cpu.yaml" --env-file "./env/${parameter1}.env" --env-file "./env/${parameter1}.secret.env" exec -u root -T "${projectName}_ow_python_cpu" update-ca-certificates &&
+        docker compose -f "docker-compose-cpu.yaml" --env-file "./env/${parameter1}.env" --env-file "./env/${parameter1}.secret.env" exec -u root -T "${projectName}_ow_apache" sh -c 'cp -a "${PATH_ROOT}certificate/." "/usr/local/share/ca-certificates/"' &&
+        docker compose -f "docker-compose-cpu.yaml" --env-file "./env/${parameter1}.env" --env-file "./env/${parameter1}.secret.env" exec -u root -T "${projectName}_ow_apache" update-ca-certificates
     elif [ "${parameter3}" = "gpu" ]
     then
-        docker compose -f "docker-compose-gpu.yaml" --env-file "./env/${parameter1}.env" --env-file "./env/${parameter1}.secret.env" up --detach --pull always
+        docker compose -f "docker-compose-gpu.yaml" --env-file "./env/${parameter1}.env" --env-file "./env/${parameter1}.secret.env" up --detach --pull always --wait &&
+        docker compose -f "docker-compose-gpu.yaml" --env-file "./env/${parameter1}.env" --env-file "./env/${parameter1}.secret.env" exec -u root -T "${projectName}_ow_nodejs_gpu" sh -c 'cp -a "${PATH_ROOT}certificate/." "/usr/local/share/ca-certificates/"' &&
+        docker compose -f "docker-compose-gpu.yaml" --env-file "./env/${parameter1}.env" --env-file "./env/${parameter1}.secret.env" exec -u root -T "${projectName}_ow_nodejs_gpu" update-ca-certificates &&
+        docker compose -f "docker-compose-gpu.yaml" --env-file "./env/${parameter1}.env" --env-file "./env/${parameter1}.secret.env" exec -u root -T "${projectName}_ow_python_gpu" sh -c 'cp -a "${PATH_ROOT}certificate/." "/usr/local/share/ca-certificates/"' &&
+        docker compose -f "docker-compose-gpu.yaml" --env-file "./env/${parameter1}.env" --env-file "./env/${parameter1}.secret.env" exec -u root -T "${projectName}_ow_python_gpu" update-ca-certificates &&
+        docker compose -f "docker-compose-gpu.yaml" --env-file "./env/${parameter1}.env" --env-file "./env/${parameter1}.secret.env" exec -u root -T "${projectName}_ow_apache" sh -c 'cp -a "${PATH_ROOT}certificate/." "/usr/local/share/ca-certificates/"' &&
+        docker compose -f "docker-compose-gpu.yaml" --env-file "./env/${parameter1}.env" --env-file "./env/${parameter1}.secret.env" exec -u root -T "${projectName}_ow_apache" update-ca-certificates
     fi
 fi
