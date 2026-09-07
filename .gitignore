@@ -40,6 +40,8 @@ certificate/**
 !certificate/.gitkeep
 !certificate/custom/.gitkeep
 !certificate/proxy/.gitkeep
+file/test/Document-別表四.pdf
+file/test/Document-別表四_page1.pdf
 log/*
 !log/.gitkeep
 project/*

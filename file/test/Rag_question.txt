@@ -1,0 +1,89 @@
+EN
+
+What did Nikola Tesla invent?
+How did Tesla and Edison disagree about electricity?
+
+Where and when was Albert Einstein born?
+What was Einstein's role during World War II?
+
+What did Tesla and Einstein have in common as scientists?
+Compare Tesla's and Einstein's contributions to physics.
+Who was born first, Nikola or Albert?
+
+Who founded Toyota?
+How many vehicles did Toyota sell worldwide in 2024?
+
+What is the capital of Japan?
+What economic challenges does Japan face today?
+Tell me about Japan capital cities and their economies.
+
+How many inhabitants does Italy have?
+When was the Kingdom of Italy born?
+Which countries border Italy to the north?
+
+What "Data.xlsx" have in column B row 2?
+Which document talk about "Wireless"?
+
+How does photosynthesis work?
+What is the recipe for carbonara?
+Which document talk about "XXX".
+
+JA
+
+ニコラ・テスラは何を発明しましたか？
+テスラとエジソンは電気についてどのような点で対立していましたか？
+
+アルベルト・アインシュタインはどこで、いつ生まれましたか？
+アインシュタインは第二次世界大戦中にどのような役割を果たしましたか？
+
+テスラとアインシュタインには、科学者としてどのような共通点がありましたか？
+テスラとアインシュタインの物理学への貢献を比較してください。
+ニコラとアルベルトでは、どちらが先に生まれましたか？
+
+トヨタを創業したのは誰ですか？
+トヨタは2024年に世界で何台の車両を販売しましたか？
+
+日本の首都はどこですか？
+現在、日本はどのような経済的課題に直面していますか？
+日本の歴代の首都とそれぞれの経済について教えてください。
+
+イタリアの人口は何人ですか？
+イタリア王国はいつ成立しましたか？
+イタリアと北側で国境を接している国はどこですか？
+
+Data.xlsx のB列2行目には何がありますか？
+ワイヤレスについて書かれている文書はどれですか？
+
+光合成はどのように行われますか？
+カルボナーラのレシピを教えてください。
+XXXについて書かれているのはどの書類ですか？
+
+IT
+
+Che cosa ha inventato Nikola Tesla?
+In che cosa Tesla ed Edison erano in disaccordo riguardo all'elettricità?
+
+Dove e quando è nato Albert Einstein?
+Quale fu il ruolo di Einstein durante la Seconda guerra mondiale?
+
+Che cosa avevano in comune Tesla ed Einstein come scienziati?
+Confronta i contributi di Tesla ed Einstein alla fisica.
+Chi è nato per primo, Nikola o Albert?
+
+Chi ha fondato Toyota?
+Quanti veicoli ha venduto Toyota nel mondo nel 2024?
+
+Qual è la capitale del Giappone?
+Quali sfide economiche deve affrontare oggi il Giappone?
+Parlami delle capitali del Giappone e delle loro economie.
+
+Quanti abitanti ha l'Italia?
+Quando è nato il Regno d'Italia?
+Quali Paesi confinano con l'Italia a nord?
+
+Che cosa contiene la cella B2 del file Data.xlsx?
+Quale documento parla di "Wireless"?
+
+Come funziona la fotosintesi?
+Qual'è la ricetta della carbonara?
+Quale documento parla di "XXX".
