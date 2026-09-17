@@ -33,27 +33,34 @@ then
     if [ "${parameter3}" = "cpu" ]
     then
         docker compose -f "docker-compose-cpu.yaml" --env-file "./env/${parameter1}.env" --env-file "./env/${parameter1}.secret.env" build cimo_ow_nodejs_cpu --no-cache &&
-        docker compose -f "docker-compose-cpu.yaml" --env-file "./env/${parameter1}.env" --env-file "./env/${parameter1}.secret.env" up cimo_ow_nodejs_cpu --detach --pull always &&
+        docker compose -f "docker-compose-cpu.yaml" --env-file "./env/${parameter1}.env" --env-file "./env/${parameter1}.secret.env" up cimo_ow_nodejs_cpu --detach --pull always --force-recreate &&
         docker compose -f "docker-compose-cpu.yaml" --env-file "./env/${parameter1}.env" --env-file "./env/${parameter1}.secret.env" build cimo_ow_python_cpu --no-cache &&
-        docker compose -f "docker-compose-cpu.yaml" --env-file "./env/${parameter1}.env" --env-file "./env/${parameter1}.secret.env" up cimo_ow_python_cpu --detach --pull always &&
+        docker compose -f "docker-compose-cpu.yaml" --env-file "./env/${parameter1}.env" --env-file "./env/${parameter1}.secret.env" up cimo_ow_python_cpu --detach --pull always --force-recreate &&
         docker compose -f "docker-compose-cpu.yaml" --env-file "./env/${parameter1}.env" --env-file "./env/${parameter1}.secret.env" build cimo_ow_apache --no-cache &&
-        docker compose -f "docker-compose-cpu.yaml" --env-file "./env/${parameter1}.env" --env-file "./env/${parameter1}.secret.env" up cimo_ow_apache --detach --pull always
+        docker compose -f "docker-compose-cpu.yaml" --env-file "./env/${parameter1}.env" --env-file "./env/${parameter1}.secret.env" up cimo_ow_apache --detach --pull always --force-recreate
     elif [ "${parameter3}" = "gpu" ]
     then
         docker compose -f "docker-compose-gpu.yaml" --env-file "./env/${parameter1}.env" --env-file "./env/${parameter1}.secret.env" build cimo_ow_nodejs_gpu --no-cache &&
-        docker compose -f "docker-compose-gpu.yaml" --env-file "./env/${parameter1}.env" --env-file "./env/${parameter1}.secret.env" up cimo_ow_nodejs_gpu --detach --pull always &&
+        docker compose -f "docker-compose-gpu.yaml" --env-file "./env/${parameter1}.env" --env-file "./env/${parameter1}.secret.env" up cimo_ow_nodejs_gpu --detach --pull always --force-recreate &&
         docker compose -f "docker-compose-gpu.yaml" --env-file "./env/${parameter1}.env" --env-file "./env/${parameter1}.secret.env" build cimo_ow_python_gpu --no-cache &&
-        docker compose -f "docker-compose-gpu.yaml" --env-file "./env/${parameter1}.env" --env-file "./env/${parameter1}.secret.env" up cimo_ow_python_gpu --detach --pull always &&
+        docker compose -f "docker-compose-gpu.yaml" --env-file "./env/${parameter1}.env" --env-file "./env/${parameter1}.secret.env" up cimo_ow_python_gpu --detach --pull always --force-recreate &&
         docker compose -f "docker-compose-gpu.yaml" --env-file "./env/${parameter1}.env" --env-file "./env/${parameter1}.secret.env" build cimo_ow_apache --no-cache &&
-        docker compose -f "docker-compose-gpu.yaml" --env-file "./env/${parameter1}.env" --env-file "./env/${parameter1}.secret.env" up cimo_ow_apache --detach --pull always
+        docker compose -f "docker-compose-gpu.yaml" --env-file "./env/${parameter1}.env" --env-file "./env/${parameter1}.secret.env" up cimo_ow_apache --detach --pull always --force-recreate
     fi
 elif [ "${parameter2}" = "up" ]
 then
     if [ "${parameter3}" = "cpu" ]
     then
-        docker compose -f "docker-compose-cpu.yaml" --env-file "./env/${parameter1}.env" --env-file "./env/${parameter1}.secret.env" up --detach --pull always
+        docker compose -f "docker-compose-cpu.yaml" --env-file "./env/${parameter1}.env" --env-file "./env/${parameter1}.secret.env" up --detach --pull always --force-recreate
     elif [ "${parameter3}" = "gpu" ]
     then
-        docker compose -f "docker-compose-gpu.yaml" --env-file "./env/${parameter1}.env" --env-file "./env/${parameter1}.secret.env" up --detach --pull always
+        docker compose -f "docker-compose-gpu.yaml" --env-file "./env/${parameter1}.env" --env-file "./env/${parameter1}.secret.env" up --detach --pull always --force-recreate
     fi
+fi
+
+if [ "${parameter2}" = "build-up" ] || [ "${parameter2}" = "up" ]
+then
+    docker compose -f "docker-compose-${parameter3}.yaml" --env-file "./env/${parameter1}.env" --env-file "./env/${parameter1}.secret.env" exec -u root -T "${projectName}_ow_nodejs_${parameter3}" update-ca-certificates &&
+    docker compose -f "docker-compose-${parameter3}.yaml" --env-file "./env/${parameter1}.env" --env-file "./env/${parameter1}.secret.env" exec -u root -T "${projectName}_ow_python_${parameter3}" update-ca-certificates &&
+    docker compose -f "docker-compose-${parameter3}.yaml" --env-file "./env/${parameter1}.env" --env-file "./env/${parameter1}.secret.env" exec -u root -T "${projectName}_ow_apache" update-ca-certificates
 fi
