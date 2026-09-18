@@ -1,3 +1,5 @@
+# RAG
+
 EN
 
 What did Nikola Tesla invent?
@@ -87,3 +89,10 @@ Quale documento parla di "Wireless"?
 Come funziona la fotosintesi?
 Qual'è la ricetta della carbonara?
 Quale documento parla di "XXX".
+
+# Parser
+In 'Wikipedia - Japan.pdf' search the prefecture and create a list.
+In 'Wikipedia - Japan.pdf' when modern humans arrived in Japan?
+In 'en_1.jpg' how much is Grand total?
+In 'en_1.jpg' do the sum for each total present in the table and tell me the result.
+Do the sum of grand total in 'en_1.jpg' and total in 'en_2.jpg'.
