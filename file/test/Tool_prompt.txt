@@ -94,5 +94,6 @@ Quale documento parla di "XXX".
 In 'Wikipedia - Japan.pdf' search the prefecture and create a list.
 In 'Wikipedia - Japan.pdf' when modern humans arrived in Japan?
 In 'en_1.jpg' how much is Grand total?
-In 'en_1.jpg' do the sum for each total present in the table and tell me the result.
+In 'en_1.jpg' do the sum for each total column present in the table and tell me the result.
 Do the sum of grand total in 'en_1.jpg' and total in 'en_2.jpg'.
+In 'jp_2.jpg' do the sum for each 金額 column in the table and sum it with the 合計請求金額 in 'jp_1.jpg'.
